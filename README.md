@@ -2,6 +2,7 @@
 Visual Maths Interpreter
 
 - [ ] expressions
+	- [ ] simplify
 - [ ] polynomials
 - [ ] functions
 	- [ ] sin
@@ -26,3 +27,6 @@ Visual Maths Interpreter
 	- [ ] pi
 	- [ ] e
 	- [ ] i
+- [ ] calculus
+	- [ ] differentiation
+	- [ ] integration
