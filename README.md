@@ -23,6 +23,12 @@ Visual Maths Interpreter
 	- [ ] acsc
 	- [ ] asec
 	- [ ] acot
+	- [ ] csch
+	- [ ] sech
+	- [ ] coth
+	- [ ] acsch
+	- [ ] asech
+	- [ ] acoth
 - [ ] constants
 	- [ ] pi
 	- [ ] e
