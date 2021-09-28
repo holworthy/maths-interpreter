@@ -1,6 +1,6 @@
 package holworthy.maths.nodes;
 
-public class BinaryNode extends Node {
+public abstract class BinaryNode extends Node {
 	private Node left;
 	private Node right;
 

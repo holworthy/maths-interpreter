@@ -13,7 +13,6 @@ import holworthy.maths.nodes.Variable;
 
 public class Maths {
 	private Node parseValue(Parser parser) throws Exception {
-		System.out.println(parser.getChar());
 		if(parser.getChar() == '(') {
 			parser.incrementCursor();
 			Node expression = parseExpression(parser);
@@ -110,7 +109,9 @@ public class Maths {
 	}
 
 	public Maths() throws Exception {
-		System.out.println(parseInput("3*x^2+5*x+1"));
+		Node input = parseInput("2+3");
+		System.out.println(input);
+		System.out.println(input.simplify());
 	}
 
 	public static void main(String[] args) throws Exception {
