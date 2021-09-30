@@ -7,12 +7,10 @@ public class Divide extends BinaryNode {
 
 	@Override
 	public boolean matches(Node node) {
-		if(node instanceof Divide) {
+		if(node instanceof Divide)
 			return super.matches(node);
-		}
-		if(node instanceof Matching.Constant) {
-
-		}
+		if(node instanceof Matching.Constant)
+			return this.isConstant();
 		return super.matches(node);
 	}
 
@@ -25,6 +23,6 @@ public class Divide extends BinaryNode {
 
 	@Override
 	public String toString() {
-		return "(" + getLeft() + "/" + getRight() + ")";
+		return "(" + getLeft() + ")/(" + getRight() + ")";
 	}
 }

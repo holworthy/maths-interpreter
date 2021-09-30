@@ -6,13 +6,8 @@ public class Negative extends UnaryNode {
 	}
 
 	@Override
-	public boolean isConstant() {
-		return getNode().isConstant();
-	}
-
-	@Override
 	public String toString() {
-		return "(-" + getNode() + ")";
+		return "-" + getNode();
 	}
 
 	@Override

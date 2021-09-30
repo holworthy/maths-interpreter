@@ -1,5 +1,7 @@
 package holworthy.maths;
 
+import java.util.Scanner;
+
 import holworthy.maths.nodes.Add;
 import holworthy.maths.nodes.BinaryNode;
 import holworthy.maths.nodes.Brackets;
@@ -112,7 +114,8 @@ public class Maths {
 	}
 
 	public Maths() throws Exception {
-		Node input = parseInput("1*x^2+4*x+3=0");
+		Scanner scanner = new Scanner(System.in);
+		Node input = parseInput(scanner.nextLine());
 		System.out.println(input);
 		Node simplified = input.simplify();
 		System.out.println(simplified);

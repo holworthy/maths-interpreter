@@ -6,7 +6,7 @@ public class Brackets extends UnaryNode {
 	}
 
 	@Override
-	public boolean isConstant() {
-		return getNode().isConstant();
+	public String toString() {
+		return "(" + getNode() + ")";
 	}
 }
