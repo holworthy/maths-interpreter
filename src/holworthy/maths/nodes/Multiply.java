@@ -19,6 +19,6 @@ public class Multiply extends BinaryNode {
 			return new Number(((Number) left).getValue() * ((Number) right).getValue());
 		}
 
-		return super.simplify();
+		return new Multiply(left, right);
 	}
 }

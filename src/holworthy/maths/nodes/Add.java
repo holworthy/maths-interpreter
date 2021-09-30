@@ -19,6 +19,6 @@ public class Add extends BinaryNode {
 			return new Number(((Number) left).getValue() + ((Number) right).getValue());
 		}
 
-		return super.simplify();
+		return new Add(left, right);
 	}
 }

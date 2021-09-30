@@ -14,6 +14,11 @@ public class Subtract extends BinaryNode {
 			return new Number(((Number) left).getValue() - ((Number) right).getValue());
 		}
 
-		return super.simplify();
+		return new Subtract(left, right);
+	}
+
+	@Override
+	public String toString() {
+		return "(" + getLeft() + "-" + getRight() + ")";
 	}
 }

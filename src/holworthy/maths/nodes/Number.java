@@ -15,4 +15,16 @@ public class Number extends Node {
 	public String toString() {
 		return value + "";
 	}
+
+	@Override
+	public boolean matches(Node node) {
+		if(node instanceof Matching.Constant)
+			return isConstant();
+		return node instanceof Number && ((Number) node).getValue() == getValue();
+	}
+
+	@Override
+	public boolean isConstant() {
+		return true;
+	}
 }

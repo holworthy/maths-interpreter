@@ -1,13 +1,16 @@
 package holworthy.maths;
 
 import holworthy.maths.nodes.Add;
+import holworthy.maths.nodes.BinaryNode;
 import holworthy.maths.nodes.Brackets;
 import holworthy.maths.nodes.Divide;
 import holworthy.maths.nodes.Equation;
 import holworthy.maths.nodes.Multiply;
+import holworthy.maths.nodes.Negative;
 import holworthy.maths.nodes.Node;
 import holworthy.maths.nodes.Number;
 import holworthy.maths.nodes.Power;
+import holworthy.maths.nodes.Sqrt;
 import holworthy.maths.nodes.Subtract;
 import holworthy.maths.nodes.Variable;
 
@@ -109,9 +112,80 @@ public class Maths {
 	}
 
 	public Maths() throws Exception {
-		Node input = parseInput("2+3");
+		Node input = parseInput("1*x^2+4*x+3=0");
 		System.out.println(input);
-		System.out.println(input.simplify());
+		Node simplified = input.simplify();
+		System.out.println(simplified);
+		if(simplified instanceof Equation) {
+			Equation before = (Equation) simplified;
+			if(before.isQuadratic()) {
+				Equation after = new Equation(
+					new Variable("x"),
+					new Divide(
+						new Add(
+							new Negative(
+								((BinaryNode) ((BinaryNode) ((BinaryNode) before.getLeft()).getLeft()).getRight()).getLeft()
+							),
+							new Sqrt(
+								new Subtract(
+									new Power(
+										((BinaryNode) ((BinaryNode) ((BinaryNode) before.getLeft()).getLeft()).getRight()).getLeft(),
+										new Number(2)
+									),
+									new Multiply(
+										new Multiply(
+											new Number(4),
+											((BinaryNode) ((BinaryNode) ((BinaryNode) before.getLeft()).getLeft()).getLeft()).getLeft()
+										),
+										((BinaryNode) before.getLeft()).getRight()
+									)
+								)
+							)
+						),
+						new Multiply(
+							new Number(2),
+							((BinaryNode) ((BinaryNode) ((BinaryNode) before.getLeft()).getLeft()).getLeft()).getLeft()
+						)
+					)
+				);
+
+				System.out.println(after);
+				System.out.println(after.simplify());
+
+				after = new Equation(
+					new Variable("x"),
+					new Divide(
+						new Subtract(
+							new Negative(
+								((BinaryNode) ((BinaryNode) ((BinaryNode) before.getLeft()).getLeft()).getRight()).getLeft()
+							),
+							new Sqrt(
+								new Subtract(
+									new Power(
+										((BinaryNode) ((BinaryNode) ((BinaryNode) before.getLeft()).getLeft()).getRight()).getLeft(),
+										new Number(2)
+									),
+									new Multiply(
+										new Multiply(
+											new Number(4),
+											((BinaryNode) ((BinaryNode) ((BinaryNode) before.getLeft()).getLeft()).getLeft()).getLeft()
+										),
+										((BinaryNode) before.getLeft()).getRight()
+									)
+								)
+							)
+						),
+						new Multiply(
+							new Number(2),
+							((BinaryNode) ((BinaryNode) ((BinaryNode) before.getLeft()).getLeft()).getLeft()).getLeft()
+						)
+					)
+				);
+
+				System.out.println(after);
+				System.out.println(after.simplify());
+			}
+		}
 	}
 
 	public static void main(String[] args) throws Exception {

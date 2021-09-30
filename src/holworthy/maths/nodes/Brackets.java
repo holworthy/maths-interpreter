@@ -1,9 +1,12 @@
 package holworthy.maths.nodes;
 
-public class Brackets extends Node {
-	private Node node;
-
+public class Brackets extends UnaryNode {
 	public Brackets(Node node) {
-		this.node = node;
+		super(node);
+	}
+
+	@Override
+	public boolean isConstant() {
+		return getNode().isConstant();
 	}
 }
