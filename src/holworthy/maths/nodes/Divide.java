@@ -14,10 +14,28 @@ public class Divide extends BinaryNode {
 		return super.matches(node);
 	}
 
+	private int gcd(int a, int b) {
+		return b == 0 ? a : gcd(b, a % b);
+	}
+
 	@Override
 	public Node simplify() {
 		Node left = getLeft().simplify();
 		Node right = getRight().simplify();
+
+		// TODO: handle divide by 0
+
+		if(left instanceof Number && right instanceof Number) {
+			int a = ((Number) getLeft()).getValue();
+			int b = ((Number) getRight()).getValue();
+			int divisor = gcd(a, b);
+
+			if(a % b == 0)
+				return new Number(a / b);
+
+			return new Divide(new Number(a / divisor), new Number(b / divisor));
+		}
+
 		return new Divide(left, right);
 	}
 

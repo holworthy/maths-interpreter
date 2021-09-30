@@ -9,4 +9,9 @@ public class Brackets extends UnaryNode {
 	public String toString() {
 		return "(" + getNode() + ")";
 	}
+
+	@Override
+	public Node simplify() {
+		return getNode().simplify();
+	}
 }

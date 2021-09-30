@@ -46,11 +46,20 @@ public class Maths {
 		}
 	}
 
+	private Node parseNegative(Parser parser) throws Exception {
+		if(parser.hasMore() && parser.getChar() == '-') {
+			parser.incrementCursor();
+			Node node = parseNegative(parser);
+			return new Negative(node);
+		}
+		return parseValue(parser);
+	}
+
 	private Node parsePower(Parser parser) throws Exception {
-		Node left = parseValue(parser);
+		Node left = parseNegative(parser);
 		while(parser.hasMore() && parser.getChar() == '^') {
 			parser.incrementCursor();
-			Node right = parseValue(parser);
+			Node right = parseNegative(parser);
 			left = new Power(left, right);
 		}
 		return left;
@@ -116,9 +125,12 @@ public class Maths {
 	public Maths() throws Exception {
 		Scanner scanner = new Scanner(System.in);
 		Node input = parseInput(scanner.nextLine());
+		scanner.close();
+
 		System.out.println(input);
 		Node simplified = input.simplify();
 		System.out.println(simplified);
+		
 		if(simplified instanceof Equation) {
 			Equation before = (Equation) simplified;
 			if(before.isQuadratic()) {

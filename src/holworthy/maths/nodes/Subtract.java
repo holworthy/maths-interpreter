@@ -13,7 +13,7 @@ public class Subtract extends BinaryNode {
 		if(left instanceof Number && right instanceof Number)
 			return new Number(((Number) left).getValue() - ((Number) right).getValue());
 
-		return new Subtract(left, right);
+		return new Add(left, new Negative(right).simplify());
 	}
 
 	@Override
