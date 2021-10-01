@@ -11,7 +11,7 @@ public class Brackets extends UnaryNode {
 	}
 
 	@Override
-	public Node simplify() {
-		return getNode().simplify();
+	public Node expand() {
+		return getNode().expand();
 	}
 }
