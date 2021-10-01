@@ -4,7 +4,6 @@ import java.util.Scanner;
 
 import holworthy.maths.nodes.Add;
 import holworthy.maths.nodes.BinaryNode;
-import holworthy.maths.nodes.Brackets;
 import holworthy.maths.nodes.Divide;
 import holworthy.maths.nodes.Equation;
 import holworthy.maths.nodes.Multiply;
@@ -16,17 +15,16 @@ import holworthy.maths.nodes.Sqrt;
 import holworthy.maths.nodes.Subtract;
 import holworthy.maths.nodes.Variable;
 
-public class Maths {
-	private Node parseValue(Parser parser) throws Exception {
+public abstract class Maths {
+	private static Node parseValue(Parser parser) throws Exception {
 		if(parser.getChar() == '(') {
 			parser.incrementCursor();
 			Node expression = parseExpression(parser);
-			Node brackets = new Brackets(expression);
 			if(parser.getChar() != ')') {
 				throw new Exception("Need a closing bracket");
 			}
 			parser.incrementCursor();
-			return brackets;
+			return expression;
 		} else if(parser.getChar() >= 'a' && parser.getChar() <= 'z') {
 			int start = parser.getCursor();
 			while(parser.hasMore() && parser.getChar() >= 'a' && parser.getChar() <= 'z')
@@ -46,7 +44,7 @@ public class Maths {
 		}
 	}
 
-	private Node parseNegative(Parser parser) throws Exception {
+	private static Node parseNegative(Parser parser) throws Exception {
 		if(parser.hasMore() && parser.getChar() == '-') {
 			parser.incrementCursor();
 			Node node = parseNegative(parser);
@@ -55,7 +53,7 @@ public class Maths {
 		return parseValue(parser);
 	}
 
-	private Node parsePower(Parser parser) throws Exception {
+	private static Node parsePower(Parser parser) throws Exception {
 		Node left = parseNegative(parser);
 		while(parser.hasMore() && parser.getChar() == '^') {
 			parser.incrementCursor();
@@ -65,7 +63,7 @@ public class Maths {
 		return left;
 	}
 
-	private Node parseMultiplyOrDivide(Parser parser) throws Exception {
+	private static Node parseMultiplyOrDivide(Parser parser) throws Exception {
 		Node left = parsePower(parser);
 		while(true) {
 			if(parser.hasMore() && parser.getChar() == '*') {
@@ -83,7 +81,7 @@ public class Maths {
 		return left;
 	}
 
-	private Node parseAddOrSubtract(Parser parser) throws Exception {
+	private static Node parseAddOrSubtract(Parser parser) throws Exception {
 		Node left = parseMultiplyOrDivide(parser);
 		while(true) {
 			if(parser.hasMore() && parser.getChar() == '+') {
@@ -101,11 +99,11 @@ public class Maths {
 		return left;
 	}
 
-	private Node parseExpression(Parser parser) throws Exception {
+	private static Node parseExpression(Parser parser) throws Exception {
 		return parseAddOrSubtract(parser);
 	}
 	
-	private Node parseEquation(Parser parser) throws Exception {
+	private static Node parseEquation(Parser parser) throws Exception {
 		Node left = parseExpression(parser);
 		if(parser.hasMore() && parser.getChar() == '=') {
 			parser.incrementCursor();
@@ -115,26 +113,25 @@ public class Maths {
 		return left;
 	}
 
-	private Node parseInput(String input) throws Exception {
+	public static Node parseInput(String input) throws Exception {
 		Parser parser = new Parser(input);
 		Node equation = parseEquation(parser);
 		assert parser.getInput().length() == parser.getCursor();
 		return equation;
 	}
 
-	public Maths() throws Exception {
+	public static void main(String[] args) throws Exception {
 		Scanner scanner = new Scanner(System.in);
 
 		Node input = parseInput(scanner.nextLine());
-		Node expanded = input.expand();
-		Node collapsed = expanded.collapse();
-		Node simplified = input.simplify();
-
 		System.out.println(input);
+		Node expanded = input.expand();
 		System.out.println(expanded);
+		Node collapsed = expanded.collapse();
 		System.out.println(collapsed);
+		Node simplified = input.simplify();
 		System.out.println(simplified);
-		
+
 		if(simplified instanceof Equation) {
 			Equation before = (Equation) simplified;
 			if(before.isQuadratic()) {
@@ -207,9 +204,5 @@ public class Maths {
 		}
 
 		scanner.close();
-	}
-
-	public static void main(String[] args) throws Exception {
-		new Maths();
 	}
 }

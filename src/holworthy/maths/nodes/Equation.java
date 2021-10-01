@@ -35,9 +35,7 @@ public class Equation extends BinaryNode {
 	}
 
 	@Override
-	public Node simplify() {
-		Node left = getLeft().simplify();
-		Node right = getRight().simplify();
-		return new Equation(left, right);
+	public Node expand() {
+		return new Equation(getLeft().expand(), getRight().expand());
 	}
 }

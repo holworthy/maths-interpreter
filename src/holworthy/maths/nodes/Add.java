@@ -11,15 +11,24 @@ public class Add extends BinaryNode {
 	}
 
 	@Override
+	public Node normalise() {
+		Node left = getLeft().normalise();
+		Node right = getRight().normalise();
+
+		// make tree left leaning
+		if(right instanceof Add)
+			return new Add(new Add(left, ((Add) right).getLeft().collapse()).collapse(), ((Add) right).getRight().collapse());
+
+		return new Add(left, right);
+	}
+
+	@Override
 	public Node collapse() {
 		Node left = getLeft().collapse();
 		Node right = getRight().collapse();
 
 		if(left instanceof Number && right instanceof Number)
 			return new Number(((Number) left).getValue() + ((Number) right).getValue());
-
-		if(right instanceof Add)
-			return new Add(new Add(left, ((Add) right).getLeft().collapse()).collapse(), ((Add) right).getRight().collapse());
 
 		if(left instanceof Multiply && right instanceof Multiply && ((Multiply) left).getRight().matches(((Multiply) right).getRight()))
 			return new Multiply(new Add(((Multiply) left).getLeft(), ((Multiply) right).getLeft()).collapse(), ((Multiply) left).getRight());

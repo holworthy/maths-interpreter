@@ -11,9 +11,9 @@ public class Power extends BinaryNode {
 	}
 
 	@Override
-	public Node simplify() {
-		Node left = getLeft().simplify();
-		Node right = getRight().simplify();
+	public Node expand() {
+		Node left = getLeft().expand();
+		Node right = getRight().expand();
 
 		if(left instanceof Number && right instanceof Number)
 			return new Number((int) Math.pow(((Number) left).getValue(), ((Number) right).getValue()));

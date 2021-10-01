@@ -6,14 +6,13 @@ public class Subtract extends BinaryNode {
 	}
 
 	@Override
-	public Node simplify() {
-		Node left = getLeft().simplify();
-		Node right = getRight().simplify();
+	public Node normalise() {
+		return new Add(getLeft(), new Negative(getRight()));
+	}
 
-		if(left instanceof Number && right instanceof Number)
-			return new Number(((Number) left).getValue() - ((Number) right).getValue());
-
-		return new Add(left, new Negative(right).simplify());
+	@Override
+	public Node expand() {
+		return normalise();
 	}
 
 	@Override

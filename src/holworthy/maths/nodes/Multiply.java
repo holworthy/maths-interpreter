@@ -18,10 +18,7 @@ public class Multiply extends BinaryNode {
 		// move constants to left
 		if(right.matches(new Matching.Constant()) && !left.matches(new Matching.Constant()))
 			return new Multiply(right, left).normalise();
-
-		// organise variables
-		// if()
-
+		
 		// Make tree left leaning
 		if(right instanceof Multiply)
 			return new Multiply(new Multiply(left, ((Multiply) right).getLeft().normalise()).normalise(), ((Multiply) right).getRight());

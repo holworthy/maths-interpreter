@@ -19,9 +19,9 @@ public class Divide extends BinaryNode {
 	}
 
 	@Override
-	public Node simplify() {
-		Node left = getLeft().simplify();
-		Node right = getRight().simplify();
+	public Node expand() {
+		Node left = getLeft().expand();
+		Node right = getRight().expand();
 
 		// TODO: handle divide by 0
 

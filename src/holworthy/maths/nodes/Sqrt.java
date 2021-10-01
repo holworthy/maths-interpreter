@@ -16,8 +16,8 @@ public class Sqrt extends UnaryNode {
 	}
 
 	@Override
-	public Node simplify() {
-		Node node = getNode().simplify();
+	public Node expand() {
+		Node node = getNode().expand();
 		if(node instanceof Number && ((Number) node).getValue() == 0)
 			return new Number(0);
 		if(node instanceof Number && ((Number) node).getValue() == 1)
