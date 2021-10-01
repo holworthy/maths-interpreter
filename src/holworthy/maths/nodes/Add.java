@@ -24,6 +24,28 @@ public class Add extends BinaryNode {
 		if(left instanceof Multiply && right instanceof Multiply && ((Multiply) left).getRight().matches(((Multiply) right).getRight()))
 			return new Multiply(new Add(((Multiply) left).getLeft(), ((Multiply) right).getLeft()).simplify(), ((Multiply) left).getRight());
 
+		if(left instanceof Variable && right instanceof Variable && left.matches(right))
+			return new Multiply(new Number(2), left);
+
+		// if(left instanceof Multiply && right instanceof Multiply){
+		// 	if(((BinaryNode) left).getLeft() instanceof Number && ((BinaryNode) left).getRight() instanceof Variable && ((BinaryNode) right).getLeft() instanceof Number && ((BinaryNode) right).getRight() instanceof Variable && ((BinaryNode) left).getRight().matches(((BinaryNode) right).getRight())){
+		// 		Add a = new Add(((BinaryNode) left).getLeft(), ((BinaryNode) right).getLeft());
+		// 		return new Multiply(a.simplify(), ((BinaryNode) left).getRight());
+		// 	}
+		// 	if(left.getLeft() instanceof Number)
+		// }
+
+		if(left instanceof Multiply && right instanceof Multiply){
+			if(((BinaryNode) left).getRight().matches(((BinaryNode) right).getRight())){
+				Add a = new Add(((BinaryNode) left).getLeft(), ((BinaryNode) right).getLeft());
+				return new Multiply(a.simplify(), ((BinaryNode) right).getRight());
+			}
+			if(((BinaryNode) left).getLeft().matches(((BinaryNode) right).getLeft())){
+				Add a = new Add(((BinaryNode) left).getRight(), ((BinaryNode) right).getRight());
+				return new Multiply(a.simplify(), ((BinaryNode) right).getLeft());
+			}
+		}
+
 		return new Add(left, right);
 	}
 }
