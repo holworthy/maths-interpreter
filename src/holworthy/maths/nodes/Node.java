@@ -2,7 +2,7 @@ package holworthy.maths.nodes;
 
 public abstract class Node {
 	public Node simplify() {
-		return normalise().expand().collapse().normalise();
+		return normalise().expand().normalise().collapse().normalise();
 	}
 
 	public Node normalise() {

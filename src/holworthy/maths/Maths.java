@@ -124,11 +124,15 @@ public class Maths {
 
 	public Maths() throws Exception {
 		Scanner scanner = new Scanner(System.in);
+
 		Node input = parseInput(scanner.nextLine());
-		scanner.close();
+		Node expanded = input.expand();
+		Node collapsed = expanded.collapse();
+		Node simplified = input.simplify();
 
 		System.out.println(input);
-		Node simplified = input.simplify();
+		System.out.println(expanded);
+		System.out.println(collapsed);
 		System.out.println(simplified);
 		
 		if(simplified instanceof Equation) {
@@ -201,6 +205,8 @@ public class Maths {
 				System.out.println(after.simplify());
 			}
 		}
+
+		scanner.close();
 	}
 
 	public static void main(String[] args) throws Exception {
