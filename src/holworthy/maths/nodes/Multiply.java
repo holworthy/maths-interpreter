@@ -19,6 +19,17 @@ public class Multiply extends BinaryNode {
 		if(left instanceof Number && right instanceof Number)
 			return new Number(((Number) left).getValue() * ((Number) right).getValue());
 	
+		// x*x = x^2
+		if(left.matches(right))
+			return new Power(left, new Number(2));
+
+		// move constants to left
+		if(right.matches(new Matching.Constant()) && !left.matches(new Matching.Constant()))
+			return new Multiply(right, left).simplify();
+
+		// organise variables
+		// if()
+
 		// Make tree left leaning
 		if(right instanceof Multiply)
 			return new Multiply(new Multiply(left, ((Multiply) right).getLeft().simplify()).simplify(), ((Multiply) right).getRight());

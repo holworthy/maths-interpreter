@@ -7,7 +7,7 @@ public class Power extends BinaryNode {
 
 	@Override
 	public String toString() {
-		return getLeft() + "^" + getRight();
+		return (getLeft() instanceof Power ? getLeft() : "(" + getLeft() + ")") + "^" + (getRight() instanceof Power || getRight() instanceof Number || getRight() instanceof Variable ? getRight() : "(" + getRight() + ")");
 	}
 
 	@Override
