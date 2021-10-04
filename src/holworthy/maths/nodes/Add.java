@@ -22,6 +22,68 @@ public class Add extends BinaryNode {
 		return new Add(left, right);
 	}
 
+	private Variable getVariable(Node node) {
+		if(node instanceof Variable)
+			return (Variable) node;
+		if(node instanceof Power)
+			return (Variable) ((Power) node).getLeft();
+		if(node instanceof Multiply)
+			return getVariable(((Multiply) node).getLeft());
+		return null;
+	}
+
+	private int countVariables(Node node) {
+		if(node instanceof Number)
+			return 0;
+		if(node instanceof Variable)
+			return 1;
+		if(node instanceof Power)
+			return countVariables(((Power) node).getLeft());
+		if(node instanceof Multiply)
+			return countVariables(((BinaryNode) node).getLeft()) + countVariables(((BinaryNode) node).getRight());
+		return 0;
+	}
+
+	private boolean compareVariables(Node left, Node right) {
+		if(left instanceof Variable && right instanceof Variable)
+			return ((Variable) left).getName().compareTo(((Variable) right).getName()) > 0;
+		if(left instanceof Power)
+			return compareVariables(((Power) left).getLeft(), right);
+		if(right instanceof Power)
+			return compareVariables(left, ((Power) right).getLeft());
+		if(left instanceof Multiply && right instanceof Multiply)
+			return compareVariables(((Multiply) left).getLeft(), ((Multiply) right).getLeft()) || compareVariables(((Multiply) left).getRight(), ((Multiply) right).getRight());
+		return false;
+	}
+
+	private boolean shouldSwap(Node left, Node right) {
+		if(left instanceof Number && right instanceof Variable)
+			return true;
+		if(left instanceof Variable && right instanceof Power)
+			return true;
+		if(countVariables(left) < countVariables(right))
+			return true;
+		if(countVariables(left) == countVariables(right))
+			return compareVariables(left, right);
+		if(getVariable(left).getName().compareTo(getVariable(right).getName()) > 0)
+			return true;
+		
+		return false;
+	}
+
+	@Override
+	public Node expand() {
+		Node left = getLeft().expand();
+		Node right = getRight().expand();
+
+		if(!(left instanceof Add) && shouldSwap(left, right))
+			return new Add(right, left).expand();
+		if(left instanceof Add && shouldSwap(((Add) left).getRight(), right))
+			return new Add(new Add(((Add) left).getLeft(), right), ((Add) left).getRight()).expand();
+
+		return new Add(left, right);
+	}
+
 	@Override
 	public Node collapse() {
 		Node left = getLeft().collapse();
