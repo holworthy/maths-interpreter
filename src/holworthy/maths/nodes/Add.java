@@ -7,7 +7,7 @@ public class Add extends BinaryNode {
 
 	@Override
 	public String toString() {
-		return getLeft() + "+" + getRight();
+		return getLeft() + " + " + getRight();
 	}
 
 	@Override
@@ -27,8 +27,12 @@ public class Add extends BinaryNode {
 			return (Variable) node;
 		if(node instanceof Power)
 			return (Variable) ((Power) node).getLeft();
+		if(node instanceof Multiply && ((Multiply) node).getLeft().matches(new Matching.Constant()))
+			return getVariable(((Multiply) node).getRight());
 		if(node instanceof Multiply)
 			return getVariable(((Multiply) node).getLeft());
+		
+		System.out.println(node);
 		return null;
 	}
 
@@ -57,6 +61,8 @@ public class Add extends BinaryNode {
 	}
 
 	private boolean shouldSwap(Node left, Node right) {
+		if(!(left instanceof Number) && right instanceof Number)
+			return false;
 		if(left instanceof Number && right instanceof Variable)
 			return true;
 		if(left instanceof Variable && right instanceof Power)
@@ -75,6 +81,14 @@ public class Add extends BinaryNode {
 	public Node expand() {
 		Node left = getLeft().expand();
 		Node right = getRight().expand();
+
+		if(left instanceof Number && right instanceof Number)
+			return new Number(((Number) left).getValue() + ((Number) right).getValue());
+
+		// make tree left leaning
+		if(right instanceof Add)
+			return new Add(new Add(left, ((Add) right).getLeft()), ((Add) right).getRight());
+
 
 		if(!(left instanceof Add) && shouldSwap(left, right))
 			return new Add(right, left).expand();

@@ -15,6 +15,10 @@ public class Multiply extends BinaryNode {
 		Node left = getLeft().normalise();
 		Node right = getRight().normalise();
 
+		// constant folding
+		if(left instanceof Number && right instanceof Number)
+			return new Number(((Number) left).getValue() * ((Number) right).getValue());
+
 		// move constants to left
 		if(right.matches(new Matching.Constant()) && !left.matches(new Matching.Constant()))
 			return new Multiply(right, left).normalise();
@@ -33,39 +37,42 @@ public class Multiply extends BinaryNode {
 
 		// Expanding brackets
 		if(right instanceof Add)
-			return new Add(new Multiply(left, ((Add) right).getLeft().expand()).expand(), new Multiply(left, ((Add) right).getRight().expand()).expand());
+			return new Add(new Multiply(left, ((Add) right).getLeft()).normalise(), new Multiply(left, ((Add) right).getRight()).normalise()).expand().normalise();
 
 		// Putting brackets on the right (which then calls the rule above)
 		if(left instanceof Add)
 			return new Multiply(right, left).expand();
 
 		// sort terms
-		// swap variables and numbers
-		if((left instanceof Variable && right instanceof Number) || (left instanceof Power && right instanceof Number))
+		if(needSwitching(left, right))
 			return new Multiply(right, left);
-		// swap powers and variables
-		if(left instanceof Variable && right instanceof Power)
-			return new Multiply(right, left);
+		else if(left instanceof Power && right instanceof Variable)
+			return new Multiply(right, left).expand();
 		// swap variables 
 		if(left instanceof Variable && right instanceof Variable)
-			if (((Variable) left).getName().compareTo(((Variable) right).getName()) < 0)
+			if (((Variable) left).getName().compareTo(((Variable) right).getName()) > 0)
 				return new Multiply(right, left);
 		// swap with lower multiply nodes
 		if(left instanceof Multiply){
-			left = left.expand();
-			// swap variables and numbers
-			if((((BinaryNode) left).getRight() instanceof Variable && right instanceof Number) || (((BinaryNode) left).getRight() instanceof Power && right instanceof Number))
+			if(needSwitching(((BinaryNode) left).getRight(), right))
 				return new Multiply(new Multiply(((BinaryNode) left).getLeft(), right).expand(), ((BinaryNode) left).getRight()).expand();
-			// swap powers and variables
-			if(((BinaryNode) left).getRight() instanceof Variable && right instanceof Power)
+			else if(((BinaryNode) left).getRight() instanceof Power && right instanceof Variable)
 				return new Multiply(new Multiply(((BinaryNode) left).getLeft(), right).expand(), ((BinaryNode) left).getRight()).expand();
-			// swap variables 
-			if(((BinaryNode) left).getRight() instanceof Variable && right instanceof Variable)
-				if (((Variable) ((BinaryNode) left).getRight()).getName().compareTo(((Variable) right).getName()) < 0)
-					return new Multiply(new Multiply(((BinaryNode) left).getLeft(), right).expand(), ((BinaryNode) left).getRight()).expand();
 		}
 
 		return new Multiply(left, right);
+	}
+
+	public boolean needSwitching(Node left, Node right){
+		// swap variables and numbers
+		if((left instanceof Variable && right instanceof Number) || (left instanceof Power && right instanceof Number))
+			return true;
+		// swap powers by variables
+		if(left instanceof Variable && right instanceof Power && ((Variable) left).getName().compareTo(((Variable) ((BinaryNode) right).getLeft()).getName()) > 0)
+			return true;
+		if(left instanceof Power && right instanceof Power && ((Variable) ((BinaryNode) left).getLeft()).getName().compareTo(((Variable) ((BinaryNode) right).getLeft()).getName()) > 0)
+			return true;
+		return false;
 	}
 
 	@Override
