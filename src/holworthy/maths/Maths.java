@@ -124,10 +124,9 @@ public abstract class Maths {
 		Scanner scanner = new Scanner(System.in);
 
 		Node input = parseInput(scanner.nextLine());
-		System.out.println(input);
-		Node expanded = input.expand();
+		Node expanded = input.normalise().expand();
 		System.out.println(expanded);
-		Node collapsed = expanded.collapse();
+		Node collapsed = expanded.normalise().collapse();
 		System.out.println(collapsed);
 		Node simplified = input.simplify();
 		System.out.println(simplified);
