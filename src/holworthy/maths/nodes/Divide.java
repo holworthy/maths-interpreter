@@ -25,9 +25,13 @@ public class Divide extends BinaryNode {
 
 		// TODO: handle divide by 0
 
+		if(left.matches(right))
+			return new Number(1);
+
 		if(left instanceof Number && right instanceof Number) {
 			int a = ((Number) getLeft()).getValue();
 			int b = ((Number) getRight()).getValue();
+
 			int divisor = gcd(a, b);
 
 			if(a % b == 0)
@@ -40,7 +44,12 @@ public class Divide extends BinaryNode {
 	}
 
 	@Override
+	public Node collapse() {
+		return new Divide(getLeft().collapse(), getRight().collapse());
+	}
+
+	@Override
 	public String toString() {
-		return "(" + getLeft() + ")/(" + getRight() + ")";
+		return (getLeft() instanceof Number | getLeft() instanceof Variable | getLeft() instanceof Multiply ? getLeft() : "(" + getLeft() + ")") + "/" + (getRight() instanceof Number | getRight() instanceof Variable ? getRight() : "(" + getRight() + ")");
 	}
 }
