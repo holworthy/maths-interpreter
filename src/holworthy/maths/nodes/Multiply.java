@@ -88,6 +88,9 @@ public class Multiply extends BinaryNode {
 		if(left.matches(right))
 			return new Power(left, new Number(2));
 
+		if(left instanceof Divide && right instanceof Number)
+			return new Divide(new Multiply(((Divide) left).getLeft(), right), ((Divide) left).getRight()).collapse();
+
 		return new Multiply(left, right);
 	}
 }
