@@ -5,6 +5,8 @@ public class Number extends Node {
 
 	public Number(int value) {
 		this.value = value;
+		if(value < 0)
+			throw new Error("Negative number");
 	}
 
 	public int getValue() {

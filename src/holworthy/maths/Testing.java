@@ -2,7 +2,10 @@ package holworthy.maths;
 
 import java.util.LinkedHashMap;
 
+import holworthy.maths.nodes.Negative;
 import holworthy.maths.nodes.Node;
+import holworthy.maths.nodes.Number;
+import holworthy.maths.nodes.Sqrt;
 
 public class Testing {
 
@@ -43,6 +46,17 @@ public class Testing {
 		// tests.put("(3*x*2)/(3*x*5)", "(2)/(5)"); crashes
 
 
+		tests.put("a*a", "a^2");
+		tests.put("a*a^7", "a^8");
+		tests.put("b*a*b^3*c*a^2", "a^3*b^4*c");
+		// tests.put("(x+3)*(x-2)", "x^2+x-6");
+
+		// negatives
+		tests.put("-5", "-5");
+		tests.put("10-100", "-90");
+
+		// complex numbers
+		System.out.println(new Sqrt(new Negative(new Number(16))).simplify());
 
 		// run the tests
 		runTests(tests);

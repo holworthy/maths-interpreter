@@ -18,6 +18,10 @@ public class Power extends BinaryNode {
 		if(left instanceof Number && right instanceof Number)
 			return new Number((int) Math.pow(((Number) left).getValue(), ((Number) right).getValue()));
 
+		// i*i = -1
+		if(matches(new Power(new I(), new Number(2))))
+			return new Negative(new Number(1));
+
 		return new Power(left, right);
 	}
 }
