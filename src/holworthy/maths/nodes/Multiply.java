@@ -39,6 +39,32 @@ public class Multiply extends BinaryNode {
 		if(left instanceof Add)
 			return new Multiply(right, left).expand();
 
+		// sort terms
+		// swap variables and numbers
+		if((left instanceof Variable && right instanceof Number) || (left instanceof Power && right instanceof Number))
+			return new Multiply(right, left);
+		// swap powers and variables
+		if(left instanceof Variable && right instanceof Power)
+			return new Multiply(right, left);
+		// swap variables 
+		if(left instanceof Variable && right instanceof Variable)
+			if (((Variable) left).getName().compareTo(((Variable) right).getName()) < 0)
+				return new Multiply(right, left);
+		// swap with lower multiply nodes
+		if(left instanceof Multiply){
+			left = left.expand();
+			// swap variables and numbers
+			if((((BinaryNode) left).getRight() instanceof Variable && right instanceof Number) || (((BinaryNode) left).getRight() instanceof Power && right instanceof Number))
+				return new Multiply(new Multiply(((BinaryNode) left).getLeft(), right).expand(), ((BinaryNode) left).getRight()).expand();
+			// swap powers and variables
+			if(((BinaryNode) left).getRight() instanceof Variable && right instanceof Power)
+				return new Multiply(new Multiply(((BinaryNode) left).getLeft(), right).expand(), ((BinaryNode) left).getRight()).expand();
+			// swap variables 
+			if(((BinaryNode) left).getRight() instanceof Variable && right instanceof Variable)
+				if (((Variable) ((BinaryNode) left).getRight()).getName().compareTo(((Variable) right).getName()) < 0)
+					return new Multiply(new Multiply(((BinaryNode) left).getLeft(), right).expand(), ((BinaryNode) left).getRight()).expand();
+		}
+
 		return new Multiply(left, right);
 	}
 
