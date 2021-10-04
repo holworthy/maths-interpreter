@@ -44,17 +44,8 @@ public abstract class Maths {
 		}
 	}
 
-	private static Node parseNegative(Parser parser) throws Exception {
-		if(parser.hasMore() && parser.getChar() == '-') {
-			parser.incrementCursor();
-			Node node = parseNegative(parser);
-			return new Negative(node);
-		}
-		return parseValue(parser);
-	}
-
 	private static Node parsePower(Parser parser) throws Exception {
-		Node left = parseNegative(parser);
+		Node left = parseValue(parser);
 		if(parser.hasMore() && parser.getChar() == '^') {
 			parser.incrementCursor();
 			Node right = parsePower(parser);
@@ -63,16 +54,25 @@ public abstract class Maths {
 		return left;
 	}
 
+	private static Node parseNegative(Parser parser) throws Exception {
+		if(parser.hasMore() && parser.getChar() == '-') {
+			parser.incrementCursor();
+			Node node = parseNegative(parser);
+			return new Negative(node);
+		}
+		return parsePower(parser);
+	}
+
 	private static Node parseMultiplyOrDivide(Parser parser) throws Exception {
-		Node left = parsePower(parser);
+		Node left = parseNegative(parser);
 		while(true) {
 			if(parser.hasMore() && parser.getChar() == '*') {
 				parser.incrementCursor();
-				Node right = parsePower(parser);
+				Node right = parseNegative(parser);
 				left = new Multiply(left, right);
 			} else if(parser.hasMore() && parser.getChar() == '/') {
 				parser.incrementCursor();
-				Node right = parsePower(parser);
+				Node right = parseNegative(parser);
 				left = new Divide(left, right);
 			} else {
 				break;
