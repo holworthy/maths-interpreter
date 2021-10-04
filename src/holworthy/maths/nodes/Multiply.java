@@ -21,7 +21,7 @@ public class Multiply extends BinaryNode {
 		if(left.matches(new Number(0)))
 			return new Number(0);
 		if(left.matches(new Number(1)))
-			return getRight();
+			return right;
 
 		// move constants to left
 		if(right.matches(new Matching.Constant()) && !left.matches(new Matching.Constant()))
@@ -31,6 +31,13 @@ public class Multiply extends BinaryNode {
 		if(right instanceof Multiply)
 			return new Multiply(new Multiply(left, ((Multiply) right).getLeft().normalise()).normalise(), ((Multiply) right).getRight());
 
+		// x*x = x^2
+		if(left instanceof Variable && left.matches(right))
+			return new Power(left, new Number(2)).normalise();
+		// x*x^n = x^(n+1)
+		if(left instanceof Variable && right instanceof Power && ((Power) right).getLeft().matches(left))
+			return new Power(left, new Add(new Number(1), ((Power) right).getRight())).normalise();
+
 		return new Multiply(left, right);
 	}
 
@@ -39,13 +46,31 @@ public class Multiply extends BinaryNode {
 		Node left = getLeft().expand();
 		Node right = getRight().expand();
 
+		// x*x = x^2
+		if(left instanceof Variable && left.matches(right))
+			return new Power(left, new Number(2)).normalise();
+		// a*b*b = a*b^2
+		if(left instanceof Multiply && ((Multiply) left).getRight() instanceof Variable && ((Multiply) left).getRight().matches(right))
+			return new Multiply(((Multiply) left).getLeft(), new Power(((Multiply) left).getRight(), new Number(2))).normalise();
+		// x*x^n = x^(n+1)
+		if(left instanceof Variable && right instanceof Power && ((Power) right).getLeft().matches(left))
+			return new Power(left, new Add(new Number(1), ((Power) right).getRight())).expand();
+		// a*x*x^n = a*x^(n+1)
+		if(left instanceof Multiply && ((Multiply) left).getRight() instanceof Variable && right instanceof Power && ((Power) right).getLeft().matches(((Multiply) left).getRight()))
+			return new Multiply(((Multiply) left).getLeft(), new Power(((Multiply) left).getRight(), new Add(new Number(1), ((Power) right).getRight()))).expand();
+		// x^a*x^b = x^(a+b)
+		if(left instanceof Power && right instanceof Power && ((Power) left).getLeft().matches(((Power) right).getLeft()))
+			return new Power(((BinaryNode) left).getLeft(), new Add(((Power) left).getRight(), ((Power) right).getRight())).expand();
+		// // c*x^a*x^b = c*x^(a+b)
+		if(left instanceof Multiply && ((Multiply) left).getRight() instanceof Power && right instanceof Power && ((Power) ((Multiply) left).getRight()).getLeft().matches(((Power) right).getLeft()))
+			return new Multiply(((Multiply) left).getLeft(), new Power(((Power) ((Multiply) left).getRight()).getLeft(), new Add(((Power) ((Multiply) left).getRight()).getRight(), ((Power) right).getRight()))).expand();
+
 		// Expanding brackets
 		if(right instanceof Add)
-			return new Add(new Multiply(left, ((Add) right).getLeft()).normalise(), new Multiply(left, ((Add) right).getRight()).normalise()).expand().normalise();
-
+			return new Add(new Multiply(left, ((Add) right).getLeft()).normalise(), new Multiply(left, ((Add) right).getRight()).normalise()).normalise().expand();
 		// Putting brackets on the right (which then calls the rule above)
 		if(left instanceof Add)
-			return new Multiply(right, left).expand();
+			return new Multiply(right, left).normalise().expand();
 
 		// sort terms
 		if(needSwitching(left, right))
@@ -85,8 +110,8 @@ public class Multiply extends BinaryNode {
 		Node right = getRight().collapse();
 
 		// x*x = x^2
-		if(left.matches(right))
-			return new Power(left, new Number(2));
+		// if(left.matches(right))
+		// 	return new Power(left, new Number(2));
 
 		if(left instanceof Divide && right instanceof Number)
 			return new Divide(new Multiply(((Divide) left).getLeft(), right), ((Divide) left).getRight()).collapse();

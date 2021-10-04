@@ -17,7 +17,7 @@ public class Add extends BinaryNode {
 
 		// make tree left leaning
 		if(right instanceof Add)
-			return new Add(new Add(left, ((Add) right).getLeft().collapse()).collapse(), ((Add) right).getRight().collapse());
+			return new Add(new Add(left, ((Add) right).getLeft().normalise()).normalise(), ((Add) right).getRight().normalise());
 
 		return new Add(left, right);
 	}
