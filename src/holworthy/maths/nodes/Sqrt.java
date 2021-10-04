@@ -18,10 +18,17 @@ public class Sqrt extends UnaryNode {
 	@Override
 	public Node expand() {
 		Node node = getNode().expand();
-		if(node instanceof Number && ((Number) node).getValue() == 0)
-			return new Number(0);
-		if(node instanceof Number && ((Number) node).getValue() == 1)
-			return new Number(1);
+
+		if(node instanceof Negative)
+			return new Multiply(new I(), new Sqrt(((Negative) node).getNode())).expand();
+
+		if(node instanceof Number) {
+			int n = ((Number) node).getValue();
+			int s = (int) Math.floor(Math.sqrt(n));
+			if(Math.pow(s, 2) == n)
+				return new Number(s);
+		}
+
 		return new Sqrt(node);
 	}
 }

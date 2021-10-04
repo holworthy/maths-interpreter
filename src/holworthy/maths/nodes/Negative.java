@@ -12,9 +12,6 @@ public class Negative extends UnaryNode {
 
 	@Override
 	public Node expand() {
-		Node node = getNode().expand();
-		if(node instanceof Number)
-			return new Number(-((Number) node).getValue());
-		return new Negative(node);
+		return new Negative(getNode().expand());
 	}
 }
