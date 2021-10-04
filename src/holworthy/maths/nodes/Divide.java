@@ -36,7 +36,7 @@ public class Divide extends BinaryNode {
 			return new Divide(new Number(a / divisor), new Number(b / divisor));
 		}
 
-		return new Divide(left, right);
+		return new Multiply(left, new Power(right, new Number(-1)));
 	}
 
 	@Override

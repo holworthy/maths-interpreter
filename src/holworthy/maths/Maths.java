@@ -55,10 +55,10 @@ public abstract class Maths {
 
 	private static Node parsePower(Parser parser) throws Exception {
 		Node left = parseNegative(parser);
-		while(parser.hasMore() && parser.getChar() == '^') {
+		if(parser.hasMore() && parser.getChar() == '^') {
 			parser.incrementCursor();
-			Node right = parseNegative(parser);
-			left = new Power(left, right);
+			Node right = parsePower(parser);
+			return new Power(left, right);
 		}
 		return left;
 	}
