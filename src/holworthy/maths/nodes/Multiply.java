@@ -48,10 +48,6 @@ public class Multiply extends BinaryNode {
 			return new Multiply(right, left);
 		else if(left instanceof Power && right instanceof Variable)
 			return new Multiply(right, left).expand();
-		// swap variables 
-		if(left instanceof Variable && right instanceof Variable)
-			if (((Variable) left).getName().compareTo(((Variable) right).getName()) > 0)
-				return new Multiply(right, left);
 		// swap with lower multiply nodes
 		if(left instanceof Multiply){
 			if(needSwitching(((BinaryNode) left).getRight(), right))
@@ -72,6 +68,9 @@ public class Multiply extends BinaryNode {
 			return true;
 		if(left instanceof Power && right instanceof Power && ((Variable) ((BinaryNode) left).getLeft()).getName().compareTo(((Variable) ((BinaryNode) right).getLeft()).getName()) > 0)
 			return true;
+		if(left instanceof Variable && right instanceof Variable)
+			if (((Variable) left).getName().compareTo(((Variable) right).getName()) > 0)
+				return true;
 		return false;
 	}
 
