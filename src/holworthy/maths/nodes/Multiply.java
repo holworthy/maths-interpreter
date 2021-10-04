@@ -46,6 +46,14 @@ public class Multiply extends BinaryNode {
 		Node left = getLeft().expand();
 		Node right = getRight().expand();
 
+		// constant folding
+		if(left instanceof Number && right instanceof Number)
+			return new Number(((Number) left).getValue() * ((Number) right).getValue());
+		if(left.matches(new Number(0)))
+			return new Number(0);
+		if(left.matches(new Number(1)))
+			return right;
+
 		// x*x = x^2
 		if(left instanceof Variable && left.matches(right))
 			return new Power(left, new Number(2)).normalise();
@@ -80,10 +88,13 @@ public class Multiply extends BinaryNode {
 		// swap with lower multiply nodes
 		if(left instanceof Multiply){
 			if(needSwitching(((BinaryNode) left).getRight(), right))
-				return new Multiply(new Multiply(((BinaryNode) left).getLeft(), right).expand(), ((BinaryNode) left).getRight()).expand();
-			else if(((BinaryNode) left).getRight() instanceof Power && right instanceof Variable)
-				return new Multiply(new Multiply(((BinaryNode) left).getLeft(), right).expand(), ((BinaryNode) left).getRight()).expand();
+				return new Multiply(new Multiply(((BinaryNode) left).getLeft(), right), ((BinaryNode) left).getRight()).expand();
+		// 	else if(((BinaryNode) left).getRight() instanceof Power && right instanceof Variable)
+		// 		return new Multiply(new Multiply(((BinaryNode) left).getLeft(), right), ((BinaryNode) left).getRight()).expand();
 		}
+
+		if(left instanceof Divide && right instanceof Number)
+			return new Divide(new Multiply(((Divide) left).getLeft(), right).expand(), ((Divide) left).getRight());
 
 		return new Multiply(left, right);
 	}
@@ -109,12 +120,10 @@ public class Multiply extends BinaryNode {
 		Node left = getLeft().collapse();
 		Node right = getRight().collapse();
 
+		// TODO:
 		// x*x = x^2
 		// if(left.matches(right))
 		// 	return new Power(left, new Number(2));
-
-		if(left instanceof Divide && right instanceof Number)
-			return new Divide(new Multiply(((Divide) left).getLeft(), right), ((Divide) left).getRight()).collapse();
 
 		return new Multiply(left, right);
 	}

@@ -32,6 +32,10 @@ public class Testing {
 		// basic algebra
 		tests.put("3*a+3*b", "3*(a+b)");
 		tests.put("3*x+5*x", "8*x");
+		tests.put("a*a", "a^2");
+		tests.put("a*a^7", "a^8");
+		tests.put("b*a*b^3*c*a^2", "a^3*b^4*c");
+		// tests.put("(x+3)*(x-2)", "x^2+x-6");
 
 		// run the tests
 		runTests(tests);
