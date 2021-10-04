@@ -89,7 +89,7 @@ public class Add extends BinaryNode {
 		if(right instanceof Add)
 			return new Add(new Add(left, ((Add) right).getLeft()), ((Add) right).getRight());
 
-
+		// sort terms
 		if(!(left instanceof Add) && shouldSwap(left, right))
 			return new Add(right, left).expand();
 		if(left instanceof Add && shouldSwap(((Add) left).getRight(), right))

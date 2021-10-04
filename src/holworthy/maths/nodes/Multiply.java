@@ -18,6 +18,10 @@ public class Multiply extends BinaryNode {
 		// constant folding
 		if(left instanceof Number && right instanceof Number)
 			return new Number(((Number) left).getValue() * ((Number) right).getValue());
+		if(left.matches(new Number(0)))
+			return new Number(0);
+		if(left.matches(new Number(1)))
+			return getRight();
 
 		// move constants to left
 		if(right.matches(new Matching.Constant()) && !left.matches(new Matching.Constant()))
@@ -80,10 +84,6 @@ public class Multiply extends BinaryNode {
 		Node left = getLeft().collapse();
 		Node right = getRight().collapse();
 
-		// Multiply two numbers together
-		if(left instanceof Number && right instanceof Number)
-			return new Number(((Number) left).getValue() * ((Number) right).getValue());
-	
 		// x*x = x^2
 		if(left.matches(right))
 			return new Power(left, new Number(2));
