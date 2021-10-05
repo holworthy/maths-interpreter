@@ -53,7 +53,13 @@ public class Testing {
 
 		// negatives
 		tests.put("-5", "-5");
-		tests.put("10-100", "-90");
+		tests.put("5-2", "3");
+		tests.put("2-5", "-3");
+		tests.put("-5+2", "-3");
+		tests.put("-5+7", "2");
+		tests.put("-5-2", "-7");
+		tests.put("-5-7", "-12");
+		tests.put("-1--5", "4");
 
 		// complex numbers
 		System.out.println(new Sqrt(new Negative(new Number(16))).simplify());

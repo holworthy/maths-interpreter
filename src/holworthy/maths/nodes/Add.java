@@ -82,8 +82,23 @@ public class Add extends BinaryNode {
 		Node left = getLeft().expand();
 		Node right = getRight().expand();
 
+		// constant folding
 		if(left instanceof Number && right instanceof Number)
 			return new Number(((Number) left).getValue() + ((Number) right).getValue());
+		if(left instanceof Number && right instanceof Negative && ((Negative) right).getNode() instanceof Number) {
+			if(((Number) ((Negative) right).getNode()).getValue() <= ((Number) left).getValue())
+				return new Number(((Number) left).getValue() - ((Number) ((Negative) right).getNode()).getValue());
+			else
+				return new Negative(new Number(((Number) ((Negative) right).getNode()).getValue() - ((Number) left).getValue()));
+		}
+		if(left instanceof Negative && right instanceof Number && ((Negative) left).getNode() instanceof Number) {
+			if(((Number) ((Negative) left).getNode()).getValue() <= ((Number) right).getValue())
+				return new Number(((Number) right).getValue() - ((Number) ((Negative) left).getNode()).getValue());
+			else
+				return new Negative(new Number(((Number) ((Negative) left).getNode()).getValue() - ((Number) right).getValue()));
+		}
+		if(left instanceof Negative && right instanceof Negative && ((Negative) left).getNode() instanceof Number && ((Negative) right).getNode() instanceof Number)
+			return new Negative(new Number(((Number) ((Negative) left).getNode()).getValue() + ((Number) ((Negative) right).getNode()).getValue()));
 
 		// make tree left leaning
 		if(right instanceof Add)
@@ -96,11 +111,10 @@ public class Add extends BinaryNode {
 			return new Add(new Add(((Add) left).getLeft(), right), ((Add) left).getRight()).expand();
 
 		if(left instanceof Divide && right instanceof Divide){
-			Divide newLeft = new Divide(new Multiply(((BinaryNode) left).getLeft(), ((BinaryNode) right).getRight()), new Multiply(((BinaryNode) left).getRight(), ((BinaryNode) right).getRight()));
-			Divide newRight = new Divide(new Multiply(((BinaryNode) right).getLeft(), ((BinaryNode) left).getRight()), new Multiply(((BinaryNode) right).getRight(),((BinaryNode) left).getRight()));
+			Divide newLeft = new Divide(new Multiply(((Divide) left).getLeft(), ((Divide) right).getRight()), new Multiply(((Divide) left).getRight(), ((Divide) right).getRight()));
+			Divide newRight = new Divide(new Multiply(((Divide) right).getLeft(), ((Divide) left).getRight()), new Multiply(((Divide) right).getRight(),((Divide) left).getRight()));
 			return new Divide(new Add(newLeft.getLeft(), newRight.getLeft()), newLeft.getRight()).expand();
 		}
-
 
 		return new Add(left, right);
 	}

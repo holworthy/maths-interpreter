@@ -12,6 +12,23 @@ public class Negative extends UnaryNode {
 
 	@Override
 	public Node expand() {
-		return new Negative(getNode().expand());
+		Node node = getNode().expand();
+		if(node instanceof Negative)
+			return ((Negative) node).getNode();
+		return new Negative(node);
+	}
+
+	@Override
+	public boolean matches(Node node) {
+		if(node instanceof Matching.Constant)
+			return isConstant();
+		if(node instanceof Negative)
+			return getNode().matches(((Negative) node).getNode());
+		return false;
+	}
+
+	@Override
+	public boolean isConstant() {
+		return getNode().isConstant();
 	}
 }
