@@ -12,7 +12,7 @@ public class Subtract extends BinaryNode {
 
 	@Override
 	public Node expand() {
-		return normalise();
+		return normalise().expand();
 	}
 
 	@Override
