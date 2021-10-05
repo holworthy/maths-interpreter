@@ -37,10 +37,7 @@ public class Divide extends BinaryNode {
 			if(a % b == 0)
 				return new Number(a / b);
 
-			if(divisor == 1)
-				return this;
-
-			return new Divide(new Number(a / divisor), new Number(b / divisor)).expand();
+			return new Divide(new Number(a / divisor), new Number(b / divisor));
 		}
 
 		return new Multiply(left, new Power(right, new Number(-1))).expand();

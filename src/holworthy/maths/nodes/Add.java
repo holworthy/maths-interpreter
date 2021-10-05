@@ -113,9 +113,8 @@ public class Add extends BinaryNode {
 		if(left instanceof Divide && right instanceof Divide){
 			Divide newLeft = new Divide(new Multiply(((Divide) left).getLeft(), ((Divide) right).getRight()), new Multiply(((Divide) left).getRight(), ((Divide) right).getRight()));
 			Divide newRight = new Divide(new Multiply(((Divide) right).getLeft(), ((Divide) left).getRight()), new Multiply(((Divide) right).getRight(),((Divide) left).getRight()));
-			return new Divide(new Add(newLeft.getLeft(), newRight.getLeft()).expand(), newLeft.getRight().expand()).expand();
+			return new Divide(new Add(newLeft.getLeft(), newRight.getLeft()), newLeft.getRight()).expand();
 		}
-
 
 		return new Add(left, right);
 	}
