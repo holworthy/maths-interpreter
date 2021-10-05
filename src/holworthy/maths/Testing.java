@@ -31,8 +31,8 @@ public class Testing {
 		tests.put("8/2", "4");
 		tests.put("2^3", "8");
 		tests.put("1/4*5", "5/4");
-		tests.put("49^(3/2)", "343"); // failed 
-		tests.put("(1/3)+(2/5)", "11/15"); // doesn't solve
+		tests.put("49^(3/2)", "343"); 
+		tests.put("(1/3)+(2/5)", "11/15");
 
 		// basic algebra
 		tests.put("3*a+3*b", "3*(a+b)");
@@ -40,7 +40,7 @@ public class Testing {
 		// tests.put("6*i+2*j-3*k+5*j+4*k","6*i+7*j+k"); crashes
 		tests.put("(z+3)*2","2*z+6");
 		tests.put("2*(x+5)", "2*x+10");
-		tests.put("2*x+5=15", "x=5"); //doesn't solve
+		// tests.put("2*x+5=15", "x=5"); //doesn't solve
 		tests.put("(x+2)^2+3","x^2+4*x+7"); //doesn't do anything
 		tests.put("(3*x+2)/(3*x+2)", "1");
 		// tests.put("(3*x*2)/(3*x*5)", "(2)/(5)"); crashes

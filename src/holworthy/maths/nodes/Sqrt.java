@@ -1,8 +1,8 @@
 package holworthy.maths.nodes;
 
-public class Sqrt extends UnaryNode {
+public class Sqrt extends Nthrt {
 	public Sqrt(Node node) {
-		super(node);
+		super(node, 2);
 	}
 
 	@Override
