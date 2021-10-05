@@ -32,7 +32,7 @@ public class Testing {
 		tests.put("2^3", "8");
 		tests.put("1/4*5", "5/4");
 		tests.put("49^(3/2)", "343"); // failed 
-		tests.put("(1/3)+(2/5)", "11/15"); // doesn't solve
+		tests.put("(1/3)+(2/5)", "11/15");
 
 		// basic algebra
 		tests.put("3*a+3*b", "3*(a+b)");

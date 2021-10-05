@@ -17,6 +17,10 @@ public class Power extends BinaryNode {
 
 		if(left instanceof Number && right instanceof Number)
 			return new Number((int) Math.pow(((Number) left).getValue(), ((Number) right).getValue()));
+		
+		if(left instanceof Number && right instanceof Divide && ((BinaryNode) right).getLeft() instanceof Number && ((BinaryNode) right).getRight() instanceof Number){
+			return new Nthrt(new Power(left, ((BinaryNode) right).getLeft()), ((Number) ((BinaryNode) right).getRight()).getValue()).expand();
+		}
 
 		// i*i = -1
 		if(matches(new Power(new I(), new Number(2))))
