@@ -46,6 +46,10 @@ public class Multiply extends BinaryNode {
 		Node left = getLeft().expand();
 		Node right = getRight().expand();
 
+		// Make tree left leaning
+		if(right instanceof Multiply)
+			return new Multiply(new Multiply(left, ((Multiply) right).getLeft()), ((Multiply) right).getRight()).expand();
+
 		// constant folding
 		if(left instanceof Number && right instanceof Number)
 			return new Number(((Number) left).getValue() * ((Number) right).getValue());
@@ -71,10 +75,10 @@ public class Multiply extends BinaryNode {
 			return new Negative(new Multiply(right, ((UnaryNode) left).getNode()).expand());
 		// x*x = x^2
 		if(left instanceof Variable && left.matches(right))
-			return new Power(left, new Number(2)).normalise();
+			return new Power(left, new Number(2)).expand();
 		// a*b*b = a*b^2
 		if(left instanceof Multiply && ((Multiply) left).getRight() instanceof Variable && ((Multiply) left).getRight().matches(right))
-			return new Multiply(((Multiply) left).getLeft(), new Power(((Multiply) left).getRight(), new Number(2))).normalise();
+			return new Multiply(((Multiply) left).getLeft(), new Power(((Multiply) left).getRight(), new Number(2))).expand();
 		// x*x^n = x^(n+1)
 		if(left instanceof Variable && right instanceof Power && ((Power) right).getLeft().matches(left))
 			return new Power(left, new Add(new Number(1), ((Power) right).getRight())).expand();
@@ -90,10 +94,10 @@ public class Multiply extends BinaryNode {
 
 		// Expanding brackets
 		if(right instanceof Add)
-			return new Add(new Multiply(left, ((Add) right).getLeft()).normalise(), new Multiply(left, ((Add) right).getRight()).normalise()).normalise().expand();
+			return new Add(new Multiply(left, ((Add) right).getLeft()), new Multiply(left, ((Add) right).getRight())).expand();
 		// Putting brackets on the right (which then calls the rule above)
 		if(left instanceof Add)
-			return new Multiply(right, left).normalise().expand();
+			return new Multiply(right, left).expand();
 
 		// sort terms
 		if(needSwitching(left, right))
@@ -104,8 +108,8 @@ public class Multiply extends BinaryNode {
 		if(left instanceof Multiply){
 			if(needSwitching(((BinaryNode) left).getRight(), right))
 				return new Multiply(new Multiply(((BinaryNode) left).getLeft(), right), ((BinaryNode) left).getRight()).expand();
-		// 	else if(((BinaryNode) left).getRight() instanceof Power && right instanceof Variable)
-		// 		return new Multiply(new Multiply(((BinaryNode) left).getLeft(), right), ((BinaryNode) left).getRight()).expand();
+			// else if(((BinaryNode) left).getRight() instanceof Power && right instanceof Variable)
+			// 	return new Multiply(new Multiply(((BinaryNode) left).getLeft(), right), ((BinaryNode) left).getRight()).expand();
 		}
 
 		if(left instanceof Divide && right instanceof Number)

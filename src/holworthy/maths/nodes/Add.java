@@ -7,7 +7,7 @@ public class Add extends BinaryNode {
 
 	@Override
 	public String toString() {
-		return "(" + getLeft() + " + " + getRight() + ")";
+		return getLeft() + " + " + getRight();
 	}
 
 	@Override
@@ -20,20 +20,6 @@ public class Add extends BinaryNode {
 			return new Add(new Add(left, ((Add) right).getLeft().normalise()).normalise(), ((Add) right).getRight().normalise());
 
 		return new Add(left, right);
-	}
-
-	private Variable getVariable(Node node) {
-		if(node instanceof Variable)
-			return (Variable) node;
-		if(node instanceof Power)
-			return (Variable) ((Power) node).getLeft();
-		if(node instanceof Multiply && ((Multiply) node).getLeft().matches(new Matching.Constant()))
-			return getVariable(((Multiply) node).getRight());
-		if(node instanceof Multiply)
-			return getVariable(((Multiply) node).getLeft());
-		
-		System.out.println(node);
-		return null;
 	}
 
 	private int countVariables(Node node) {
@@ -49,8 +35,13 @@ public class Add extends BinaryNode {
 	}
 
 	private boolean compareVariables(Node left, Node right) {
+		// sort variables alphabetically
 		if(left instanceof Variable && right instanceof Variable)
 			return ((Variable) left).getName().compareTo(((Variable) right).getName()) > 0;
+		if(left instanceof Multiply && ((Multiply) left).getLeft().isConstant() && !((Multiply) left).getRight().isConstant())
+			return compareVariables(((Multiply) left).getRight(), right);
+		if(left instanceof Variable && right instanceof Power && ((Power) right).getLeft() instanceof Variable)
+			return compareVariables(left, ((Power) right).getLeft()) || ((Variable) left).getName().equals(((Variable) ((BinaryNode) right).getLeft()).getName());
 		if(left instanceof Power)
 			return compareVariables(((Power) left).getLeft(), right);
 		if(right instanceof Power)
@@ -61,19 +52,17 @@ public class Add extends BinaryNode {
 	}
 
 	private boolean shouldSwap(Node left, Node right) {
-		if(!(left instanceof Number) && right instanceof Number)
+		if(left.matches(right))
 			return false;
-		if(left instanceof Number && right instanceof Variable)
+		// 2 + x => x + 2
+		if(left instanceof Number && !(right instanceof Number))
 			return true;
-		if(left instanceof Variable && right instanceof Power)
-			return true;
+		if(right instanceof Number)
+			return false;
 		if(countVariables(left) < countVariables(right))
 			return true;
 		if(countVariables(left) == countVariables(right))
 			return compareVariables(left, right);
-		if(getVariable(left).getName().compareTo(getVariable(right).getName()) > 0)
-			return true;
-		
 		return false;
 	}
 
@@ -102,16 +91,6 @@ public class Add extends BinaryNode {
 		if(left instanceof Negative && right instanceof Negative && ((Negative) left).getNode() instanceof Number && ((Negative) right).getNode() instanceof Number)
 			return new Negative(new Number(((Number) ((Negative) left).getNode()).getValue() + ((Number) ((Negative) right).getNode()).getValue()));
 
-		// make tree left leaning
-		if(right instanceof Add)
-			return new Add(new Add(left, ((Add) right).getLeft()), ((Add) right).getRight()).expand();
-
-		// sort terms
-		if(!(left instanceof Add) && shouldSwap(left, right))
-			return new Add(right, left).expand();
-		if(left instanceof Add && shouldSwap(((Add) left).getRight(), right))
-			return new Add(new Add(((Add) left).getLeft(), right), ((Add) left).getRight()).expand();
-
 		// x+x=2*x
 		if(left.matches(right))
 			return new Multiply(new Number(2), left).expand();
@@ -128,8 +107,8 @@ public class Add extends BinaryNode {
 		if(left instanceof Multiply && ((BinaryNode) left).getLeft().isConstant() && right instanceof Multiply && ((BinaryNode) right).getLeft().isConstant() && ((BinaryNode) left).getRight().matches(((BinaryNode) right).getRight()))
 			return new Multiply(new Add(((BinaryNode) left).getLeft(), ((BinaryNode) right).getLeft()), ((BinaryNode) left).getRight()).expand();
 		// c+a*x^n+b*x^n=c+(a+b)*x^n
-		if(left instanceof Add && ((BinaryNode) left).getRight() instanceof Multiply && ((BinaryNode) ((BinaryNode) left).getRight()).getLeft().isConstant() && right instanceof Multiply && ((BinaryNode) right).getLeft().isConstant() && ((BinaryNode) ((BinaryNode) left).getRight()).getRight().matches(((BinaryNode) right).getRight()))
-			return new Multiply(new Add(((BinaryNode) ((BinaryNode) left).getRight()).getLeft(), ((BinaryNode) right).getLeft()), ((BinaryNode) ((BinaryNode) left).getRight()).getRight()).expand();
+		if(left instanceof Add && ((Add) left).getRight() instanceof Multiply && ((BinaryNode) ((BinaryNode) left).getRight()).getLeft().isConstant() && right instanceof Multiply && ((BinaryNode) right).getLeft().isConstant() && ((BinaryNode) ((BinaryNode) left).getRight()).getRight().matches(((BinaryNode) right).getRight()))
+			return new Add(((Add) left).getLeft(), new Multiply(new Add(((BinaryNode) ((BinaryNode) left).getRight()).getLeft(), ((BinaryNode) right).getLeft()), ((BinaryNode) ((BinaryNode) left).getRight()).getRight())).expand();
 
 		// a/b+c/d
 		if(left instanceof Divide && right instanceof Divide){
@@ -137,6 +116,16 @@ public class Add extends BinaryNode {
 			Divide newRight = new Divide(new Multiply(((Divide) right).getLeft(), ((Divide) left).getRight()), new Multiply(((Divide) right).getRight(),((Divide) left).getRight()));
 			return new Divide(new Add(newLeft.getLeft(), newRight.getLeft()), newLeft.getRight()).expand();
 		}
+
+		// make tree left leaning
+		if(right instanceof Add)
+			return new Add(new Add(left, ((Add) right).getLeft()), ((Add) right).getRight()).expand();
+
+		// sort terms
+		if(!(left instanceof Add) && shouldSwap(left, right))
+			return new Add(right, left).expand();
+		if(left instanceof Add && shouldSwap(((Add) left).getRight(), right))
+			return new Add(new Add(((Add) left).getLeft(), right), ((Add) left).getRight()).expand();
 
 		return new Add(left, right);
 	}
@@ -146,25 +135,25 @@ public class Add extends BinaryNode {
 		Node left = getLeft().collapse();
 		Node right = getRight().collapse();
 
-		if(left instanceof Number && right instanceof Number)
-			return new Number(((Number) left).getValue() + ((Number) right).getValue());
+		// if(left instanceof Number && right instanceof Number)
+		// 	return new Number(((Number) left).getValue() + ((Number) right).getValue());
 
-		if(left instanceof Multiply && right instanceof Multiply && ((Multiply) left).getRight().matches(((Multiply) right).getRight()))
-			return new Multiply(new Add(((Multiply) left).getLeft(), ((Multiply) right).getLeft()).collapse(), ((Multiply) left).getRight());
+		// if(left instanceof Multiply && right instanceof Multiply && ((Multiply) left).getRight().matches(((Multiply) right).getRight()))
+		// 	return new Multiply(new Add(((Multiply) left).getLeft(), ((Multiply) right).getLeft()).collapse(), ((Multiply) left).getRight());
 
-		if(left instanceof Variable && right instanceof Variable && left.matches(right))
-			return new Multiply(new Number(2), left);
+		// if(left instanceof Variable && right instanceof Variable && left.matches(right))
+		// 	return new Multiply(new Number(2), left);
 
-		if(left instanceof Multiply && right instanceof Multiply){
-			if(((BinaryNode) left).getRight().matches(((BinaryNode) right).getRight())){
-				Add a = new Add(((BinaryNode) left).getLeft(), ((BinaryNode) right).getLeft());
-				return new Multiply(a.collapse(), ((BinaryNode) right).getRight());
-			}
-			if(((BinaryNode) left).getLeft().matches(((BinaryNode) right).getLeft())){
-				Add a = new Add(((BinaryNode) left).getRight(), ((BinaryNode) right).getRight());
-				return new Multiply(((BinaryNode) right).getLeft(), a.collapse());
-			}
-		}
+		// if(left instanceof Multiply && right instanceof Multiply){
+		// 	if(((BinaryNode) left).getRight().matches(((BinaryNode) right).getRight())){
+		// 		Add a = new Add(((BinaryNode) left).getLeft(), ((BinaryNode) right).getLeft());
+		// 		return new Multiply(a.collapse(), ((BinaryNode) right).getRight());
+		// 	}
+		// 	if(((BinaryNode) left).getLeft().matches(((BinaryNode) right).getLeft())){
+		// 		Add a = new Add(((BinaryNode) left).getRight(), ((BinaryNode) right).getRight());
+		// 		return new Multiply(((BinaryNode) right).getLeft(), a.collapse());
+		// 	}
+		// }
 
 		return new Add(left, right);
 	}
