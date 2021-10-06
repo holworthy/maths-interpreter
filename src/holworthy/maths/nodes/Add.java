@@ -7,7 +7,7 @@ public class Add extends BinaryNode {
 
 	@Override
 	public String toString() {
-		return getLeft() + " + " + getRight();
+		return "(" + getLeft() + " + " + getRight() + ")";
 	}
 
 	@Override
@@ -85,6 +85,8 @@ public class Add extends BinaryNode {
 		// constant folding
 		if(left instanceof Number && right instanceof Number)
 			return new Number(((Number) left).getValue() + ((Number) right).getValue());
+		if(left instanceof Add && right instanceof Number && (((Add) left).getRight() instanceof Number || ((Add) left).getRight() instanceof Negative))
+			return new Add(((Add) left).getLeft(), new Add(((Add) left).getRight(), right)).expand();
 		if(left instanceof Number && right instanceof Negative && ((Negative) right).getNode() instanceof Number) {
 			if(((Number) ((Negative) right).getNode()).getValue() <= ((Number) left).getValue())
 				return new Number(((Number) left).getValue() - ((Number) ((Negative) right).getNode()).getValue());
