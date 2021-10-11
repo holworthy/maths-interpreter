@@ -1,11 +1,14 @@
 package holworthy.maths;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 
 import holworthy.maths.nodes.Add;
 import holworthy.maths.nodes.BinaryNode;
 import holworthy.maths.nodes.Divide;
 import holworthy.maths.nodes.Equation;
+import holworthy.maths.nodes.I;
 import holworthy.maths.nodes.Multiply;
 import holworthy.maths.nodes.Negative;
 import holworthy.maths.nodes.Node;
@@ -16,6 +19,13 @@ import holworthy.maths.nodes.Subtract;
 import holworthy.maths.nodes.Variable;
 
 public abstract class Maths {
+	// Array of reserved or keywords
+	private final static ArrayList<String> KEY_RESERVED_WORDS = new ArrayList<>(
+		Arrays.asList("e","i","pi","sqrt","acos","acosh","acot","acoth","acsc",
+		"acsch","asec","asech","asin","asinh","atan","atanh","cos","cosh","cot",
+		"coth","csc","csch","sec","sech","sin","sinh","tan","tanh")
+	);
+
 	private static Node parseValue(Parser parser) throws Exception {
 		if(parser.getChar() == '(') {
 			parser.incrementCursor();
@@ -30,6 +40,11 @@ public abstract class Maths {
 			while(parser.hasMore() && parser.getChar() >= 'a' && parser.getChar() <= 'z')
 				parser.incrementCursor();
 			String name = parser.getInput().substring(start, parser.getCursor());
+			if (KEY_RESERVED_WORDS.contains(name)){
+				// TODO: assign this correctly and efficiently
+				if (name.equals("i"))
+					return new I();
+			}
 			Node variable = new Variable(name);
 			return variable;
 		} else if(parser.getChar() >= '0' && parser.getChar() <= '9') {
