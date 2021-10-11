@@ -28,6 +28,13 @@ public class Divide extends BinaryNode {
 		if(left.matches(right))
 			return new Number(1);
 
+		if(left instanceof Negative && right instanceof Negative)
+			return new Divide(((Negative) left).getNode(), ((Negative) right).getNode()).expand();
+		if(left instanceof Negative)
+			return new Negative(new Divide(((Negative) left).getNode(), right)).expand();
+		if(right instanceof Negative)
+			return new Negative(new Divide(left, ((Negative) right).getNode())).expand();
+
 		if(left instanceof Number && right instanceof Number) {
 			int a = ((Number) left).getValue();
 			int b = ((Number) right).getValue();
