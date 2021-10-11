@@ -1,5 +1,7 @@
 package holworthy.maths.nodes;
 
+import holworthy.maths.DivideByZeroException;
+
 public class Log extends FunctionNode {
 	private Node base;
 
@@ -13,7 +15,7 @@ public class Log extends FunctionNode {
 	}
 
 	@Override
-	public Node expand() {
+	public Node expand() throws DivideByZeroException {
 		Node node = getNode().expand();
 		Node base = getBase().expand();
 
