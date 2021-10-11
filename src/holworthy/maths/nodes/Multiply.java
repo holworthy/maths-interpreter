@@ -1,5 +1,7 @@
 package holworthy.maths.nodes;
 
+import holworthy.maths.nodes.constant.I;
+
 public class Multiply extends BinaryNode {
 	public Multiply(Node left, Node right) {
 		super(left, right);
@@ -104,6 +106,9 @@ public class Multiply extends BinaryNode {
 			// 	return new Multiply(new Multiply(((BinaryNode) left).getLeft(), right), ((BinaryNode) left).getRight()).expand();
 		}
 
+		if(left instanceof I && right instanceof I)
+			return new Negative(new Number(1));
+
 		if(left instanceof Divide && right instanceof Number)
 			return new Divide(new Multiply(((Divide) left).getLeft(), right).expand(), ((Divide) left).getRight());
 
@@ -137,6 +142,12 @@ public class Multiply extends BinaryNode {
 		// 	return new Power(left, new Number(2));
 
 		return new Multiply(left, right);
+	}
+
+	@Override
+	public Node differentiate(Variable wrt) {
+		// TODO: implement
+		return null;
 	}
 }
 

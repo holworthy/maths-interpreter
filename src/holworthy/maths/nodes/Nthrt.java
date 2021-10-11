@@ -1,6 +1,6 @@
 package holworthy.maths.nodes;
 
-public class Nthrt extends UnaryNode {
+public class Nthrt extends FunctionNode {
 	private int exponent;
 
 	public Nthrt(Node node, int exponent) {
@@ -22,7 +22,6 @@ public class Nthrt extends UnaryNode {
 	public Node expand() {
 		Node node = getNode().expand();
 		
-
 		if(node instanceof Negative)
 			throw new Error("negative in nth root idk what maths is");
 
@@ -34,5 +33,11 @@ public class Nthrt extends UnaryNode {
 		}
 
 		return new Nthrt(node, exponent);
+	}
+
+	@Override
+	public Node differentiate(Variable wrt) {
+		// TODO: implement
+		return null;
 	}
 }

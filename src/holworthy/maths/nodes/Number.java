@@ -29,4 +29,10 @@ public class Number extends Node {
 	public boolean isConstant() {
 		return true;
 	}
+
+	@Override
+	public Node differentiate(Variable wrt) {
+		// TODO: implement
+		return null;
+	}
 }

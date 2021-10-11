@@ -159,4 +159,10 @@ public class Add extends BinaryNode {
 
 		return new Add(left, right);
 	}
+
+	@Override
+	public Node differentiate(Variable wrt) {
+		// TODO: implement
+		return null;
+	}
 }

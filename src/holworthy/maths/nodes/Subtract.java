@@ -19,4 +19,10 @@ public class Subtract extends BinaryNode {
 	public String toString() {
 		return getLeft() + " - " + getRight();
 	}
+
+	@Override
+	public Node differentiate(Variable wrt) {
+		// TODO: implement
+		return null;
+	}
 }

@@ -11,5 +11,11 @@ public abstract class Matching {
 		public String toString() {
 			return "CONSTANT";
 		}
+
+		@Override
+		public Node differentiate(Variable wrt) {
+			// TODO: implement
+			return null;
+		}
 	}
 }

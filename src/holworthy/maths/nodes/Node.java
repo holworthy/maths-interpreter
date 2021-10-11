@@ -22,4 +22,5 @@ public abstract class Node {
 	}
 
 	public abstract boolean isConstant();
+	public abstract Node differentiate(Variable wrt);
 }

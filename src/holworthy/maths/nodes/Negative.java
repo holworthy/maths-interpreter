@@ -33,4 +33,10 @@ public class Negative extends UnaryNode {
 	public boolean isConstant() {
 		return getNode().isConstant();
 	}
+
+	@Override
+	public Node differentiate(Variable wrt) {
+		// TODO: implement
+		return null;
+	}
 }

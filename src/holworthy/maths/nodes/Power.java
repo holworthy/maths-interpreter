@@ -1,5 +1,7 @@
 package holworthy.maths.nodes;
 
+import holworthy.maths.nodes.constant.I;
+
 public class Power extends BinaryNode {
 	public Power(Node left, Node right) {
 		super(left, right);
@@ -41,5 +43,11 @@ public class Power extends BinaryNode {
 			return new Multiply(new Power(left, new Subtract(right, new Number(1))), left).expand();
 
 		return new Power(left, right);
+	}
+
+	@Override
+	public Node differentiate(Variable wrt) {
+		// TODO: implement
+		return null;
 	}
 }

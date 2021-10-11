@@ -38,4 +38,10 @@ public class Equation extends BinaryNode {
 	public Node expand() {
 		return new Equation(getLeft().expand(), getRight().expand());
 	}
+
+	@Override
+	public Node differentiate(Variable wrt) {
+		// TODO: implement
+		return null;
+	}
 }

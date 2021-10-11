@@ -25,4 +25,10 @@ public class Variable extends Node {
 	public boolean isConstant() {
 		return false;
 	}
+
+	@Override
+	public Node differentiate(Variable wrt) {
+		// TODO: implement
+		return null;
+	}
 }
