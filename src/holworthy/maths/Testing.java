@@ -47,7 +47,7 @@ public class Testing {
 		tests.put("a*a", "a^2");
 		tests.put("a*a^7", "a^8");
 		tests.put("b*a*b^3*c*a^2", "a^3*b^4*c");
-		// tests.put("(x+3)*(x-2)", "x^2+x-6");
+		tests.put("(x+3)*(x-2)", "x^2+x-6");
 
 		// negatives
 		tests.put("-5", "-5");

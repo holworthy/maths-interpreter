@@ -38,9 +38,7 @@ public class Divide extends BinaryNode {
 		if(left instanceof Number && right instanceof Number) {
 			int a = ((Number) left).getValue();
 			int b = ((Number) right).getValue();
-
 			int divisor = gcd(a, b);
-
 			if(a % b == 0)
 				return new Number(a / b);
 
