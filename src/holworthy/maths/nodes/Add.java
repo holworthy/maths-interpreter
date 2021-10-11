@@ -1,5 +1,9 @@
 package holworthy.maths.nodes;
 
+import java.util.ArrayList;
+import java.util.ListIterator;
+import java.util.Arrays;
+
 public class Add extends BinaryNode {
 	public Add(Node left, Node right) {
 		super(left, right);
@@ -128,6 +132,31 @@ public class Add extends BinaryNode {
 		return b == 0 ? a : gcd(b, a % b);
 	}
 
+	public ArrayList<Node> flatten(Multiply root){
+		if(!(root.getLeft() instanceof Multiply)){
+			return new ArrayList<Node>(Arrays.asList(root.getLeft(), root.getRight()));
+		}
+		else{
+			ArrayList<Node> list = new ArrayList<>(Arrays.asList(root.getRight()));
+			list.addAll(flatten((Multiply) root.getLeft()));
+			return list;
+		}
+	}
+
+	public Node unFlatten(ArrayList<Node> list){
+		if (list.size() == 1)
+			return list.get(0);
+		if (list.size() == 2)
+			return new Multiply(list.get(0), list.get(1));
+		else{
+			Multiply multi = new Multiply(list.get(0), list.get(1));
+			for (int i = 2; i < list.size(); i++){
+				multi = new Multiply(multi, list.get(i));
+			}
+			return multi;
+		}
+	}
+
 	@Override
 	public Node collapse() {
 		Node left = getLeft().collapse();
@@ -153,8 +182,37 @@ public class Add extends BinaryNode {
 			}
 			// if(gcd(((Number) ((BinaryNode) left).getLeft()).getValue(), ((Number) ((BinaryNode) right).getLeft()).getValue()) != 1){
 			// 	int gcd = gcd(((Number) ((BinaryNode) left).getLeft()).getValue(), ((Number) ((BinaryNode) right).getLeft()).getValue());
-			// 	return new Multiply(gcd)
+			// 	return new Multiply(gcd, new Add(left, right))
 			// }
+			ArrayList<Node> leftList = flatten((Multiply) left);
+			ArrayList<Node> rightList = flatten((Multiply) right);
+			ArrayList<Node> removeList = new ArrayList<>();
+			ListIterator<Node> leftItr = leftList.listIterator();
+			
+			while(leftItr.hasNext()){
+				Node n = leftItr.next();
+				ListIterator<Node> rightItr = rightList.listIterator();
+				while(rightItr.hasNext()){
+					Node o = rightItr.next();
+					if(n.matches(o)){
+						removeList.add(o);
+						rightItr.remove();
+						leftItr.remove();
+						break;
+					}
+					if(n instanceof Number && o instanceof Number && gcd(((Number) n).getValue(), ((Number) o).getValue()) != 1){
+						int gcd = gcd(((Number) n).getValue(), ((Number) o).getValue());
+						removeList.add(new Number(gcd));
+						rightItr.remove();
+						rightItr.add(new Number(((Number) o).getValue()/gcd));
+						leftItr.remove();
+						leftItr.add(new Number(((Number) n).getValue()/gcd));
+						break;
+					}
+				}
+			}
+			if(!(removeList.isEmpty()))
+				return new Multiply(unFlatten(removeList), new Add(unFlatten(leftList), unFlatten(rightList)));
 		}
 
 		return new Add(left, right);

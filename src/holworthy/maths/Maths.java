@@ -364,3 +364,8 @@ public abstract class Maths {
 		scanner.close();
 	}
 }
+
+
+// expr = expr + mul
+// mul = mul * num
+// num = digit
