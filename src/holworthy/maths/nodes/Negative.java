@@ -1,5 +1,7 @@
 package holworthy.maths.nodes;
 
+import holworthy.maths.DivideByZeroException;
+
 public class Negative extends UnaryNode {
 	public Negative(Node node) {
 		super(node);
@@ -11,7 +13,7 @@ public class Negative extends UnaryNode {
 	}
 
 	@Override
-	public Node expand() {
+	public Node expand() throws DivideByZeroException{
 		Node node = getNode().expand();
 		if(node instanceof Negative)
 			return ((Negative) node).getNode();

@@ -1,5 +1,7 @@
 package holworthy.maths.nodes;
 
+import holworthy.maths.DivideByZeroException;
+
 public class Equation extends BinaryNode {
 	public Equation(Node left, Node right) {
 		super(left, right);
@@ -35,7 +37,7 @@ public class Equation extends BinaryNode {
 	}
 
 	@Override
-	public Node expand() {
+	public Node expand() throws DivideByZeroException{
 		return new Equation(getLeft().expand(), getRight().expand());
 	}
 

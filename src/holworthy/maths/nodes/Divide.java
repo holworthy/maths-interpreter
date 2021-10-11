@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.ListIterator;
 
+import holworthy.maths.DivideByZeroException;
+
 public class Divide extends BinaryNode {
 	public Divide(Node left, Node right) {
 		super(left, right);
@@ -23,11 +25,13 @@ public class Divide extends BinaryNode {
 	}
 
 	@Override
-	public Node expand() {
+	public Node expand() throws DivideByZeroException{
 		Node left = getLeft().expand();
 		Node right = getRight().expand();
 
-		// TODO: handle divide by 0
+		if (right instanceof Number && ((Number) right).getValue() == 0){
+			throw new DivideByZeroException("You Can't divide by zero");
+		}
 
 		if(left.matches(right))
 			return new Number(1);

@@ -1,5 +1,7 @@
 package holworthy.maths.nodes;
 
+import holworthy.maths.DivideByZeroException;
+
 public class Subtract extends BinaryNode {
 	public Subtract(Node left, Node right) {
 		super(left, right);
@@ -11,7 +13,7 @@ public class Subtract extends BinaryNode {
 	}
 
 	@Override
-	public Node expand() {
+	public Node expand() throws DivideByZeroException{
 		return normalise().expand();
 	}
 
