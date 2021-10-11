@@ -57,8 +57,12 @@ public class Multiply extends BinaryNode {
 			return new Number(((Number) left).getValue() * ((Number) right).getValue());
 		if(left.matches(new Number(0)))
 			return new Number(0);
+		if(right.matches(new Number(0)))
+			return new Number(0);
 		if(left.matches(new Number(1)))
 			return right;
+		if(right.matches(new Number(1)))
+			return left;
 		// negative constant handling
 		if(left instanceof Negative && !(right instanceof Negative))
 			return new Negative(new Multiply(((UnaryNode) left).getNode(), right)).expand();
