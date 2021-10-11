@@ -1,5 +1,7 @@
 package holworthy.maths.nodes;
 
+import holworthy.maths.DivideByZeroException;
+
 public class Nthrt extends FunctionNode {
 	private int exponent;
 
@@ -19,7 +21,7 @@ public class Nthrt extends FunctionNode {
 	}
 
 	@Override
-	public Node expand() {
+	public Node expand() throws DivideByZeroException{
 		Node node = getNode().expand();
 		
 		if(node instanceof Negative)

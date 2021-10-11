@@ -1,5 +1,6 @@
 package holworthy.maths.nodes;
 
+import holworthy.maths.DivideByZeroException;
 import holworthy.maths.nodes.constant.I;
 
 public class Multiply extends BinaryNode {
@@ -44,7 +45,7 @@ public class Multiply extends BinaryNode {
 	}
 
 	@Override
-	public Node expand() {
+	public Node expand() throws DivideByZeroException{
 		Node left = getLeft().expand();
 		Node right = getRight().expand();
 
@@ -141,13 +142,8 @@ public class Multiply extends BinaryNode {
 		Node right = getRight().collapse();
 
 		if(right instanceof Power && ((BinaryNode) right).getRight() instanceof Negative){
-			return new Divide(left, new Power(((BinaryNode) right).getLeft(), ((UnaryNode) ((BinaryNode) right).getRight()).getNode()).expand()).collapse();
+			return new Divide(left, new Power(((BinaryNode) right).getLeft(), ((UnaryNode) ((BinaryNode) right).getRight()).getNode())).collapse();
 		}
-
-		// TODO:
-		// x*x = x^2
-		// if(left.matches(right))
-		// 	return new Power(left, new Number(2));
 
 		return new Multiply(left, right);
 	}

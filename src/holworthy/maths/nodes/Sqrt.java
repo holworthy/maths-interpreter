@@ -1,5 +1,6 @@
 package holworthy.maths.nodes;
 
+import holworthy.maths.DivideByZeroException;
 import holworthy.maths.nodes.constant.I;
 
 public class Sqrt extends Nthrt {
@@ -18,7 +19,7 @@ public class Sqrt extends Nthrt {
 	}
 
 	@Override
-	public Node expand() {
+	public Node expand() throws DivideByZeroException{
 		Node node = getNode().expand();
 
 		if(node instanceof Negative)

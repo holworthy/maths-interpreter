@@ -1,5 +1,6 @@
 package holworthy.maths.nodes;
 
+import holworthy.maths.DivideByZeroException;
 import holworthy.maths.nodes.constant.I;
 
 public class Power extends BinaryNode {
@@ -13,7 +14,7 @@ public class Power extends BinaryNode {
 	}
 
 	@Override
-	public Node expand() {
+	public Node expand() throws DivideByZeroException{
 		Node left = getLeft().expand();
 		Node right = getRight().expand();
 

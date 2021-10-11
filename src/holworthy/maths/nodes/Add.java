@@ -2,6 +2,9 @@ package holworthy.maths.nodes;
 
 import java.util.ArrayList;
 import java.util.ListIterator;
+
+import holworthy.maths.DivideByZeroException;
+
 import java.util.Arrays;
 
 public class Add extends BinaryNode {
@@ -57,7 +60,7 @@ public class Add extends BinaryNode {
 	}
 
 	@Override
-	public Node expand() {
+	public Node expand() throws DivideByZeroException{
 		Node left = getLeft().expand();
 		Node right = getRight().expand();
 

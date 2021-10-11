@@ -1,11 +1,13 @@
 package holworthy.maths.nodes;
 
+import holworthy.maths.DivideByZeroException;
+
 public abstract class Node {
 	public Node normalise() {
 		return this;
 	}
 
-	public Node expand() {
+	public Node expand() throws DivideByZeroException {
 		return this;
 	}
 
@@ -13,7 +15,7 @@ public abstract class Node {
 		return this;
 	}
 
-	public final Node simplify() {
+	public final Node simplify() throws DivideByZeroException {
 		return normalise().expand().normalise().collapse().normalise();
 	}
 
