@@ -37,17 +37,17 @@ public class Testing {
 		// basic algebra
 		tests.put("3*a+3*b", "3*(a+b)");
 		tests.put("3*x+5*x", "8*x");
-		// tests.put("6*l+2*j-3*k+5*j+4*k","6*l+7*j+k"); crashes
+		tests.put("6*l+2*j-3*k+5*j+4*k","6*l+7*j+k");
 		tests.put("(z+3)*2","2*z+6");
 		tests.put("2*(x+5)", "2*x+10");
-		// tests.put("2*x+5=15", "x=5"); //doesn't solve
-		tests.put("(x+2)^2+3","x^2+4*x+7"); //doesn't do anything
+		tests.put("2*x+5=15", "x=5"); //doesn't solve
+		tests.put("(x+2)^2+3","x^2+4*x+7");
 		tests.put("(3*x+2)/(3*x+2)", "1");
-		// tests.put("(3*x*2)/(3*x*5)", "(2)/(5)"); crashes
+		tests.put("(3*x*2)/(3*x*5)", "(2)/(5)"); 
 		tests.put("a*a", "a^2");
 		tests.put("a*a^7", "a^8");
 		tests.put("b*a*b^3*c*a^2", "a^3*b^4*c");
-		// tests.put("(x+3)*(x-2)", "x^2+x-6");
+		tests.put("(x+3)*(x-2)", "x^2+x-6");
 
 		// negatives
 		tests.put("-5", "-5");

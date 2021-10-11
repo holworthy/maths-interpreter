@@ -120,10 +120,10 @@ public class Multiply extends BinaryNode {
 
 	public boolean needSwitching(Node left, Node right){
 		// swap variables and numbers
-		if((left instanceof Variable && right instanceof Number) || (left instanceof Power && right instanceof Number))
+		if((left instanceof Variable && (right instanceof Number || right instanceof Negative)) || (left instanceof Power && (right instanceof Number || right instanceof Negative)))
 			return true;
 		// swap powers by variables
-		if(left instanceof Variable && right instanceof Power && ((Variable) left).getName().compareTo(((Variable) ((BinaryNode) right).getLeft()).getName()) > 0)
+		if(left instanceof Variable && right instanceof Power && ((BinaryNode) right).getLeft() instanceof Variable && ((Variable) left).getName().compareTo(((Variable) ((BinaryNode) right).getLeft()).getName()) > 0)
 			return true;
 		if(left instanceof Power && right instanceof Power && ((Variable) ((BinaryNode) left).getLeft()).getName().compareTo(((Variable) ((BinaryNode) right).getLeft()).getName()) > 0)
 			return true;
