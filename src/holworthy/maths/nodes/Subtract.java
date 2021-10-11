@@ -17,6 +17,6 @@ public class Subtract extends BinaryNode {
 
 	@Override
 	public String toString() {
-		return getLeft() + "-" + getRight();
+		return getLeft() + " - " + getRight();
 	}
 }

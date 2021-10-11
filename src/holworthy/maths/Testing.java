@@ -44,8 +44,6 @@ public class Testing {
 		tests.put("(x+2)^2+3","x^2+4*x+7"); //doesn't do anything
 		tests.put("(3*x+2)/(3*x+2)", "1");
 		// tests.put("(3*x*2)/(3*x*5)", "(2)/(5)"); crashes
-
-
 		tests.put("a*a", "a^2");
 		tests.put("a*a^7", "a^8");
 		tests.put("b*a*b^3*c*a^2", "a^3*b^4*c");
@@ -60,6 +58,9 @@ public class Testing {
 		tests.put("-5-2", "-7");
 		tests.put("-5-7", "-12");
 		tests.put("-1--5", "4");
+
+		// division
+		tests.put("-(2/-3)", "2/3");
 
 		// complex numbers
 		System.out.println(new Sqrt(new Negative(new Number(16))).simplify());
