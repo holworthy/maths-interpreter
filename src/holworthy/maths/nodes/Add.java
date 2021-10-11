@@ -123,31 +123,39 @@ public class Add extends BinaryNode {
 
 		return new Add(left, right);
 	}
+	// TODO: refactor as wetted in divide
+	private int gcd(int a, int b) {
+		return b == 0 ? a : gcd(b, a % b);
+	}
 
 	@Override
 	public Node collapse() {
 		Node left = getLeft().collapse();
 		Node right = getRight().collapse();
 
-		// if(left instanceof Number && right instanceof Number)
-		// 	return new Number(((Number) left).getValue() + ((Number) right).getValue());
+		if(left instanceof Number && right instanceof Number)
+			return new Number(((Number) left).getValue() + ((Number) right).getValue());
 
-		// if(left instanceof Multiply && right instanceof Multiply && ((Multiply) left).getRight().matches(((Multiply) right).getRight()))
-		// 	return new Multiply(new Add(((Multiply) left).getLeft(), ((Multiply) right).getLeft()).collapse(), ((Multiply) left).getRight());
+		if(left instanceof Multiply && right instanceof Multiply && ((Multiply) left).getRight().matches(((Multiply) right).getRight()))
+			return new Multiply(new Add(((Multiply) left).getLeft(), ((Multiply) right).getLeft()).collapse(), ((Multiply) left).getRight());
 
-		// if(left instanceof Variable && right instanceof Variable && left.matches(right))
-		// 	return new Multiply(new Number(2), left);
+		if(left instanceof Variable && right instanceof Variable && left.matches(right))
+			return new Multiply(new Number(2), left);
 
-		// if(left instanceof Multiply && right instanceof Multiply){
-		// 	if(((BinaryNode) left).getRight().matches(((BinaryNode) right).getRight())){
-		// 		Add a = new Add(((BinaryNode) left).getLeft(), ((BinaryNode) right).getLeft());
-		// 		return new Multiply(a.collapse(), ((BinaryNode) right).getRight());
-		// 	}
-		// 	if(((BinaryNode) left).getLeft().matches(((BinaryNode) right).getLeft())){
-		// 		Add a = new Add(((BinaryNode) left).getRight(), ((BinaryNode) right).getRight());
-		// 		return new Multiply(((BinaryNode) right).getLeft(), a.collapse());
-		// 	}
-		// }
+		if(left instanceof Multiply && right instanceof Multiply){
+			if(((BinaryNode) left).getRight().matches(((BinaryNode) right).getRight())){
+				Add a = new Add(((BinaryNode) left).getLeft(), ((BinaryNode) right).getLeft());
+				return new Multiply(a.collapse(), ((BinaryNode) right).getRight());
+			}
+			if(((BinaryNode) left).getLeft().matches(((BinaryNode) right).getLeft())){
+				Add a = new Add(((BinaryNode) left).getRight(), ((BinaryNode) right).getRight());
+				return new Multiply(((BinaryNode) right).getLeft(), a.collapse());
+			}
+			// if(gcd(((Number) ((BinaryNode) left).getLeft()).getValue(), ((Number) ((BinaryNode) right).getLeft()).getValue()) != 1){
+			// 	int gcd = gcd(((Number) ((BinaryNode) left).getLeft()).getValue(), ((Number) ((BinaryNode) right).getLeft()).getValue());
+			// 	return new Multiply(gcd)
+			// }
+		}
 
 		return new Add(left, right);
 	}
