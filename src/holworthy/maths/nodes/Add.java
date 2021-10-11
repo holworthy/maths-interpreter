@@ -22,47 +22,33 @@ public class Add extends BinaryNode {
 		return new Add(left, right);
 	}
 
-	private int countVariables(Node node) {
-		if(node instanceof Number)
-			return 0;
-		if(node instanceof Variable)
-			return 1;
-		if(node instanceof Power)
-			return countVariables(((Power) node).getLeft());
-		if(node instanceof Multiply)
-			return countVariables(((BinaryNode) node).getLeft()) + countVariables(((BinaryNode) node).getRight());
-		return 0;
-	}
-
-	private boolean compareVariables(Node left, Node right) {
-		// sort variables alphabetically
-		if(left instanceof Variable && right instanceof Variable)
-			return ((Variable) left).getName().compareTo(((Variable) right).getName()) > 0;
-		if(left instanceof Multiply && ((Multiply) left).getLeft().isConstant() && !((Multiply) left).getRight().isConstant())
-			return compareVariables(((Multiply) left).getRight(), right);
-		if(left instanceof Variable && right instanceof Power && ((Power) right).getLeft() instanceof Variable)
-			return compareVariables(left, ((Power) right).getLeft()) || ((Variable) left).getName().equals(((Variable) ((BinaryNode) right).getLeft()).getName());
-		if(left instanceof Power)
-			return compareVariables(((Power) left).getLeft(), right);
-		if(right instanceof Power)
-			return compareVariables(left, ((Power) right).getLeft());
-		if(left instanceof Multiply && right instanceof Multiply)
-			return compareVariables(((Multiply) left).getLeft(), ((Multiply) right).getLeft()) || compareVariables(((Multiply) left).getRight(), ((Multiply) right).getRight());
-		return false;
-	}
-
 	private boolean shouldSwap(Node left, Node right) {
 		if(left.matches(right))
 			return false;
-		// 2 + x => x + 2
+		if(left instanceof Number && right instanceof Number)
+			return ((Number) left).getValue() < ((Number) right).getValue();
 		if(left instanceof Number && !(right instanceof Number))
 			return true;
 		if(right instanceof Number)
 			return false;
-		if(countVariables(left) < countVariables(right))
-			return true;
-		if(countVariables(left) == countVariables(right))
-			return compareVariables(left, right);
+		if(left instanceof Variable && right instanceof Variable)
+			return ((Variable) left).getName().compareTo(((Variable) right).getName()) > 0;
+		if(left instanceof Multiply && ((BinaryNode) left).getLeft().isConstant() && ((BinaryNode) left).getRight() instanceof Variable && right instanceof Variable)
+			return ((BinaryNode) left).getRight().matches(right) ? false : shouldSwap(((BinaryNode) left).getRight(), right);
+		if(left instanceof Power && right instanceof Power) {
+			if(((BinaryNode) left).getLeft() instanceof Variable && ((BinaryNode) right).getLeft() instanceof Variable) {
+				return ((BinaryNode) left).getLeft().matches(((BinaryNode) right).getLeft()) ? shouldSwap(((BinaryNode) left).getRight(), ((BinaryNode) right).getRight()) : shouldSwap(((BinaryNode) left).getLeft(), ((BinaryNode) right).getLeft());
+			}
+			// TODO: 2^x + 2^z + 2^y
+		}
+		if(left instanceof Variable && right instanceof Power && ((BinaryNode) right).getLeft() instanceof Variable)
+			return left.matches(((BinaryNode) right).getLeft()) ? true : shouldSwap(left, ((BinaryNode) right).getLeft());
+		if(left instanceof Multiply && ((BinaryNode) left).getLeft().isConstant() && ((BinaryNode) left).getRight() instanceof Power)
+			return shouldSwap(((BinaryNode) left).getRight(), right);
+		if(right instanceof Multiply && ((BinaryNode) right).getLeft().isConstant() && ((BinaryNode) right).getRight() instanceof Power)
+			return shouldSwap(left, ((BinaryNode) right).getRight());
+		
+
 		return false;
 	}
 
@@ -124,8 +110,10 @@ public class Add extends BinaryNode {
 		// sort terms
 		if(!(left instanceof Add) && shouldSwap(left, right))
 			return new Add(right, left).expand();
-		if(left instanceof Add && shouldSwap(((Add) left).getRight(), right))
+		if(left instanceof Add && shouldSwap(((Add) left).getRight(), right)) {
+			System.out.println("swapping " + ((BinaryNode) left).getRight() + " with " + right);
 			return new Add(new Add(((Add) left).getLeft(), right), ((Add) left).getRight()).expand();
+		}
 
 		return new Add(left, right);
 	}
