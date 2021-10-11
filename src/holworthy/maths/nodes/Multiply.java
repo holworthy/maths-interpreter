@@ -131,6 +131,10 @@ public class Multiply extends BinaryNode {
 		Node left = getLeft().collapse();
 		Node right = getRight().collapse();
 
+		if(right instanceof Power && ((BinaryNode) right).getRight() instanceof Negative){
+			return new Divide(left, new Power(((BinaryNode) right).getLeft(), ((UnaryNode) ((BinaryNode) right).getRight()).getNode()).expand()).collapse();
+		}
+
 		// TODO:
 		// x*x = x^2
 		// if(left.matches(right))
