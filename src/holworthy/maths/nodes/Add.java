@@ -161,7 +161,7 @@ public class Add extends BinaryNode {
 	}
 
 	@Override
-	public Node collapse() {
+	public Node collapse() throws DivideByZeroException{
 		Node left = getLeft().collapse();
 		Node right = getRight().collapse();
 

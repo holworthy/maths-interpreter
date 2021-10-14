@@ -63,8 +63,8 @@ public class Testing {
 		tests.put("-(2/-3)", "2/3");
 
 		// complex numbers
-		System.out.println(new Sqrt(new Negative(new Number(16))).simplify());
-
+		
+		tests.put("sqrt(-16)","4*i");
 		// run the tests
 		runTests(tests);
 	}
