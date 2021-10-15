@@ -3,7 +3,9 @@ package holworthy.maths.nodes;
 import java.math.BigInteger;
 
 import holworthy.maths.DivideByZeroException;
+import holworthy.maths.nodes.constant.E;
 import holworthy.maths.nodes.constant.I;
+import holworthy.maths.nodes.constant.Pi;
 
 public class Power extends BinaryNode {
 	public Power(Node left, Node right) {
@@ -20,6 +22,9 @@ public class Power extends BinaryNode {
 		Node left = getLeft().expand();
 		Node right = getRight().expand();
 
+		if(left.matches(new Number(0)) && right.matches(new Number(0)))
+			throw new DivideByZeroException("0^0 is undefined");
+
 		// 2^3 = 8
 		if(left instanceof Number && right instanceof Number)
 			return new Number(((Number) left).getValue().pow(((Number) right).getValue().intValue()));
@@ -32,7 +37,6 @@ public class Power extends BinaryNode {
 		if(matches(new Power(new I(), new Number(2))))
 			return new Negative(new Number(1));
 
-		// TODO: handle 0^0
 		// x^0 = 1
 		if(right instanceof Number && ((Number) right).getValue().compareTo(BigInteger.ZERO) == 0)
 			return new Number(1);
@@ -41,9 +45,27 @@ public class Power extends BinaryNode {
 		if(right instanceof Number && ((Number) right).getValue().compareTo(BigInteger.ONE) == 0)
 			return left;
 
+		// binomial theorum
+		if(left instanceof Add && !(((BinaryNode) left).getLeft() instanceof Add) && right instanceof Number) {
+			Node temp = new Number(0);
+			for(int k = 0; k < ((Number) right).getValue() + 1; k++)
+				temp = new Add(temp, new Multiply(new Multiply(new Divide(new Factorial(right), new Multiply(new Factorial(new Number(k)), new Factorial(new Subtract(right, new Number(k))))), new Power(((BinaryNode) left).getLeft(), new Subtract(right, new Number(k)))), new Power(((BinaryNode) left).getRight(), new Number(k))).expand());
+			return temp.expand();
+		}
+
 		// (a+b)^3 = (a+b)^2*(a+b)
 		if(left instanceof Add && right instanceof Number)
 			return new Multiply(new Power(left, new Subtract(right, new Number(1))), left).expand();
+
+		// e^(i*pi) = -1
+		if(left instanceof E && right instanceof Multiply && ((BinaryNode) right).getLeft() instanceof I && ((BinaryNode) right).getRight() instanceof Pi)
+			return new Negative(new Number(1));
+
+		if(left instanceof Multiply)
+			return new Multiply(new Power(((BinaryNode) left).getLeft(), right), new Power(((BinaryNode) left).getRight(), right)).expand();
+
+
+
 
 		return new Power(left, right);
 	}

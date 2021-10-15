@@ -1,6 +1,7 @@
 package holworthy.maths.nodes;
 
 import holworthy.maths.DivideByZeroException;
+import holworthy.maths.nodes.constant.ConstantNode;
 import holworthy.maths.nodes.constant.I;
 
 public class Multiply extends BinaryNode {
@@ -133,6 +134,8 @@ public class Multiply extends BinaryNode {
 		if(left instanceof Variable && right instanceof Variable)
 			if (((Variable) left).getName().compareTo(((Variable) right).getName()) > 0)
 				return true;
+		if(left instanceof ConstantNode && right instanceof ConstantNode)
+			return left.toString().compareTo(right.toString()) > 0;
 		return false;
 	}
 

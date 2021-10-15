@@ -2,11 +2,10 @@ package holworthy.maths.nodes;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.ListIterator;
 
 import holworthy.maths.DivideByZeroException;
-
-import java.util.Arrays;
 
 public class Add extends BinaryNode {
 	public Add(Node left, Node right) {
@@ -30,32 +29,75 @@ public class Add extends BinaryNode {
 		return new Add(left, right);
 	}
 
+	private ArrayList<Node> flatten2(Node node) {
+		if(node instanceof Multiply && ((BinaryNode) node).getLeft() instanceof Multiply) {
+			ArrayList<Node> items = flatten2(((Multiply) node).getLeft());
+			items.add(((BinaryNode) node).getRight());
+			return items;
+		} else {
+			ArrayList<Node> items = new ArrayList<>();
+			if(node instanceof Multiply) {
+				items.add(((BinaryNode) node).getLeft());
+				items.add(((BinaryNode) node).getRight());
+			} else {
+				items.add(node);
+			}
+			return items;
+		}
+	}
+
 	private boolean shouldSwap(Node left, Node right) {
 		if(left.matches(right))
 			return false;
+
 		if(left instanceof Number && right instanceof Number)
 			return ((Number) left).getValue().compareTo(((Number) right).getValue()) < 0;
 		if(left instanceof Number && !(right instanceof Number))
+			return ((Number) left).getValue().compareTo(((Number) right).getValue()) < 0;
+
+		if(left instanceof Number && (right instanceof Multiply || right instanceof Power))
 			return true;
-		if(right instanceof Number)
-			return false;
+
 		if(left instanceof Variable && right instanceof Variable)
 			return ((Variable) left).getName().compareTo(((Variable) right).getName()) > 0;
-		if(left instanceof Multiply && ((BinaryNode) left).getLeft().isConstant() && ((BinaryNode) left).getRight() instanceof Variable && right instanceof Variable)
-			return ((BinaryNode) left).getRight().matches(right) ? false : shouldSwap(((BinaryNode) left).getRight(), right);
-		if(left instanceof Power && right instanceof Power) {
-			if(((BinaryNode) left).getLeft() instanceof Variable && ((BinaryNode) right).getLeft() instanceof Variable) {
-				return ((BinaryNode) left).getLeft().matches(((BinaryNode) right).getLeft()) ? shouldSwap(((BinaryNode) left).getRight(), ((BinaryNode) right).getRight()) : shouldSwap(((BinaryNode) left).getLeft(), ((BinaryNode) right).getLeft());
+
+		if(left instanceof Negative)
+			return shouldSwap(((UnaryNode) left).getNode(), right);
+		if(right instanceof Negative)
+			return shouldSwap(left, ((UnaryNode) right).getNode());
+
+		ArrayList<Node> flattenedLeft = flatten2(left);
+		ArrayList<Node> flattenedRight = flatten2(right);
+
+		int leftIndex = 0;
+		int rightIndex = 0;
+
+		// remove constants
+		while(flattenedLeft.size() > 0 && flattenedLeft.get(0).matches(new Matching.Constant()))
+			flattenedLeft.remove(0);
+		while(flattenedRight.size() > 0 && flattenedRight.get(0).matches(new Matching.Constant()))
+			flattenedRight.remove(0);
+
+		while(leftIndex < flattenedLeft.size() && rightIndex < flattenedRight.size()) {
+			Power leftPower = flattenedLeft.get(leftIndex) instanceof Variable ? new Power(flattenedLeft.get(leftIndex), new Number(1)) : (Power) flattenedLeft.get(leftIndex);
+			Power rightPower = flattenedRight.get(rightIndex) instanceof Variable ? new Power(flattenedRight.get(rightIndex), new Number(1)) : (Power) flattenedRight.get(rightIndex);
+
+			if(leftPower.getLeft().matches(rightPower.getLeft())) {
+				if(leftPower.matches(rightPower)) {
+					leftIndex++;
+					rightIndex++;
+				} else if(shouldSwap(leftPower.getRight(), rightPower.getRight())) {
+					return true;
+				} else {
+					return false;
+				}
+			} else {
+				if(shouldSwap(leftPower.getLeft(), rightPower.getLeft()))
+					return true;
+				else if(shouldSwap(rightPower.getLeft(), leftPower.getLeft()))
+					return false;
 			}
-			// TODO: 2^x + 2^z + 2^y
 		}
-		if(left instanceof Variable && right instanceof Power && ((BinaryNode) right).getLeft() instanceof Variable)
-			return left.matches(((BinaryNode) right).getLeft()) ? true : shouldSwap(left, ((BinaryNode) right).getLeft());
-		if(left instanceof Multiply && ((BinaryNode) left).getLeft().isConstant() && ((BinaryNode) left).getRight() instanceof Power)
-			return shouldSwap(((BinaryNode) left).getRight(), right);
-		if(right instanceof Multiply && ((BinaryNode) right).getLeft().isConstant() && ((BinaryNode) right).getRight() instanceof Power)
-			return shouldSwap(left, ((BinaryNode) right).getRight());
-		
 
 		return false;
 	}
@@ -64,6 +106,11 @@ public class Add extends BinaryNode {
 	public Node expand() throws DivideByZeroException{
 		Node left = getLeft().expand();
 		Node right = getRight().expand();
+
+		if(left.matches(new Number(0)))
+			return right;
+		if(right.matches(new Number(0)))
+			return left;
 
 		// constant folding
 		if(left instanceof Number && right instanceof Number)
@@ -100,6 +147,8 @@ public class Add extends BinaryNode {
 		// a*x^n+b*x^n=(a+b)*x^n
 		if(left instanceof Multiply && ((BinaryNode) left).getLeft().isConstant() && right instanceof Multiply && ((BinaryNode) right).getLeft().isConstant() && ((BinaryNode) left).getRight().matches(((BinaryNode) right).getRight()))
 			return new Multiply(new Add(((BinaryNode) left).getLeft(), ((BinaryNode) right).getLeft()), ((BinaryNode) left).getRight()).expand();
+		if(left instanceof Add && ((BinaryNode) left).getRight() instanceof Multiply && ((BinaryNode) ((BinaryNode) left).getRight()).getLeft().isConstant() && right instanceof Multiply && ((BinaryNode) right).getLeft().isConstant() && ((BinaryNode) ((BinaryNode) left).getRight()).getRight().matches(((BinaryNode) right).getRight()))
+			return new Multiply(new Add(((BinaryNode) ((BinaryNode) left).getRight()).getLeft(), ((BinaryNode) right).getLeft()), ((BinaryNode) ((BinaryNode) left).getRight()).getRight()).expand();
 		// 2*x + -(3*x)
 		if(left instanceof Multiply && right instanceof Negative && ((UnaryNode) right).getNode() instanceof Multiply && ((BinaryNode) left).getLeft().isConstant() && ((BinaryNode) ((UnaryNode) right).getNode()).getLeft().isConstant() && ((BinaryNode) left).getRight().matches(((BinaryNode) ((UnaryNode) right).getNode()).getRight()))
 			return new Multiply(new Subtract(((BinaryNode) left).getLeft(), ((BinaryNode) ((UnaryNode) right).getNode()).getLeft()), ((BinaryNode) left).getRight()).expand();
@@ -124,10 +173,10 @@ public class Add extends BinaryNode {
 		// sort terms
 		if(!(left instanceof Add) && shouldSwap(left, right))
 			return new Add(right, left).expand();
-		if(left instanceof Add && shouldSwap(((Add) left).getRight(), right)) {
-			System.out.println("swapping " + ((BinaryNode) left).getRight() + " with " + right);
+		if(left instanceof Add && shouldSwap(((Add) left).getRight(), right)) // {
+			// System.out.println("swapping " + ((BinaryNode) left).getRight() + " with " + right);
 			return new Add(new Add(((Add) left).getLeft(), right), ((Add) left).getRight()).expand();
-		}
+		// }
 
 		return new Add(left, right);
 	}

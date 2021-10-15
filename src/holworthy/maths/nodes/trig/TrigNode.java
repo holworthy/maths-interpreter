@@ -13,4 +13,9 @@ public abstract class TrigNode extends FunctionNode {
 	public Node differentiate(Variable wrt) {
 		return null;
 	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName().toLowerCase() + "(" + getNode() + ")";
+	}
 }
