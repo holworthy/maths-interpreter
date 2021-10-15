@@ -11,7 +11,7 @@ public abstract class Node {
 		return this;
 	}
 
-	public Node collapse() {
+	public Node collapse() throws DivideByZeroException{
 		return this;
 	}
 

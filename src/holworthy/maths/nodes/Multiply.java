@@ -140,12 +140,12 @@ public class Multiply extends BinaryNode {
 	}
 
 	@Override
-	public Node collapse() {
+	public Node collapse() throws DivideByZeroException{
 		Node left = getLeft().collapse();
 		Node right = getRight().collapse();
 
 		if(right instanceof Power && ((BinaryNode) right).getRight() instanceof Negative){
-			return new Divide(left, new Power(((BinaryNode) right).getLeft(), ((UnaryNode) ((BinaryNode) right).getRight()).getNode())).collapse();
+			return new Divide(left, new Power(((BinaryNode) right).getLeft(), ((UnaryNode) ((BinaryNode) right).getRight()).getNode()).expand()).collapse();
 		}
 
 		return new Multiply(left, right);

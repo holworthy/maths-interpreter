@@ -193,14 +193,40 @@ public abstract class Maths {
 			return variable;
 		} else if(parser.hasMore() && parser.getChar() >= '0' && parser.getChar() <= '9') {
 			int start = parser.getCursor();
-			while(parser.hasMore() && parser.getChar() >= '0' && parser.getChar() <= '9')
+			boolean decimal = false;
+			while(parser.hasMore() && (parser.getChar() >= '0' && parser.getChar() <= '9' || (parser.getChar() == '.' && !decimal))){
+				if(parser.getChar() == '.')
+					decimal = true;
 				parser.incrementCursor();
+			}
+				
 			String value = parser.getInput().substring(start, parser.getCursor());
+			if(decimal)
+				return decimalToFraction(Double.parseDouble(value));
 			Node number = new Number(Integer.parseInt(value));
 			return number;
 		} else {
 			throw new Exception("Syntax Error");
 		}
+	}
+
+	private static Node decimalToFraction(double parseDouble) {
+		if (parseDouble < 0)
+			return new Negative(decimalToFraction(-parseDouble));
+		double tolerance = 1.0E-10;
+		double h1 = 1, h2 = 0, k1 = 0, k2 = 1, b = parseDouble;
+		do {
+			double a = Math.floor(b);
+			double aux = h1;
+			h1 = a*h1+h2;
+			h2 = aux;
+			aux = k1;
+			k1 = a*k1+k2;
+			k2 = aux;
+			b = 1/(b-a);
+		} while (Math.abs(parseDouble-h1/k1) > parseDouble*tolerance);
+
+		return new Divide(new Number((int) h1), new Number((int) k1));
 	}
 
 	private static Node parsePower(Parser parser) throws Exception {
