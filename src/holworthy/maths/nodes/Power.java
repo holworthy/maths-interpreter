@@ -1,5 +1,7 @@
 package holworthy.maths.nodes;
 
+import java.math.BigInteger;
+
 import holworthy.maths.DivideByZeroException;
 import holworthy.maths.nodes.constant.I;
 
@@ -20,10 +22,10 @@ public class Power extends BinaryNode {
 
 		// 2^3 = 8
 		if(left instanceof Number && right instanceof Number)
-			return new Number((int) Math.pow(((Number) left).getValue(), ((Number) right).getValue()));
+			return new Number(((Number) left).getValue().pow(((Number) right).getValue().intValue()));
 		
 		if(left instanceof Number && right instanceof Divide && ((BinaryNode) right).getLeft() instanceof Number && ((BinaryNode) right).getRight() instanceof Number){
-			return new Nthrt(new Power(left, ((BinaryNode) right).getLeft()), ((Number) ((BinaryNode) right).getRight()).getValue()).expand();
+			return new Nthrt(new Power(left, ((BinaryNode) right).getLeft()), ((Number) ((BinaryNode) right).getRight()).getValue().intValue()).expand();
 		}
 
 		// i*i = -1
@@ -32,11 +34,11 @@ public class Power extends BinaryNode {
 
 		// TODO: handle 0^0
 		// x^0 = 1
-		if(right instanceof Number && ((Number) right).getValue() == 0)
+		if(right instanceof Number && ((Number) right).getValue().compareTo(BigInteger.ZERO) == 0)
 			return new Number(1);
 
 		// x^1 = x
-		if(right instanceof Number && ((Number) right).getValue() == 1)
+		if(right instanceof Number && ((Number) right).getValue().compareTo(BigInteger.ONE) == 0)
 			return left;
 
 		// (a+b)^3 = (a+b)^2*(a+b)

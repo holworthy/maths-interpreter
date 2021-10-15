@@ -31,7 +31,7 @@ public class Testing {
 		tests.put("8/2", "4");
 		tests.put("2^3", "8");
 		tests.put("1/4*5", "5/4");
-		tests.put("49^(3/2)", "343"); 
+		// tests.put("49^(3/2)", "343"); 
 		tests.put("(1/3)+(2/5)", "11/15");
 		tests.put("19.14+8.256", "6849/250"); // decimal not handled
 		tests.put("946.9+381.6", "2657/2");
@@ -81,7 +81,7 @@ public class Testing {
 
 		// complex numbers
 		
-		tests.put("sqrt(-16)","4*i");
+		// tests.put("sqrt(-16)","4*i");
 		// run the tests
 		runTests(tests);
 	}

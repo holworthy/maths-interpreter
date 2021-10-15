@@ -1,15 +1,23 @@
 package holworthy.maths.nodes;
 
-public class Number extends Node {
-	private int value;
+import java.math.BigInteger;
 
-	public Number(int value) {
+public class Number extends Node {
+	private BigInteger value;
+
+	public Number(BigInteger value) {
 		this.value = value;
-		if(value < 0)
+		if(value.compareTo(BigInteger.ZERO) < 0)
 			throw new Error("Negative number");
 	}
 
-	public int getValue() {
+	public Number(int value){
+		this.value = BigInteger.valueOf(value);
+		if(this.value.compareTo(BigInteger.ZERO) < 0)
+			throw new Error("Negative number");
+	}
+
+	public BigInteger getValue() {
 		return value;
 	}
 

@@ -1,5 +1,6 @@
 package holworthy.maths.nodes;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.ListIterator;
@@ -20,8 +21,8 @@ public class Divide extends BinaryNode {
 		return super.matches(node);
 	}
 
-	private int gcd(int a, int b) {
-		return b == 0 ? a : gcd(b, a % b);
+	private BigInteger gcd(BigInteger a, BigInteger b) {
+		return b.compareTo(BigInteger.ZERO) == 0 ? a : gcd(b, a.mod(b));
 	}
 
 	@Override
@@ -29,7 +30,7 @@ public class Divide extends BinaryNode {
 		Node left = getLeft().expand();
 		Node right = getRight().expand();
 
-		if (right instanceof Number && ((Number) right).getValue() == 0){
+		if (right instanceof Number && ((Number) right).getValue().compareTo(BigInteger.ZERO) == 0){
 			throw new DivideByZeroException("You Can't divide by zero");
 		}
 
@@ -44,13 +45,13 @@ public class Divide extends BinaryNode {
 			return new Negative(new Divide(left, ((Negative) right).getNode())).expand();
 
 		if(left instanceof Number && right instanceof Number) {
-			int a = ((Number) left).getValue();
-			int b = ((Number) right).getValue();
-			int divisor = gcd(a, b);
-			if(a % b == 0)
-				return new Number(a / b);
+			BigInteger a = ((Number) left).getValue();
+			BigInteger b = ((Number) right).getValue();
+			BigInteger divisor = gcd(a, b);
+			if(a.mod(b).compareTo(BigInteger.ZERO) == 0)
+				return new Number(a.divide(b));
 
-			return new Divide(new Number(a / divisor), new Number(b / divisor));
+			return new Divide(new Number(a.divide(divisor)), new Number(b.divide(divisor)));
 		}
 
 		return new Multiply(left, new Power(right, new Negative(new Number(1)))).expand();
@@ -101,12 +102,12 @@ public class Divide extends BinaryNode {
 						leftItr.remove();
 						break;
 					}
-					if(n instanceof Number && o instanceof Number && gcd(((Number) n).getValue(), ((Number) o).getValue()) != 1){
-						int gcd = gcd(((Number) n).getValue(), ((Number) o).getValue());
+					if(n instanceof Number && o instanceof Number && gcd(((Number) n).getValue(), ((Number) o).getValue()).compareTo(BigInteger.ONE) != 0){
+						BigInteger gcd = gcd(((Number) n).getValue(), ((Number) o).getValue());
 						rightItr.remove();
-						rightItr.add(new Number(((Number) o).getValue()/gcd));
+						rightItr.add(new Number(((Number) o).getValue().divide(gcd)));
 						leftItr.remove();
-						leftItr.add(new Number(((Number) n).getValue()/gcd));
+						leftItr.add(new Number(((Number) n).getValue().divide(gcd)));
 						break;
 					}
 				}

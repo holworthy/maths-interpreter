@@ -1,5 +1,6 @@
 package holworthy.maths.nodes;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.ListIterator;
 
@@ -33,7 +34,7 @@ public class Add extends BinaryNode {
 		if(left.matches(right))
 			return false;
 		if(left instanceof Number && right instanceof Number)
-			return ((Number) left).getValue() < ((Number) right).getValue();
+			return ((Number) left).getValue().compareTo(((Number) right).getValue()) < 0;
 		if(left instanceof Number && !(right instanceof Number))
 			return true;
 		if(right instanceof Number)
@@ -66,23 +67,23 @@ public class Add extends BinaryNode {
 
 		// constant folding
 		if(left instanceof Number && right instanceof Number)
-			return new Number(((Number) left).getValue() + ((Number) right).getValue());
+			return new Number(((Number) left).getValue().add(((Number) right).getValue()));
 		if(left instanceof Add && right instanceof Number && (((Add) left).getRight() instanceof Number || ((Add) left).getRight() instanceof Negative))
 			return new Add(((Add) left).getLeft(), new Add(((Add) left).getRight(), right)).expand();
 		if(left instanceof Number && right instanceof Negative && ((Negative) right).getNode() instanceof Number) {
-			if(((Number) ((Negative) right).getNode()).getValue() <= ((Number) left).getValue())
-				return new Number(((Number) left).getValue() - ((Number) ((Negative) right).getNode()).getValue());
+			if(((Number) ((Negative) right).getNode()).getValue().compareTo(((Number) left).getValue())  <= 0)
+				return new Number(((Number) left).getValue().subtract(((Number) ((Negative) right).getNode()).getValue()));
 			else
-				return new Negative(new Number(((Number) ((Negative) right).getNode()).getValue() - ((Number) left).getValue()));
+				return new Negative(new Number(((Number) ((Negative) right).getNode()).getValue().subtract(((Number) left).getValue())));
 		}
 		if(left instanceof Negative && right instanceof Number && ((Negative) left).getNode() instanceof Number) {
-			if(((Number) ((Negative) left).getNode()).getValue() <= ((Number) right).getValue())
-				return new Number(((Number) right).getValue() - ((Number) ((Negative) left).getNode()).getValue());
+			if(((Number) ((Negative) left).getNode()).getValue().compareTo(((Number) right).getValue()) <= 0)
+				return new Number(((Number) right).getValue().subtract(((Number) ((Negative) left).getNode()).getValue()));
 			else
-				return new Negative(new Number(((Number) ((Negative) left).getNode()).getValue() - ((Number) right).getValue()));
+				return new Negative(new Number(((Number) ((Negative) left).getNode()).getValue().subtract(((Number) right).getValue())));
 		}
 		if(left instanceof Negative && right instanceof Negative && ((Negative) left).getNode() instanceof Number && ((Negative) right).getNode() instanceof Number)
-			return new Negative(new Number(((Number) ((Negative) left).getNode()).getValue() + ((Number) ((Negative) right).getNode()).getValue()));
+			return new Negative(new Number(((Number) ((Negative) left).getNode()).getValue().add(((Number) ((Negative) right).getNode()).getValue())));
 
 		// x+x=2*x
 		if(left.matches(right))
@@ -131,8 +132,8 @@ public class Add extends BinaryNode {
 		return new Add(left, right);
 	}
 	// TODO: refactor as wetted in divide
-	private int gcd(int a, int b) {
-		return b == 0 ? a : gcd(b, a % b);
+	private BigInteger gcd(BigInteger a, BigInteger b) {
+		return b.compareTo(BigInteger.ZERO) == 0 ? a : gcd(b, a.mod(b));
 	}
 
 	public ArrayList<Node> flatten(Multiply root){
@@ -166,7 +167,7 @@ public class Add extends BinaryNode {
 		Node right = getRight().collapse();
 
 		if(left instanceof Number && right instanceof Number)
-			return new Number(((Number) left).getValue() + ((Number) right).getValue());
+			return new Number(((Number) left).getValue().add(((Number) right).getValue()));
 
 		if(left instanceof Multiply && right instanceof Multiply && ((Multiply) left).getRight().matches(((Multiply) right).getRight()))
 			return new Multiply(new Add(((Multiply) left).getLeft(), ((Multiply) right).getLeft()).collapse(), ((Multiply) left).getRight());
@@ -183,10 +184,7 @@ public class Add extends BinaryNode {
 				Add a = new Add(((BinaryNode) left).getRight(), ((BinaryNode) right).getRight());
 				return new Multiply(((BinaryNode) right).getLeft(), a.collapse());
 			}
-			// if(gcd(((Number) ((BinaryNode) left).getLeft()).getValue(), ((Number) ((BinaryNode) right).getLeft()).getValue()) != 1){
-			// 	int gcd = gcd(((Number) ((BinaryNode) left).getLeft()).getValue(), ((Number) ((BinaryNode) right).getLeft()).getValue());
-			// 	return new Multiply(gcd, new Add(left, right))
-			// }
+		
 			ArrayList<Node> leftList = flatten((Multiply) left);
 			ArrayList<Node> rightList = flatten((Multiply) right);
 			ArrayList<Node> removeList = new ArrayList<>();
@@ -203,13 +201,13 @@ public class Add extends BinaryNode {
 						leftItr.remove();
 						break;
 					}
-					if(n instanceof Number && o instanceof Number && gcd(((Number) n).getValue(), ((Number) o).getValue()) != 1){
-						int gcd = gcd(((Number) n).getValue(), ((Number) o).getValue());
+					if(n instanceof Number && o instanceof Number && gcd(((Number) n).getValue(), ((Number) o).getValue()).compareTo(BigInteger.ONE) == 0){
+						BigInteger gcd = gcd(((Number) n).getValue(), ((Number) o).getValue());
 						removeList.add(new Number(gcd));
 						rightItr.remove();
-						rightItr.add(new Number(((Number) o).getValue()/gcd));
+						rightItr.add(new Number(((Number) o).getValue().divide(gcd)));
 						leftItr.remove();
-						leftItr.add(new Number(((Number) n).getValue()/gcd));
+						leftItr.add(new Number(((Number) n).getValue().divide(gcd)));
 						break;
 					}
 				}

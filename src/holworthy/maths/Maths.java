@@ -1,5 +1,7 @@
 package holworthy.maths;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
@@ -203,7 +205,7 @@ public abstract class Maths {
 			String value = parser.getInput().substring(start, parser.getCursor());
 			if(decimal)
 				return decimalToFraction(Double.parseDouble(value));
-			Node number = new Number(Integer.parseInt(value));
+			Node number = new Number(new BigInteger(value));
 			return number;
 		} else {
 			throw new Exception("Syntax Error");
@@ -226,7 +228,7 @@ public abstract class Maths {
 			b = 1/(b-a);
 		} while (Math.abs(parseDouble-h1/k1) > parseDouble*tolerance);
 
-		return new Divide(new Number((int) h1), new Number((int) k1));
+		return new Divide(new Number(BigDecimal.valueOf(h1).toBigInteger()), new Number(BigDecimal.valueOf(k1).toBigInteger()));
 	}
 
 	private static Node parsePower(Parser parser) throws Exception {

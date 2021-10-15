@@ -20,7 +20,7 @@ public class Multiply extends BinaryNode {
 
 		// constant folding
 		if(left instanceof Number && right instanceof Number)
-			return new Number(((Number) left).getValue() * ((Number) right).getValue());
+			return new Number(((Number) left).getValue().multiply(((Number) right).getValue()));
 		if(left.matches(new Number(0)))
 			return new Number(0);
 		if(left.matches(new Number(1)))
@@ -55,7 +55,7 @@ public class Multiply extends BinaryNode {
 
 		// constant folding
 		if(left instanceof Number && right instanceof Number)
-			return new Number(((Number) left).getValue() * ((Number) right).getValue());
+			return new Number(((Number) left).getValue().multiply(((Number) right).getValue()));
 		if(left.matches(new Number(0)))
 			return new Number(0);
 		if(right.matches(new Number(0)))
