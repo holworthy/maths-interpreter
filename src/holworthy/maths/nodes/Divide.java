@@ -29,13 +29,10 @@ public class Divide extends BinaryNode {
 		Node left = getLeft().expand();
 		Node right = getRight().expand();
 
-		if (right instanceof Number && ((Number) right).getValue() == 0){
+		if(right instanceof Number && ((Number) right).getValue() == 0)
 			throw new DivideByZeroException("You Can't divide by zero");
-		}
-
 		if(left.matches(right))
 			return new Number(1);
-
 		if(left instanceof Negative && right instanceof Negative)
 			return new Divide(((Negative) left).getNode(), ((Negative) right).getNode()).expand();
 		if(left instanceof Negative)
@@ -52,6 +49,9 @@ public class Divide extends BinaryNode {
 
 			return new Divide(new Number(a / divisor), new Number(b / divisor));
 		}
+
+		if(left.isConstant() && right.isConstant())
+			return new Divide(left, right);
 
 		return new Multiply(left, new Power(right, new Negative(new Number(1)))).expand();
 	}
