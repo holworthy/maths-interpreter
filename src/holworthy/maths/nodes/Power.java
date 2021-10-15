@@ -48,7 +48,7 @@ public class Power extends BinaryNode {
 		// binomial theorum
 		if(left instanceof Add && !(((BinaryNode) left).getLeft() instanceof Add) && right instanceof Number) {
 			Node temp = new Number(0);
-			for(int k = 0; k < ((Number) right).getValue() + 1; k++)
+			for(BigInteger k = BigInteger.ZERO; k.compareTo(((Number) right).getValue().add(BigInteger.ONE)) < 0; k.add(BigInteger.ONE))
 				temp = new Add(temp, new Multiply(new Multiply(new Divide(new Factorial(right), new Multiply(new Factorial(new Number(k)), new Factorial(new Subtract(right, new Number(k))))), new Power(((BinaryNode) left).getLeft(), new Subtract(right, new Number(k)))), new Power(((BinaryNode) left).getRight(), new Number(k))).expand());
 			return temp.expand();
 		}
