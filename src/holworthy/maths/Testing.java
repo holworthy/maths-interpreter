@@ -2,10 +2,7 @@ package holworthy.maths;
 
 import java.util.LinkedHashMap;
 
-import holworthy.maths.nodes.Negative;
 import holworthy.maths.nodes.Node;
-import holworthy.maths.nodes.Number;
-import holworthy.maths.nodes.Sqrt;
 
 public class Testing {
 

@@ -12,9 +12,7 @@ public class Number extends Node {
 	}
 
 	public Number(int value){
-		this.value = BigInteger.valueOf(value);
-		if(this.value.compareTo(BigInteger.ZERO) < 0)
-			throw new Error("Negative number");
+		this(BigInteger.valueOf(value));
 	}
 
 	public BigInteger getValue() {
@@ -30,7 +28,7 @@ public class Number extends Node {
 	public boolean matches(Node node) {
 		if(node instanceof Matching.Constant)
 			return isConstant();
-		return node instanceof Number && ((Number) node).getValue() == getValue();
+		return node instanceof Number && ((Number) node).getValue().equals(getValue());
 	}
 
 	@Override
