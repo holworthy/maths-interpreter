@@ -30,14 +30,14 @@ public class Testing {
 		tests.put("1/4*5", "5/4");
 		// tests.put("49^(3/2)", "343"); 
 		tests.put("(1/3)+(2/5)", "11/15");
-		tests.put("19.14+8.256", "6849/250"); // decimal not handled
+		tests.put("19.14+8.256", "6849/250"); 
 		tests.put("946.9+381.6", "2657/2");
 		tests.put("0.2313+0.7567", "247/250");
 
 		// complex arithmetic
-		// tests.put("6^6*36^3", "2176782336"); // number too big
-		// tests.put("27^6*81^-7", "3^-10"); // parser error on negtaive power
-		// tests.put("36^-1/36^-2", "36"); // same as above
+		tests.put("6^6*36^3", "2176782336");
+		// tests.put("27^6*81^(-7)", "3^-10"); // parser error on negtaive power
+		// tests.put("36^-1/36^(-2)", "36"); // same as above
 		tests.put("(22/12)*(30/8)/(34/12)", "165/68");
 		// tests.put("(46/18)/(22/9)/(24/7)","161/528"); // crashes
 

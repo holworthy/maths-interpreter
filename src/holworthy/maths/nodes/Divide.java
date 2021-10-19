@@ -87,6 +87,23 @@ public class Divide extends BinaryNode {
 		Node left = getLeft().collapse();
 		Node right = getRight().collapse();
 
+		// simplify fraction
+		if(left instanceof Number && right instanceof Number) {
+			BigInteger a = ((Number) left).getValue();
+			BigInteger b = ((Number) right).getValue();
+			BigInteger divisor = gcd(a, b);
+			if(a.mod(b).compareTo(BigInteger.ZERO) == 0)
+				return new Number(a.divide(b));
+
+			return new Divide(new Number(a.divide(divisor)), new Number(b.divide(divisor)));
+		}
+
+		// x/y / z/w = x/y * w/z.collapse()
+		if (left instanceof Divide && right instanceof Divide){
+			return new Multiply(left, new Divide(((BinaryNode) right).getRight(), ((BinaryNode) right).getLeft())).collapse();
+		}
+
+		// remove common factors
 		if (left instanceof Multiply && right instanceof Multiply){
 			ArrayList<Node> leftList = flatten((Multiply) left);
 			ArrayList<Node> rightList = flatten((Multiply) right);
