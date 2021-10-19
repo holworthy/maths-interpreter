@@ -53,7 +53,7 @@ public class Add extends BinaryNode {
 		if(left instanceof Number && right instanceof Number)
 			return ((Number) left).getValue().compareTo(((Number) right).getValue()) < 0;
 		if(left instanceof Number && !(right instanceof Number))
-			return ((Number) left).getValue().compareTo(((Number) right).getValue()) < 0;
+			return true;
 
 		if(left instanceof Number && (right instanceof Multiply || right instanceof Power))
 			return true;
