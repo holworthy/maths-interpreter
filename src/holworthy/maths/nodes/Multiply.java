@@ -128,7 +128,7 @@ public class Multiply extends BinaryNode {
 		// swap powers by variables
 		if(left instanceof Variable && right instanceof Power && ((BinaryNode) right).getLeft() instanceof Variable && ((Variable) left).getName().compareTo(((Variable) ((BinaryNode) right).getLeft()).getName()) > 0)
 			return true;
-		if(left instanceof Power && right instanceof Power && ((Variable) ((BinaryNode) left).getLeft()).getName().compareTo(((Variable) ((BinaryNode) right).getLeft()).getName()) > 0)
+		if(left instanceof Power && right instanceof Power && ((BinaryNode) right).getLeft() instanceof Variable && ((BinaryNode) left).getLeft() instanceof Variable && ((Variable) ((BinaryNode) left).getLeft()).getName().compareTo(((Variable) ((BinaryNode) right).getLeft()).getName()) > 0)
 			return true;
 		// swap variables
 		if(left instanceof Variable && right instanceof Variable)
@@ -144,8 +144,20 @@ public class Multiply extends BinaryNode {
 		Node left = getLeft().collapse();
 		Node right = getRight().collapse();
 
+		if (left instanceof Power && right instanceof Power && ((BinaryNode) left).getRight().matches(((BinaryNode) right).getRight())){
+			return new Power(new Multiply(((BinaryNode) left).getLeft(), ((BinaryNode) right).getLeft()), ((BinaryNode) left).getRight()).expand().collapse();
+		}
+
+		if (left instanceof Multiply && ((BinaryNode) left).getRight() instanceof Power && right instanceof Power && ((BinaryNode) ((BinaryNode) left).getRight()).getRight().matches(((BinaryNode) right).getRight())){
+			return new Multiply(((BinaryNode) left).getLeft(), new Power(new Multiply(((BinaryNode) ((BinaryNode) left).getRight()).getLeft(), ((BinaryNode) right).getLeft()), ((BinaryNode) right).getRight())).expand().collapse();
+		}
+
 		if(right instanceof Power && ((BinaryNode) right).getRight() instanceof Negative){
-			return new Divide(left, new Power(((BinaryNode) right).getLeft(), ((UnaryNode) ((BinaryNode) right).getRight()).getNode()).expand()).collapse();
+			return new Divide(left, new Power(((BinaryNode) right).getLeft(), ((UnaryNode) ((BinaryNode) right).getRight()).getNode())).expand().collapse();
+		}
+
+		if(left instanceof Power && ((BinaryNode) left).getRight() instanceof Negative){
+			return new Divide(right, new Power(((BinaryNode) left).getLeft(), ((UnaryNode) ((BinaryNode) left).getRight()).getNode())).expand().collapse();
 		}
 
 		return new Multiply(left, right);
