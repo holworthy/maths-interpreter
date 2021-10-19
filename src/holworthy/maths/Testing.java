@@ -44,7 +44,7 @@ public class Testing {
 		// basic algebra
 		tests.put("3*a+3*b", "3*(a+b)");
 		tests.put("3*x+5*x", "8*x");
-		tests.put("6*l+2*j-3*k+5*j+4*k","6*l+7*j+k");
+		tests.put("6*l+2*j-3*k+5*j+4*k","7*j+k+6*l");
 		tests.put("(z+3)*2","2*z+6");
 		tests.put("2*(x+5)", "2*x+10");
 		tests.put("2*x+5=15", "x=5"); //doesn't solve
