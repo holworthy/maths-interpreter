@@ -23,4 +23,21 @@ public abstract class Matching {
 			return null;
 		}
 	}
+
+	public static class Anything extends Node {
+		@Override
+		public Node copy() {
+			return this;
+		}
+
+		@Override
+		public boolean isConstant() {
+			return false;
+		}
+
+		@Override
+		public Node differentiate(Variable wrt) {
+			return null;
+		}
+	}
 }

@@ -19,9 +19,7 @@ public abstract class BinaryNode extends Node {
 
 	@Override
 	public boolean matches(Node node) {
-		if(node instanceof Matching.Constant)
-			return isConstant();
-		return node.getClass().equals(getClass()) && getLeft().matches(((BinaryNode) node).getLeft()) && getRight().matches(((BinaryNode) node).getRight());
+		return (node.getClass().equals(getClass()) && getLeft().matches(((BinaryNode) node).getLeft()) && getRight().matches(((BinaryNode) node).getRight())) || super.matches(node);
 	}
 
 	@Override

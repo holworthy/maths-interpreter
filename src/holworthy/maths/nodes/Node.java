@@ -6,7 +6,7 @@ public abstract class Node {
 	public abstract Node copy();
 
 	public boolean matches(Node node) {
-		return node == this;
+		return node == this || node instanceof Matching.Anything || (node instanceof Matching.Constant && isConstant());
 	}
 
 	public abstract boolean isConstant();

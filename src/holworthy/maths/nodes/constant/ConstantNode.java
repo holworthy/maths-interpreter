@@ -1,6 +1,5 @@
 package holworthy.maths.nodes.constant;
 
-import holworthy.maths.nodes.Matching;
 import holworthy.maths.nodes.Node;
 import holworthy.maths.nodes.Number;
 import holworthy.maths.nodes.Variable;
@@ -23,7 +22,7 @@ public abstract class ConstantNode extends Node {
 
 	@Override
 	public boolean matches(Node node) {
-		return node.getClass() == getClass() || node instanceof Matching.Constant;
+		return node.getClass() == getClass() || super.matches(node);
 	}
 
 	@Override

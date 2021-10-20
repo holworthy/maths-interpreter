@@ -31,9 +31,7 @@ public class Number extends Node {
 
 	@Override
 	public boolean matches(Node node) {
-		if(node instanceof Matching.Constant)
-			return isConstant();
-		return node instanceof Number && ((Number) node).getValue().equals(getValue());
+		return (node instanceof Number && ((Number) node).getValue().equals(getValue())) || super.matches(node);
 	}
 
 	@Override

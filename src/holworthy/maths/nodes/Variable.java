@@ -23,7 +23,7 @@ public class Variable extends Node {
 
 	@Override
 	public boolean matches(Node node) {
-		return node instanceof Variable && ((Variable) node).getName().equals(getName());
+		return (node instanceof Variable && ((Variable) node).getName().equals(getName())) || super.matches(node);
 	}
 
 	@Override

@@ -16,8 +16,6 @@ public class Divide extends BinaryNode {
 	public boolean matches(Node node) {
 		if(node instanceof Divide)
 			return super.matches(node);
-		if(node instanceof Matching.Constant)
-			return this.isConstant();
 		return super.matches(node);
 	}
 

@@ -29,11 +29,9 @@ public class Negative extends UnaryNode {
 
 	@Override
 	public boolean matches(Node node) {
-		if(node instanceof Matching.Constant)
-			return isConstant();
 		if(node instanceof Negative)
 			return getNode().matches(((Negative) node).getNode());
-		return false;
+		return super.matches(node);
 	}
 
 	@Override
