@@ -13,6 +13,11 @@ public class Negative extends UnaryNode {
 	}
 
 	@Override
+	public Node copy() {
+		return new Negative(getNode().copy());
+	}
+
+	@Override
 	public Node expand() throws DivideByZeroException{
 		Node node = getNode().expand();
 		if(node instanceof Negative)

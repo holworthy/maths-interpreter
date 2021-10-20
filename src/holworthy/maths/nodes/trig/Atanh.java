@@ -6,4 +6,9 @@ public class Atanh extends TrigNode {
 	public Atanh(Node arg) {
 		super(arg);
 	}
+
+	@Override
+	public Node copy() {
+		return new Atanh(getNode().copy());
+	}
 }

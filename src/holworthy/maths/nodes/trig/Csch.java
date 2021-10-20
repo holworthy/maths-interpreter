@@ -6,4 +6,9 @@ public class Csch extends TrigNode {
 	public Csch(Node arg) {
 		super(arg);
 	}
+
+	@Override
+	public Node copy() {
+		return new Csch(getNode().copy());
+	}
 }

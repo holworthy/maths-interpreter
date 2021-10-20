@@ -6,4 +6,9 @@ public class Csc extends TrigNode {
 	public Csc(Node arg) {
 		super(arg);
 	}
+
+	@Override
+	public Node copy() {
+		return new Csc(getNode().copy());
+	}
 }

@@ -25,4 +25,9 @@ public abstract class ConstantNode extends Node {
 	public boolean matches(Node node) {
 		return node.getClass() == getClass() || node instanceof Matching.Constant;
 	}
+
+	@Override
+	public Node copy() {
+		return this;
+	}
 }

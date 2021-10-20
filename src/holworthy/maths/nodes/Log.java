@@ -15,6 +15,11 @@ public class Log extends FunctionNode {
 	}
 
 	@Override
+	public Node copy() {
+		return new Log(getNode().copy(), getBase().copy());
+	}
+
+	@Override
 	public Node expand() throws DivideByZeroException {
 		Node node = getNode().expand();
 		Node base = getBase().expand();

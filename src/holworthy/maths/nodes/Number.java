@@ -3,7 +3,7 @@ package holworthy.maths.nodes;
 import java.math.BigInteger;
 
 public class Number extends Node {
-	private BigInteger value;
+	private final BigInteger value;
 
 	public Number(BigInteger value) {
 		this.value = value;
@@ -22,6 +22,11 @@ public class Number extends Node {
 	@Override
 	public String toString() {
 		return value + "";
+	}
+
+	@Override
+	public Node copy() {
+		return this;
 	}
 
 	@Override

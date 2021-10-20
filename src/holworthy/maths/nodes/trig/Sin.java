@@ -16,6 +16,11 @@ public class Sin extends TrigNode {
 	}
 
 	@Override
+	public Node copy() {
+		return new Sin(getNode().copy());
+	}
+
+	@Override
 	public Node expand() throws DivideByZeroException {
 		Node node = getNode().expand();
 

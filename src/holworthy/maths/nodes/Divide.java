@@ -21,6 +21,11 @@ public class Divide extends BinaryNode {
 		return super.matches(node);
 	}
 
+	@Override
+	public Node copy() {
+		return new Divide(getLeft().copy(), getRight().copy());
+	}
+
 	private BigInteger gcd(BigInteger a, BigInteger b) {
 		return b.compareTo(BigInteger.ZERO) == 0 ? a : gcd(b, a.mod(b));
 	}

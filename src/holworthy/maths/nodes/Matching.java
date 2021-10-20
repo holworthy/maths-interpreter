@@ -13,8 +13,13 @@ public abstract class Matching {
 		}
 
 		@Override
+		public Node copy() {
+			return this;
+		}
+
+		@Override
 		public Node differentiate(Variable wrt) {
-			// TODO: implement
+			// we can return null here becuase this should never be called
 			return null;
 		}
 	}

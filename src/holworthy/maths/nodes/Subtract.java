@@ -8,6 +8,11 @@ public class Subtract extends BinaryNode {
 	}
 
 	@Override
+	public Node copy() {
+		return new Subtract(getLeft().copy(), getRight().copy());
+	}
+
+	@Override
 	public Node normalise() {
 		return new Add(getLeft(), new Negative(getRight()));
 	}

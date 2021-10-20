@@ -18,6 +18,11 @@ public class Power extends BinaryNode {
 	}
 
 	@Override
+	public Node copy() {
+		return new Power(getLeft().copy(), getRight().copy());
+	}
+
+	@Override
 	public Node expand() throws DivideByZeroException{
 		Node left = getLeft().expand();
 		Node right = getRight().expand();

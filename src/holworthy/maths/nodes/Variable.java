@@ -1,7 +1,7 @@
 package holworthy.maths.nodes;
 
 public class Variable extends Node {
-	private String name;
+	private final String name;
 
 	public Variable(String name) {
 		this.name = name;
@@ -14,6 +14,11 @@ public class Variable extends Node {
 	@Override
 	public String toString() {
 		return name;
+	}
+
+	@Override
+	public Node copy() {
+		return this;
 	}
 
 	@Override

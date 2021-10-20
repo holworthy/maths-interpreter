@@ -6,4 +6,9 @@ public class Asech extends TrigNode {
 	public Asech(Node arg) {
 		super(arg);
 	}
+
+	@Override
+	public Node copy() {
+		return new Asech(getNode().copy());
+	}
 }

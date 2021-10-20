@@ -6,4 +6,9 @@ public class Cot extends TrigNode {
 	public Cot(Node arg) {
 		super(arg);
 	}
+
+	@Override
+	public Node copy() {
+		return new Cot(getNode().copy());
+	}
 }
