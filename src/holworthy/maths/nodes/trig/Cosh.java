@@ -6,4 +6,9 @@ public class Cosh extends TrigNode {
 	public Cosh(Node arg) {
 		super(arg);
 	}
+
+	@Override
+	public Node copy() {
+		return new Cosh(getNode().copy());
+	}
 }

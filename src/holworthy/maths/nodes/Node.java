@@ -3,6 +3,14 @@ package holworthy.maths.nodes;
 import holworthy.maths.DivideByZeroException;
 
 public abstract class Node {
+	public abstract Node copy();
+
+	public boolean matches(Node node) {
+		return node == this || node instanceof Matching.Anything || (node instanceof Matching.Constant && isConstant());
+	}
+
+	public abstract boolean isConstant();
+
 	public Node normalise() {
 		return this;
 	}
@@ -19,10 +27,5 @@ public abstract class Node {
 		return normalise().expand().normalise().collapse().normalise();
 	}
 
-	public boolean matches(Node node) {
-		return node == this;
-	}
-
-	public abstract boolean isConstant();
 	public abstract Node differentiate(Variable wrt);
 }

@@ -13,13 +13,18 @@ public class Nthrt extends FunctionNode {
 	}
 
 	@Override
-	public boolean isConstant() {
-		return getNode().isConstant();
+	public String toString() {
+		return exponent+"rt(" + getNode() + ")";
 	}
 
 	@Override
-	public String toString() {
-		return exponent+"rt(" + getNode() + ")";
+	public Node copy() {
+		return new Nthrt(getNode().copy(), exponent);
+	}
+
+	@Override
+	public boolean isConstant() {
+		return getNode().isConstant();
 	}
 
 	@Override

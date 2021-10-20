@@ -8,6 +8,11 @@ public class Factorial extends UnaryNode {
 	}
 
 	@Override
+	public Node copy() {
+		return new Factorial(getNode().copy());
+	}
+
+	@Override
 	public Node expand() throws DivideByZeroException {
 		Node node = getNode().expand();
 		if(node.matches(new Number(0)) || node.matches(new Number(1)))

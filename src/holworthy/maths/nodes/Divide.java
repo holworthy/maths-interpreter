@@ -16,9 +16,12 @@ public class Divide extends BinaryNode {
 	public boolean matches(Node node) {
 		if(node instanceof Divide)
 			return super.matches(node);
-		if(node instanceof Matching.Constant)
-			return this.isConstant();
 		return super.matches(node);
+	}
+
+	@Override
+	public Node copy() {
+		return new Divide(getLeft().copy(), getRight().copy());
 	}
 
 	private BigInteger gcd(BigInteger a, BigInteger b) {

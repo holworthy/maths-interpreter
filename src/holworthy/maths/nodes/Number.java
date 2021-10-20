@@ -3,7 +3,7 @@ package holworthy.maths.nodes;
 import java.math.BigInteger;
 
 public class Number extends Node {
-	private BigInteger value;
+	private final BigInteger value;
 
 	public Number(BigInteger value) {
 		this.value = value;
@@ -25,10 +25,13 @@ public class Number extends Node {
 	}
 
 	@Override
+	public Node copy() {
+		return this;
+	}
+
+	@Override
 	public boolean matches(Node node) {
-		if(node instanceof Matching.Constant)
-			return isConstant();
-		return node instanceof Number && ((Number) node).getValue().equals(getValue());
+		return (node instanceof Number && ((Number) node).getValue().equals(getValue())) || super.matches(node);
 	}
 
 	@Override

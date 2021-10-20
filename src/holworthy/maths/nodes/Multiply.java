@@ -15,6 +15,11 @@ public class Multiply extends BinaryNode {
 	}
 
 	@Override
+	public Node copy() {
+		return new Multiply(getLeft().copy(), getRight().copy());
+	}
+
+	@Override
 	public Node normalise() {
 		Node left = getLeft().normalise();
 		Node right = getRight().normalise();

@@ -9,6 +9,11 @@ public class Asin extends TrigNode {
 	}
 
 	@Override
+	public Node copy() {
+		return new Asin(getNode().copy());
+	}
+
+	@Override
 	public Node expand() throws DivideByZeroException {
 		Node node = getNode().expand();
 		return new Asin(node);

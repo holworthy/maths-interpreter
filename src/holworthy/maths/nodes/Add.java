@@ -18,6 +18,11 @@ public class Add extends BinaryNode {
 	}
 
 	@Override
+	public Node copy() {
+		return new Add(getLeft().copy(), getRight().copy());
+	}
+
+	@Override
 	public Node normalise() {
 		Node left = getLeft().normalise();
 		Node right = getRight().normalise();
@@ -103,7 +108,7 @@ public class Add extends BinaryNode {
 	}
 
 	@Override
-	public Node expand() throws DivideByZeroException{
+	public Node expand() throws DivideByZeroException {
 		Node left = getLeft().expand();
 		Node right = getRight().expand();
 

@@ -18,6 +18,11 @@ public class Power extends BinaryNode {
 	}
 
 	@Override
+	public Node copy() {
+		return new Power(getLeft().copy(), getRight().copy());
+	}
+
+	@Override
 	public Node expand() throws DivideByZeroException{
 		Node left = getLeft().expand();
 		Node right = getRight().expand();
@@ -35,15 +40,15 @@ public class Power extends BinaryNode {
 		}
 
 		// i*i = -1
-		if(matches(new Power(new I(), new Number(2))))
+		if(left instanceof I && right.matches(new Number(2)))
 			return new Negative(new Number(1));
 
 		// x^0 = 1
-		if(right instanceof Number && ((Number) right).getValue().compareTo(BigInteger.ZERO) == 0)
+		if(right.matches(new Number(0)))
 			return new Number(1);
 
 		// x^1 = x
-		if(right instanceof Number && ((Number) right).getValue().compareTo(BigInteger.ONE) == 0)
+		if(right.matches(new Number(1)))
 			return left;
 
 		// binomial theorum
@@ -59,14 +64,11 @@ public class Power extends BinaryNode {
 			return new Multiply(new Power(left, new Subtract(right, new Number(1))), left).expand();
 
 		// e^(i*pi) = -1
-		if(left instanceof E && right instanceof Multiply && ((BinaryNode) right).getLeft() instanceof I && ((BinaryNode) right).getRight() instanceof Pi)
+		if(left instanceof E && right.matches(new Multiply(new I(), new Pi())))
 			return new Negative(new Number(1));
 
 		if(left instanceof Multiply)
 			return new Multiply(new Power(((BinaryNode) left).getLeft(), right), new Power(((BinaryNode) left).getRight(), right)).expand();
-
-
-
 
 		return new Power(left, right);
 	}

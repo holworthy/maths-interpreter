@@ -12,6 +12,11 @@ public class Integrate extends FunctionNode {
 	}
 
 	@Override
+	public Node copy() {
+		return new Integrate(getNode().copy());
+	}
+
+	@Override
 	public Node differentiate(Variable wrt) {
 		// TODO: implement
 		return null;
