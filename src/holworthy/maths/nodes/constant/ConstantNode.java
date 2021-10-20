@@ -29,4 +29,9 @@ public abstract class ConstantNode extends Node {
 	public Node copy() {
 		return this;
 	}
+
+	@Override
+	public boolean contains(Variable variable) {
+		return false;
+	}
 }

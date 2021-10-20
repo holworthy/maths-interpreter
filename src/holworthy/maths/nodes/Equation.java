@@ -76,8 +76,26 @@ public class Equation extends BinaryNode {
 			System.out.println("solving for: " + variable);
 			System.out.println("starting with: " + equation);
 
-			// solve this
-			// output it
+			while(!equation.getLeft().matches(variable)) {
+				// -x = a -> x = -a
+				if(equation.getLeft() instanceof Negative)
+					equation = new Equation(((UnaryNode) equation.getLeft()).getNode(), new Negative(equation.getRight()));
+
+				// x + a = b -> x = b - a
+				// a + x = b -> x = b - a
+				else if(equation.getLeft() instanceof Add) {
+					if(((BinaryNode) equation.getLeft()).getLeft().contains(variable))
+						equation = new Equation(((BinaryNode) equation.getLeft()).getLeft(), new Subtract(equation.getRight(), ((BinaryNode) equation.getLeft()).getRight()));
+					else if(((BinaryNode) equation.getLeft()).getRight().contains(variable))
+						equation = new Equation(((BinaryNode) equation.getLeft()).getRight(), new Subtract(equation.getRight(), ((BinaryNode) equation.getLeft()).getLeft()));
+				}
+
+				else
+					break;
+			}
+
+
+			System.out.println(equation.simplify());
 		}
 	}
 
@@ -88,7 +106,7 @@ public class Equation extends BinaryNode {
 	}
 
 	public static void main(String[] args) throws Exception {
-		Node input = Maths.parseInput("x^2=4");
+		Node input = Maths.parseInput("x+2=0");
 		System.out.println(input);
 		System.out.println(input.simplify());
 		((Equation) input).solve();

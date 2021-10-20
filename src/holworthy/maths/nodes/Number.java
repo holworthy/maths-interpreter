@@ -40,6 +40,11 @@ public class Number extends Node {
 	}
 
 	@Override
+	public boolean contains(Variable variable) {
+		return false;
+	}
+
+	@Override
 	public Node differentiate(Variable wrt) {
 		// TODO: implement
 		return null;

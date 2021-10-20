@@ -26,4 +26,9 @@ public abstract class BinaryNode extends Node {
 	public boolean isConstant() {
 		return getLeft().isConstant() && getRight().isConstant();
 	}
+
+	@Override
+	public boolean contains(Variable variable) {
+		return getLeft().contains(variable) || getRight().contains(variable);
+	}
 }

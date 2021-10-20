@@ -11,6 +11,8 @@ public abstract class Node {
 
 	public abstract boolean isConstant();
 
+	public abstract boolean contains(Variable variable);
+
 	public Node normalise() {
 		return this;
 	}

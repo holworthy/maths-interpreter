@@ -15,4 +15,9 @@ public abstract class UnaryNode extends Node {
 	public boolean isConstant() {
 		return getNode().isConstant();
 	}
+
+	@Override
+	public boolean contains(Variable variable) {
+		return getNode().contains(variable);
+	}
 }

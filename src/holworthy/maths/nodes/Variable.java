@@ -32,6 +32,11 @@ public class Variable extends Node {
 	}
 
 	@Override
+	public boolean contains(Variable variable) {
+		return matches(variable);
+	}
+
+	@Override
 	public Node differentiate(Variable wrt) {
 		// TODO: implement
 		return null;

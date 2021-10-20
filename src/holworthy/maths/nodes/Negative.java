@@ -20,6 +20,8 @@ public class Negative extends UnaryNode {
 	@Override
 	public Node expand() throws DivideByZeroException{
 		Node node = getNode().expand();
+		if(node.matches(new Number(0)))
+			return new Number(0);
 		if(node instanceof Negative)
 			return ((Negative) node).getNode();
 		if(node instanceof Add)
