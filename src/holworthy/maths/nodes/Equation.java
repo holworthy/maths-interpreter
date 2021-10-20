@@ -1,5 +1,6 @@
 package holworthy.maths.nodes;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 
 import holworthy.maths.DivideByZeroException;
@@ -65,11 +66,16 @@ public class Equation extends BinaryNode {
 	}
 
 	public void solve() throws DivideByZeroException {
-		Node start = new Equation(new Subtract(getLeft(), getRight()).expand(), new Number(0));
-		HashSet<Variable> variables = getVariables(start);
+		Node start = new Equation(new Subtract(getLeft(), getRight()).simplify(), new Number(0));
+		ArrayList<Variable> variables = new ArrayList<>(getVariables(start));
+		variables.sort((a, b) -> a.getName().compareTo(b.getName()));
 
 		for(Variable variable : variables) {
-			Equation variableStart = (Equation) start.copy();
+			Equation equation = (Equation) start.copy();
+
+			System.out.println("solving for: " + variable);
+			System.out.println("starting with: " + equation);
+
 			// solve this
 			// output it
 		}
@@ -82,7 +88,7 @@ public class Equation extends BinaryNode {
 	}
 
 	public static void main(String[] args) throws Exception {
-		Node input = Maths.parseInput("3+y=x");
+		Node input = Maths.parseInput("x^2=4");
 		System.out.println(input);
 		System.out.println(input.simplify());
 		((Equation) input).solve();
