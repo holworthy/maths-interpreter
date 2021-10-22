@@ -267,6 +267,9 @@ public class Add extends BinaryNode {
 		if(left instanceof Number && right instanceof Number)
 			return new Number(((Number) left).getValue().add(((Number) right).getValue()));
 
+		if(left instanceof Negative && right instanceof Negative)
+			return new Negative(new Add(((UnaryNode) left).getNode(), ((UnaryNode) right).getNode()));
+
 		if(left instanceof Multiply && right instanceof Multiply && ((Multiply) left).getRight().matches(((Multiply) right).getRight()))
 			return new Multiply(new Add(((Multiply) left).getLeft(), ((Multiply) right).getLeft()).collapse(), ((Multiply) left).getRight());
 

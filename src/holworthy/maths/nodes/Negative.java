@@ -30,6 +30,11 @@ public class Negative extends UnaryNode {
 	}
 
 	@Override
+	public Node collapse() throws DivideByZeroException {
+		return new Negative(getNode().collapse());
+	}
+
+	@Override
 	public boolean matches(Node node) {
 		if(node instanceof Negative)
 			return getNode().matches(((Negative) node).getNode());

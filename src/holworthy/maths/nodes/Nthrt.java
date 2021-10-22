@@ -63,7 +63,7 @@ public class Nthrt extends FunctionNode {
 		Node node = getNode().collapse();
 		if(exponent.equals(BigInteger.TWO))
 			return new Sqrt(node);
-		return node;
+		return new Nthrt(node, exponent);
 	}
 
 	@Override

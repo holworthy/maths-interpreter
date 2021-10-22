@@ -17,6 +17,11 @@ public class Variable extends Node {
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		return obj instanceof Variable && name.equals(((Variable) obj).getName());
+	}
+
+	@Override
 	public Node copy() {
 		return this;
 	}

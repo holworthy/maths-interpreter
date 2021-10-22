@@ -1,7 +1,6 @@
 package holworthy.maths.nodes;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 
 import holworthy.maths.DivideByZeroException;
 import holworthy.maths.Maths;
@@ -26,37 +25,44 @@ public class Equation extends BinaryNode {
 		return new Equation(getLeft().expand(), getRight().expand());
 	}
 
-	private HashSet<Variable> getVariables(Node node) {
-		HashSet<Variable> hashSet = new HashSet<>();
+	@Override
+	public Node collapse() throws DivideByZeroException {
+		return new Equation(getLeft().collapse(), getRight().collapse());
+	}
 
-		if(node instanceof Variable)
-			hashSet.add((Variable) node);
-		else if(node instanceof UnaryNode)
-			hashSet.addAll(getVariables(((UnaryNode) node).getNode()));
-		else if(node instanceof BinaryNode) {
-			hashSet.addAll(getVariables(((BinaryNode) node).getLeft()));
-			hashSet.addAll(getVariables(((BinaryNode) node).getRight()));
+	private ArrayList<Variable> getVariables(Node node) {
+		ArrayList<Variable> variables = new ArrayList<>();
+
+		if(node instanceof Variable) {
+			if(!variables.contains((Variable) node))
+				variables.add((Variable) node);
+		} else if(node instanceof UnaryNode) {
+			for(Variable variable : getVariables(((UnaryNode) node).getNode()))
+				if(!variables.contains(variable))
+					variables.add(variable);
+		} else if(node instanceof BinaryNode) {
+			for(Variable variable : getVariables(((BinaryNode) node).getLeft()))
+				if(!variables.contains(variable))
+					variables.add(variable);
+
+			for(Variable variable : getVariables(((BinaryNode) node).getRight()))
+				if(!variables.contains(variable))
+						variables.add(variable);
 		}
 
-		return hashSet;
+		return variables;
 	}
 
 	public ArrayList<Equation> solve() throws DivideByZeroException {
 		Node start = new Equation(new Subtract(getLeft(), getRight()).simplify(), new Number(0));
-		ArrayList<Variable> variables = new ArrayList<>(getVariables(start));
+		ArrayList<Variable> variables = getVariables(start);
 		variables.sort((a, b) -> a.getName().compareTo(b.getName()));
 
 		ArrayList<Equation> solutions = new ArrayList<>();
-
 		for(Variable variable : variables) {
 			Equation equation = (Equation) start.copy();
-
-			System.out.println("solving for: " + variable);
-			System.out.println("starting with: " + equation);
-
+			
 			while(!equation.getLeft().matches(variable)) {
-				System.out.println(equation);
-
 				// a*x^2 + b*x + c = d
 				if(equation.getLeft().matches(new Add(new Add(new Multiply(new Matching.Constant(), new Power(new Matching.Anything(), new Number(2))), new Multiply(new Matching.Constant(), new Matching.Anything())), new Matching.Constant())) && equation.getRight().matches(new Matching.Constant()) && ((BinaryNode) ((BinaryNode) ((BinaryNode) ((BinaryNode) equation.getLeft()).getLeft()).getLeft()).getRight()).getLeft().matches(((BinaryNode) ((BinaryNode) ((BinaryNode) equation.getLeft()).getLeft()).getRight()).getRight())) {
 					Node a = ((BinaryNode) ((BinaryNode) ((BinaryNode) equation.getLeft()).getLeft()).getLeft()).getLeft();

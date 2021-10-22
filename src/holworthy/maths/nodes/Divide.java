@@ -60,6 +60,10 @@ public class Divide extends BinaryNode {
 		if(left.isConstant() && right.isConstant())
 			return new Divide(left, right);
 
+		// TODO: check if this can't be simplified any more
+		if(left instanceof Add || right instanceof Add)
+			return new Divide(left, right);
+
 		return new Multiply(left, new Power(right, new Negative(new Number(1)))).expand();
 	}
 
@@ -138,7 +142,7 @@ public class Divide extends BinaryNode {
 			return new Divide(unFlatten(leftList), unFlatten(rightList));
 		}
 
-		return new Divide(getLeft().collapse(), getRight().collapse());
+		return new Divide(left, right);
 	}
 
 	@Override

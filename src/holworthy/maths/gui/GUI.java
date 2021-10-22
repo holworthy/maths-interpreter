@@ -1,6 +1,7 @@
 package holworthy.maths.gui;
 
 import java.awt.BorderLayout;
+import java.util.ArrayList;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -11,6 +12,7 @@ import javax.swing.JTextField;
 import javax.swing.UIManager;
 
 import holworthy.maths.Maths;
+import holworthy.maths.nodes.Equation;
 import holworthy.maths.nodes.Node;
 
 public class GUI {
@@ -43,11 +45,36 @@ public class GUI {
 			try {
 				String text = inputTextField.getText();
 				if(text.length() > 0) {
-					Node input = Maths.parseInput(text);
-					outputPanel.removeAll();
 					// TODO: do this on another thread
-					Node output = input.simplify();
-					outputPanel.add(new JLabel(output.toString()));
+					Node input = Maths.parseInput(text);
+
+					outputPanel.removeAll();
+					
+					// expanded
+					JPanel expandedPanel = new JPanel();
+					expandedPanel.setLayout(new BoxLayout(expandedPanel, BoxLayout.PAGE_AXIS));
+					expandedPanel.add(new JLabel("Expanded:"));
+					expandedPanel.add(new JLabel(input.expand().toString()));
+					outputPanel.add(expandedPanel);
+
+					// simplified
+					JPanel simplifiedPanel = new JPanel();
+					simplifiedPanel.setLayout(new BoxLayout(simplifiedPanel, BoxLayout.PAGE_AXIS));
+					simplifiedPanel.add(new JLabel("Simplified:"));
+					simplifiedPanel.add(new JLabel(input.simplify().toString()));
+					outputPanel.add(simplifiedPanel);
+
+					// solutions
+					if(input instanceof Equation) {
+						JPanel solutionsPanel = new JPanel();
+						solutionsPanel.setLayout(new BoxLayout(solutionsPanel, BoxLayout.PAGE_AXIS));
+						solutionsPanel.add(new JLabel("Solutions:"));
+						ArrayList<Equation> solutions = ((Equation) input).solve();
+						for(Equation solution : solutions)
+							solutionsPanel.add(new JLabel(solution.toString()));
+						outputPanel.add(solutionsPanel);
+					}
+
 					outputPanel.revalidate();
 					outputPanel.repaint();
 				}
