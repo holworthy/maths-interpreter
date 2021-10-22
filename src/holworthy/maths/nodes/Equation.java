@@ -65,10 +65,12 @@ public class Equation extends BinaryNode {
 		return hashSet;
 	}
 
-	public void solve() throws DivideByZeroException {
+	public ArrayList<Equation> solve() throws DivideByZeroException {
 		Node start = new Equation(new Subtract(getLeft(), getRight()).simplify(), new Number(0));
 		ArrayList<Variable> variables = new ArrayList<>(getVariables(start));
 		variables.sort((a, b) -> a.getName().compareTo(b.getName()));
+
+		ArrayList<Equation> solutions = new ArrayList<>();
 
 		for(Variable variable : variables) {
 			Equation equation = (Equation) start.copy();
@@ -77,26 +79,51 @@ public class Equation extends BinaryNode {
 			System.out.println("starting with: " + equation);
 
 			while(!equation.getLeft().matches(variable)) {
+				System.out.println(equation);
+
+				// a*x^2 + b*x + c = d
+				if(equation.getLeft().matches(new Add(new Add(new Multiply(new Matching.Constant(), new Power(new Matching.Anything(), new Number(2))), new Multiply(new Matching.Constant(), new Matching.Anything())), new Matching.Constant())) && equation.getRight().matches(new Matching.Constant()) && ((BinaryNode) ((BinaryNode) ((BinaryNode) ((BinaryNode) equation.getLeft()).getLeft()).getLeft()).getRight()).getLeft().matches(((BinaryNode) ((BinaryNode) ((BinaryNode) equation.getLeft()).getLeft()).getRight()).getRight())) {
+					Node a = ((BinaryNode) ((BinaryNode) ((BinaryNode) equation.getLeft()).getLeft()).getLeft()).getLeft();
+					Node b = ((BinaryNode) ((BinaryNode) ((BinaryNode) equation.getLeft()).getLeft()).getRight()).getLeft();
+					Node c = ((BinaryNode) equation.getLeft()).getRight();
+					Node d = equation.getRight();
+					Node x = ((BinaryNode) ((BinaryNode) ((BinaryNode) equation.getLeft()).getLeft()).getRight()).getRight();
+
+					// x = (-b +- sqrt(b^2 - 4 * a * (c - d))) / (2 * a)
+					solutions.addAll(new Equation(x, new Divide(new Add(new Negative(b), new Sqrt(new Subtract(new Power(b, new Number(2)), new Multiply(new Multiply(new Number(4), a), new Subtract(c, d))))), new Multiply(new Number(2), a))).solve());
+					solutions.addAll(new Equation(x, new Divide(new Subtract(new Negative(b), new Sqrt(new Subtract(new Power(b, new Number(2)), new Multiply(new Multiply(new Number(4), a), new Subtract(c, d))))), new Multiply(new Number(2), a))).solve());
+
+					break;
+
 				// -x = a -> x = -a
-				if(equation.getLeft() instanceof Negative)
+				} else if(equation.getLeft() instanceof Negative) {
 					equation = new Equation(((UnaryNode) equation.getLeft()).getNode(), new Negative(equation.getRight()));
 
 				// x + a = b -> x = b - a
 				// a + x = b -> x = b - a
-				else if(equation.getLeft() instanceof Add) {
+				} else if(equation.getLeft() instanceof Add) {
 					if(((BinaryNode) equation.getLeft()).getLeft().contains(variable))
 						equation = new Equation(((BinaryNode) equation.getLeft()).getLeft(), new Subtract(equation.getRight(), ((BinaryNode) equation.getLeft()).getRight()));
 					else if(((BinaryNode) equation.getLeft()).getRight().contains(variable))
 						equation = new Equation(((BinaryNode) equation.getLeft()).getRight(), new Subtract(equation.getRight(), ((BinaryNode) equation.getLeft()).getLeft()));
-				}
+				
+				// x * a = b -> x = b / a
+				} else if(equation.getLeft() instanceof Multiply) {
+					if(((BinaryNode) equation.getLeft()).getLeft().contains(variable))
+						equation = new Equation(((BinaryNode) equation.getLeft()).getLeft(), new Divide(equation.getRight(), ((BinaryNode) equation.getLeft()).getRight()));
+					else if(((BinaryNode) equation.getLeft()).getRight().contains(variable))
+						equation = new Equation(((BinaryNode) equation.getLeft()).getRight(), new Divide(equation.getRight(), ((BinaryNode) equation.getLeft()).getLeft()));
 
-				else
+				} else {
 					break;
+				}
 			}
 
-
-			System.out.println(equation.simplify());
+			if(equation.getLeft().matches(variable))
+				solutions.add((Equation) equation.simplify());
 		}
+
+		return solutions;
 	}
 
 	@Override
@@ -106,9 +133,11 @@ public class Equation extends BinaryNode {
 	}
 
 	public static void main(String[] args) throws Exception {
-		Node input = Maths.parseInput("x+2=0");
+		Node input = Maths.parseInput("3*x^2+5*x+2=0");
+
 		System.out.println(input);
 		System.out.println(input.simplify());
-		((Equation) input).solve();
+
+		System.out.println(((Equation) input).solve());
 	}
 }

@@ -14,7 +14,7 @@ public class Nthrt extends FunctionNode {
 
 	@Override
 	public String toString() {
-		return exponent+"rt(" + getNode() + ")";
+		return "nthrt(" + getNode() + ", " + exponent + ")";
 	}
 
 	@Override
@@ -39,6 +39,8 @@ public class Nthrt extends FunctionNode {
 			// int s = (int) Math.floor(Math.pow(n, 1f/exponent));
 			// if(Math.pow(s, exponent) == n)
 			// 	return new Number(s);
+
+			// TODO: fix
 			BigInteger n = ((Number) node).getValue();
 			if(n.pow(iroot(n, BigInteger.valueOf(exponent))).compareTo(n) == 0)
 				return new Number(iroot(n, BigInteger.valueOf(exponent)));
@@ -64,5 +66,9 @@ public class Nthrt extends FunctionNode {
 	public Node differentiate(Variable wrt) {
 		// TODO: implement
 		return null;
+	}
+
+	public static void main(String[] args) throws DivideByZeroException {
+		System.out.println(new Nthrt(new Number(4), 2).simplify());
 	}
 }
