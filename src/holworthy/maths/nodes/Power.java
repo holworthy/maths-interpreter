@@ -36,7 +36,7 @@ public class Power extends BinaryNode {
 			return new Number(((Number) left).getValue().pow(((Number) right).getValue().intValue()));
 		
 		if(left instanceof Number && right instanceof Divide && ((BinaryNode) right).getLeft() instanceof Number && ((BinaryNode) right).getRight() instanceof Number){
-			return new Nthrt(new Power(left, ((BinaryNode) right).getLeft()), ((Number) ((BinaryNode) right).getRight()).getValue().intValue()).expand();
+			return new Nthrt(new Power(left, ((BinaryNode) right).getLeft()), ((Number) ((BinaryNode) right).getRight()).getValue()).expand();
 		}
 
 		// i*i = -1

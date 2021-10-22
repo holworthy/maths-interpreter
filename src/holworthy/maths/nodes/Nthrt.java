@@ -5,9 +5,9 @@ import java.math.BigInteger;
 import holworthy.maths.DivideByZeroException;
 
 public class Nthrt extends FunctionNode {
-	private int exponent;
+	private BigInteger exponent;
 
-	public Nthrt(Node node, int exponent) {
+	public Nthrt(Node node, BigInteger exponent) {
 		super(node);
 		this.exponent = exponent;
 	}
@@ -34,32 +34,24 @@ public class Nthrt extends FunctionNode {
 		if(node instanceof Negative)
 			throw new Error("negative in nth root idk what maths is");
 
-		if(node instanceof Number) {
-			// int n = ((Number) node).getValue();
-			// int s = (int) Math.floor(Math.pow(n, 1f/exponent));
-			// if(Math.pow(s, exponent) == n)
-			// 	return new Number(s);
-
-			// TODO: fix
+		if(node instanceof Number && exponent.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) < 0) {
 			BigInteger n = ((Number) node).getValue();
-			if(n.pow(iroot(n, BigInteger.valueOf(exponent))).compareTo(n) == 0)
-				return new Number(iroot(n, BigInteger.valueOf(exponent)));
-				
-			// TODO: fix this to work with larger numbers even tho TB of data
+			if(iroot(exponent, n).pow(exponent.intValue()).compareTo(n) == 0)
+				return new Number(iroot(exponent, n));
 		}
 
 		return new Nthrt(node, exponent);
 	}
 
-	public int iroot(BigInteger k, BigInteger n){
+	public BigInteger iroot(BigInteger k, BigInteger n){
 		BigInteger k1 = k.subtract(BigInteger.ONE);
 		BigInteger s = n.add(BigInteger.ONE);
 		BigInteger u = n;
 		while(u.compareTo(s) < 0){
 			s = u;
-			u = ((u.multiply(k1)).add(n)).divide((u.multiply(k1))).divide(k);
+			u = (u.multiply(k1).add(n.divide(u.pow(k1.intValue())))).divide(k);
 		}
-		return s.intValue();
+		return s;
 	}
 
 	@Override
@@ -68,7 +60,7 @@ public class Nthrt extends FunctionNode {
 		return null;
 	}
 
-	public static void main(String[] args) throws DivideByZeroException {
-		System.out.println(new Nthrt(new Number(4), 2).simplify());
-	}
+	// public static void main(String[] args) throws DivideByZeroException {
+	// 	System.out.println(new Nthrt(new Number(4), BigInteger.valueOf(2)).simplify());
+	// }
 }
