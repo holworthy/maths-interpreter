@@ -105,13 +105,13 @@ public class Multiply extends BinaryNode {
 			return new Multiply(right, left).expand();
 
 		// sort terms
-		if(needSwitching(left, right))
+		if(shouldSwap(left, right))
 			return new Multiply(right, left);
 		else if(left instanceof Power && right instanceof Variable)
 			return new Multiply(right, left).expand();
 		// swap with lower multiply nodes
 		if(left instanceof Multiply){
-			if(needSwitching(((BinaryNode) left).getRight(), right))
+			if(shouldSwap(((BinaryNode) left).getRight(), right))
 				return new Multiply(new Multiply(((BinaryNode) left).getLeft(), right), ((BinaryNode) left).getRight()).expand();
 			// else if(((BinaryNode) left).getRight() instanceof Power && right instanceof Variable)
 			// 	return new Multiply(new Multiply(((BinaryNode) left).getLeft(), right), ((BinaryNode) left).getRight()).expand();
@@ -126,7 +126,7 @@ public class Multiply extends BinaryNode {
 		return new Multiply(left, right);
 	}
 
-	public boolean needSwitching(Node left, Node right){
+	public boolean shouldSwap(Node left, Node right) {
 		// swap variables and numbers
 		if((left instanceof Variable && (right instanceof Number || right instanceof Negative)) || (left instanceof Power && (right instanceof Number || right instanceof Negative)))
 			return true;
@@ -141,6 +141,16 @@ public class Multiply extends BinaryNode {
 				return true;
 		if(left instanceof ConstantNode && right instanceof ConstantNode)
 			return left.toString().compareTo(right.toString()) > 0;
+		// swap functions and constants
+		if(left instanceof FunctionNode && right.isConstant())
+			return true;
+		// swap functions and variables
+		if(left instanceof FunctionNode && right instanceof Variable)
+			return true;
+		// sort functions alphabetically
+		if(left instanceof FunctionNode && right instanceof FunctionNode)
+			return ((FunctionNode) left).getName().compareTo(((FunctionNode) right).getName()) > 0;
+
 		return false;
 	}
 

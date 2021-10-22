@@ -15,6 +15,11 @@ public class Log extends FunctionNode {
 	}
 
 	@Override
+	public String toString() {
+		return "log(" + getNode() + ", " + getBase() + ")";
+	}
+
+	@Override
 	public Node copy() {
 		return new Log(getNode().copy(), getBase().copy());
 	}

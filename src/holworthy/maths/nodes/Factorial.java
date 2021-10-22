@@ -2,6 +2,7 @@ package holworthy.maths.nodes;
 
 import holworthy.maths.DivideByZeroException;
 
+// TODO: make this a usable function
 public class Factorial extends UnaryNode {
 	public Factorial(Node node) {
 		super(node);

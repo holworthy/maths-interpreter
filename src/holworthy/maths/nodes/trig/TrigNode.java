@@ -16,6 +16,6 @@ public abstract class TrigNode extends FunctionNode {
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName().toLowerCase() + "(" + getNode() + ")";
+		return getName() + "(" + getNode() + ")";
 	}
 }

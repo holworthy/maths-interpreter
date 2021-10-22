@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 import holworthy.maths.nodes.Add;
-import holworthy.maths.nodes.BinaryNode;
 import holworthy.maths.nodes.Divide;
 import holworthy.maths.nodes.Equation;
 import holworthy.maths.nodes.Ln;
