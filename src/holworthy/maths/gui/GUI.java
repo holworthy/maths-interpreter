@@ -41,13 +41,16 @@ public class GUI {
 		// event listeners
 		interpretButton.addActionListener(ae -> {
 			try {
-				Node input = Maths.parseInput(inputTextField.getText());
-				outputPanel.removeAll();
-				// TODO: do this on another thread
-				Node output = input.simplify();
-				outputPanel.add(new JLabel(output.toString()));
-				outputPanel.revalidate();
-				outputPanel.repaint();
+				String text = inputTextField.getText();
+				if(text.length() > 0) {
+					Node input = Maths.parseInput(text);
+					outputPanel.removeAll();
+					// TODO: do this on another thread
+					Node output = input.simplify();
+					outputPanel.add(new JLabel(output.toString()));
+					outputPanel.revalidate();
+					outputPanel.repaint();
+				}
 			} catch(Exception e) {
 				e.printStackTrace();
 				// TODO: remove this and handle errors

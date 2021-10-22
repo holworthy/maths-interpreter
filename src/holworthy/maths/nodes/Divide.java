@@ -33,7 +33,7 @@ public class Divide extends BinaryNode {
 		Node left = getLeft().expand();
 		Node right = getRight().expand();
 
-		if (right instanceof Number && ((Number) right).getValue().compareTo(BigInteger.ZERO) == 0)
+		if(right instanceof Number && ((Number) right).getValue().compareTo(BigInteger.ZERO) == 0)
 			throw new DivideByZeroException("You Can't divide by zero");
 		if(left.matches(right))
 			return new Number(1);
@@ -53,6 +53,9 @@ public class Divide extends BinaryNode {
 
 			return new Divide(new Number(a.divide(divisor)), new Number(b.divide(divisor)));
 		}
+
+		if(left instanceof Divide)
+			return new Divide(((BinaryNode) left).getLeft(), new Multiply(((BinaryNode) left).getRight(), right)).expand();
 
 		if(left.isConstant() && right.isConstant())
 			return new Divide(left, right);

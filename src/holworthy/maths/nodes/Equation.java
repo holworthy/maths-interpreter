@@ -21,30 +21,6 @@ public class Equation extends BinaryNode {
 		return new Equation(getLeft().copy(), getRight().copy());
 	}
 
-	public boolean isQuadratic() {
-		return matches(
-			new Equation(
-				new Add(
-					new Add(
-						new Multiply(
-							new Matching.Constant(),
-							new Power(
-								new Variable("x"),
-								new Number(2)
-							)
-						),
-						new Multiply(
-							new Matching.Constant(),
-							new Variable("x")
-						)
-					),
-					new Matching.Constant()
-				),
-				new Number(0)
-			)
-		);
-	}
-
 	@Override
 	public Node expand() throws DivideByZeroException {
 		return new Equation(getLeft().expand(), getRight().expand());
