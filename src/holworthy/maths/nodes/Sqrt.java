@@ -28,25 +28,12 @@ public class Sqrt extends Nthrt {
 	@Override
 	public Node expand() throws DivideByZeroException{
 		Node node = getNode().expand();
-
-		if(node instanceof Negative)
-			return new Multiply(new I(), new Sqrt(((Negative) node).getNode())).expand();
-
 		if(node.matches(new Number(0)))
 			return new Number(0);
 		if(node.matches(new Number(1)))
 			return new Number(1);
-
-		super.expand();
-		// TODO: check this is ok
-
-		// if(node instanceof Number) {
-		// 	int n = ((Number) node).getValue();
-		// 	int s = (int) Math.floor(Math.sqrt(n));
-		// 	if(Math.pow(s, 2) == n)
-		// 		return new Number(s);
-		// }
-
-		return new Sqrt(node);
+		if(node instanceof Negative)
+			return new Multiply(new I(), new Sqrt(((Negative) node).getNode())).expand();
+		return super.expand();
 	}
 }

@@ -53,7 +53,8 @@ import holworthy.maths.nodes.trig.Tanh;
 <expression> ::= <add-or-subtract>
 <add-or-subtract> ::= <add-or-subtract> "+" <multiply-or-divide> | <add-or-subtract> "-" <multiply-or-divide> | <multiply-or-divide>
 <multiply-or-divide> ::= <multiply-or-divide> "*" <negative> | <multiply-or-divide> "/" <negative> | <negative>
-<negative> ::= "-" <negative> | <value>
+<negative> ::= "-" <negative> | <power>
+<power> ::= <value> "^" <negative> | <value>
 <value> ::= <number> | <brackets> | <variable> | <function>
 <brackets> ::= "(" <expression> ")"
 
@@ -234,7 +235,7 @@ public abstract class Maths {
 		Node left = parseValue(parser);
 		if(parser.hasMore() && parser.getChar() == '^') {
 			parser.incrementCursor();
-			Node right = parsePower(parser);
+			Node right = parseNegative(parser);
 			return new Power(left, right);
 		}
 		return left;

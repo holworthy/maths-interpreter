@@ -109,7 +109,7 @@ public class Equation extends BinaryNode {
 	}
 
 	public static void main(String[] args) throws Exception {
-		Node input = Maths.parseInput("3*x^2+5*x+2=0");
+		Node input = Maths.parseInput("3*x=y/2");
 
 		System.out.println(input);
 		System.out.println(input.simplify());

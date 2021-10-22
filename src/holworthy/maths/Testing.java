@@ -36,8 +36,8 @@ public class Testing {
 
 		// complex arithmetic
 		tests.put("6^6*36^3", "2176782336");
-		// tests.put("27^6*81^(-7)", "3^-10"); // parser error on negtaive power
-		// tests.put("36^-1/36^(-2)", "36"); // same as above
+		tests.put("27^6*81^(-7)", "3^-10");
+		tests.put("36^-1/36^(-2)", "36");
 		tests.put("(22/12)*(30/8)/(34/12)", "165/68");
 		tests.put("(46/18)/(22/9)/(24/7)","161/528");
 

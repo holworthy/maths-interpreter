@@ -75,6 +75,17 @@ public class Power extends BinaryNode {
 	}
 
 	@Override
+	public Node collapse() throws DivideByZeroException {
+		Node left = getLeft().collapse();
+		Node right = getRight().collapse();
+
+		if(right instanceof Negative && ((UnaryNode) right).getNode() instanceof Number)
+			return new Divide(new Number(1), new Power(left, ((UnaryNode) right).getNode())).collapse();
+
+		return new Power(left, right);
+	}
+
+	@Override
 	public Node differentiate(Variable wrt) {
 		// TODO: implement
 		return null;

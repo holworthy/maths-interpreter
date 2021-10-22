@@ -27,6 +27,17 @@ public class Nthrt extends FunctionNode {
 		return getNode().isConstant();
 	}
 
+	public BigInteger iroot(BigInteger k, BigInteger n){
+		BigInteger k1 = k.subtract(BigInteger.ONE);
+		BigInteger s = n.add(BigInteger.ONE);
+		BigInteger u = n;
+		while(u.compareTo(s) < 0){
+			s = u;
+			u = (u.multiply(k1).add(n.divide(u.pow(k1.intValue())))).divide(k);
+		}
+		return s;
+	}
+
 	@Override
 	public Node expand() throws DivideByZeroException{
 		Node node = getNode().expand();
@@ -40,18 +51,19 @@ public class Nthrt extends FunctionNode {
 				return new Number(iroot(exponent, n));
 		}
 
+		// nth root where n is 1 does nothing
+		if(exponent.equals(BigInteger.ONE))
+			return node;
+
 		return new Nthrt(node, exponent);
 	}
-
-	public BigInteger iroot(BigInteger k, BigInteger n){
-		BigInteger k1 = k.subtract(BigInteger.ONE);
-		BigInteger s = n.add(BigInteger.ONE);
-		BigInteger u = n;
-		while(u.compareTo(s) < 0){
-			s = u;
-			u = (u.multiply(k1).add(n.divide(u.pow(k1.intValue())))).divide(k);
-		}
-		return s;
+	
+	@Override
+	public Node collapse() throws DivideByZeroException {
+		Node node = getNode().collapse();
+		if(exponent.equals(BigInteger.TWO))
+			return new Sqrt(node);
+		return node;
 	}
 
 	@Override
@@ -60,7 +72,7 @@ public class Nthrt extends FunctionNode {
 		return null;
 	}
 
-	// public static void main(String[] args) throws DivideByZeroException {
-	// 	System.out.println(new Nthrt(new Number(4), BigInteger.valueOf(2)).simplify());
-	// }
+	public static void main(String[] args) throws DivideByZeroException {
+		System.out.println(new Nthrt(new Number(5), BigInteger.valueOf(2)).simplify());
+	}
 }
