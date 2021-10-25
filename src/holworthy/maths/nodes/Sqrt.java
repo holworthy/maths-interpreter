@@ -1,13 +1,11 @@
 package holworthy.maths.nodes;
 
-import java.math.BigInteger;
-
 import holworthy.maths.exceptions.DivideByZeroException;
 import holworthy.maths.nodes.constant.I;
 
 public class Sqrt extends Nthrt {
 	public Sqrt(Node node) {
-		super(node, BigInteger.TWO);
+		super(node, new Number(2));
 	}
 
 	@Override
