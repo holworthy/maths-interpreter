@@ -229,10 +229,6 @@ public class Add extends BinaryNode {
 
 		return new Add(left, right);
 	}
-	// TODO: refactor as wetted in divide
-	private BigInteger gcd(BigInteger a, BigInteger b) {
-		return b.compareTo(BigInteger.ZERO) == 0 ? a : gcd(b, a.mod(b));
-	}
 
 	public ArrayList<Node> flatten(Multiply root){
 		if(!(root.getLeft() instanceof Multiply)){

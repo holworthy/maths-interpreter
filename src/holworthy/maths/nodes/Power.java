@@ -35,6 +35,23 @@ public class Power extends BinaryNode {
 		// 2^3 = 8
 		if(left instanceof Number && right instanceof Number)
 			return new Number(((Number) left).getValue().pow(((Number) right).getValue().intValue()));
+
+		// -2^3 = -8 & -2^2 = 4
+		if(left instanceof Negative && right instanceof Number){
+			if(((UnaryNode) left).getNode() instanceof Number){
+				if(((Number) right).getValue().mod(BigInteger.TWO).equals(BigInteger.ZERO))
+					return new Number(((Number) ((UnaryNode) left).getNode()).getValue().pow(((Number) right).getValue().intValue()));
+				return new Negative(new Number(((Number) ((UnaryNode) left).getNode()).getValue().pow(((Number) right).getValue().intValue())));
+			}
+		}
+
+		// 2^-2 = 1/4
+		if(left instanceof Number && right instanceof Negative)
+			return new Divide(new Number(1), new Power(left, ((UnaryNode) right).getNode())).expand();
+		
+		// -2^-2 = 1/-2^2.expand()
+		if(left instanceof Negative && right instanceof Negative)
+			return new Divide(new Number(1), new Power(left, ((UnaryNode) right).getNode())).expand();
 		
 		if(left instanceof Number && right instanceof Divide && ((BinaryNode) right).getLeft() instanceof Number && ((BinaryNode) right).getRight() instanceof Number){
 			return new Nthrt(new Power(left, ((BinaryNode) right).getLeft()), ((Number) ((BinaryNode) right).getRight()).getValue()).expand();
