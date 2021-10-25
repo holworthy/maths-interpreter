@@ -12,6 +12,7 @@ import javax.swing.JTextField;
 import javax.swing.UIManager;
 
 import holworthy.maths.Maths;
+import holworthy.maths.exceptions.MathsInterpreterException;
 import holworthy.maths.nodes.Equation;
 import holworthy.maths.nodes.Node;
 import holworthy.maths.nodes.Variable;
@@ -48,6 +49,7 @@ public class GUI {
 				if(text.length() > 0) {
 					// TODO: do this on another thread
 					Node input = Maths.parseInput(text);
+					Node simplified = input.simplify();
 
 					outputPanel.removeAll();
 					
@@ -62,24 +64,34 @@ public class GUI {
 					JPanel simplifiedPanel = new JPanel();
 					simplifiedPanel.setLayout(new BoxLayout(simplifiedPanel, BoxLayout.PAGE_AXIS));
 					simplifiedPanel.add(new JLabel("Simplified:"));
-					simplifiedPanel.add(new JLabel(input.simplify().toString()));
+					simplifiedPanel.add(new JLabel(simplified.toString()));
 					outputPanel.add(simplifiedPanel);
 
 					// solutions
-					if(input instanceof Equation) {
+					if(simplified instanceof Equation) {
 						JPanel solutionsPanel = new JPanel();
 						solutionsPanel.setLayout(new BoxLayout(solutionsPanel, BoxLayout.PAGE_AXIS));
 						solutionsPanel.add(new JLabel("Solutions:"));
-						ArrayList<Equation> solutions = ((Equation) input).solve();
+						ArrayList<Equation> solutions = ((Equation) simplified).solve();
 						for(Equation solution : solutions)
 							solutionsPanel.add(new JLabel(solution.toString()));
 						outputPanel.add(solutionsPanel);
 					}
 
+					// derivative
+					try {
+						JPanel derivativePanel = new JPanel();
+						derivativePanel.setLayout(new BoxLayout(derivativePanel, BoxLayout.PAGE_AXIS));
+						derivativePanel.add(new JLabel("Derivative:"));
+						// TODO: differentiate wrt whatever variables exist
+						derivativePanel.add(new JLabel(simplified.differentiate(new Variable("x")).toString()));
+						outputPanel.add(derivativePanel);
+					} catch(MathsInterpreterException e) {
+
+					}
+
 					outputPanel.revalidate();
 					outputPanel.repaint();
-
-					System.out.println(input.differentiate(new Variable("x")));
 				}
 			} catch(Exception e) {
 				e.printStackTrace();

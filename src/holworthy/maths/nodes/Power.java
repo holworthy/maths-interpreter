@@ -24,25 +24,37 @@ public class Power extends BinaryNode {
 	}
 
 	@Override
-	public Node expand() throws DivideByZeroException{
+	public Node expand() throws DivideByZeroException {
 		Node left = getLeft().expand();
 		Node right = getRight().expand();
 
+		// undefined behaviour
 		if(left.matches(new Number(0)) && right.matches(new Number(0)))
 			throw new DivideByZeroException("0^0 is undefined");
 
-		// TODO: if power really big then just don't
-		// 2^3 = 8
+		// constant folding
 		if(left instanceof Number && right instanceof Number)
 			return new Number(((Number) left).getValue().pow(((Number) right).getValue().intValue()));
 		
-		if(left instanceof Number && right instanceof Divide && ((BinaryNode) right).getLeft() instanceof Number && ((BinaryNode) right).getRight() instanceof Number){
+		// fractional powers
+		if(left instanceof Number && right instanceof Divide && ((BinaryNode) right).getLeft() instanceof Number && ((BinaryNode) right).getRight() instanceof Number)
 			return new Nthrt(new Power(left, ((BinaryNode) right).getLeft()), ((Number) ((BinaryNode) right).getRight()).getValue()).expand();
-		}
 
-		// i*i = -1
-		if(left instanceof I && right.matches(new Number(2)))
-			return new Negative(new Number(1));
+		// i^0 = 1
+		// i^1 = i
+		// i^2 = -1
+		// i^3 = -i
+		if(left instanceof I && right instanceof Number) {
+			Number mod = new Number(((Number) right).getValue().mod(new BigInteger("4")));
+			if(mod.matches(new Number(0)))
+				return new Number(1);
+			if(mod.matches(new Number(1)))
+				return new I();
+			if(mod.matches(new Number(2)))
+				return new Negative(new Number(1));
+			if(mod.matches(new Number(3)))
+				return new Negative(new I());
+		}
 
 		// x^0 = 1
 		if(right.matches(new Number(0)))
@@ -81,7 +93,7 @@ public class Power extends BinaryNode {
 		Node right = getRight().collapse();
 
 		if(right instanceof Negative && ((UnaryNode) right).getNode() instanceof Number)
-			return new Divide(new Number(1), new Power(left, ((UnaryNode) right).getNode())).collapse();
+			return new Divide(new Number(1), new Power(left, ((UnaryNode) right).getNode()).simplify()).collapse();
 
 		return new Power(left, right);
 	}

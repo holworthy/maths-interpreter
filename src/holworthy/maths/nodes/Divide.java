@@ -34,8 +34,14 @@ public class Divide extends BinaryNode {
 		Node left = getLeft().expand();
 		Node right = getRight().expand();
 
+		// undefined behaviour
 		if(right instanceof Number && ((Number) right).getValue().compareTo(BigInteger.ZERO) == 0)
 			throw new DivideByZeroException("You Can't divide by zero");
+
+		if(right.matches(new Number(1)))
+			return left;
+		if(left.matches(new Number(0)))
+			return new Number(0);
 		if(left.matches(right))
 			return new Number(1);
 		if(left instanceof Negative && right instanceof Negative)
@@ -154,6 +160,6 @@ public class Divide extends BinaryNode {
 	@Override
 	public Node differentiate(Variable wrt) throws MathsInterpreterException {
 		// TODO: check right is not 0
-		return new Divide(new Subtract(new Multiply(getLeft().differentiate(wrt), getRight()), new Multiply(getLeft(), getRight().differentiate(wrt))), new Power(getRight(), new Number(2)));
+		return new Divide(new Subtract(new Multiply(getLeft().differentiate(wrt), getRight()), new Multiply(getLeft(), getRight().differentiate(wrt))), new Power(getRight(), new Number(2))).simplify();
 	}
 }
