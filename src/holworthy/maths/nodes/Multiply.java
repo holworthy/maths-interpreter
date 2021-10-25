@@ -165,7 +165,7 @@ public class Multiply extends BinaryNode {
 
 		// x * y/z = (x*y)/z
 		if (right instanceof Divide && !(left instanceof Divide))
-			return new Divide(new Multiply(left, ((BinaryNode) right).getLeft()), ((BinaryNode) right).getRight()).expand().collapse();
+			return new Divide(new Multiply(left, ((BinaryNode) right).getLeft()), ((BinaryNode) right).getRight()).collapse();
 
 		// x/y * z/w = x*z / y*w
 		if (left instanceof Divide && right instanceof Divide){
