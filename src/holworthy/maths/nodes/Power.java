@@ -55,7 +55,7 @@ public class Power extends BinaryNode {
 		
 		// fractional powers
 		if(left instanceof Number && right instanceof Divide && ((BinaryNode) right).getLeft() instanceof Number && ((BinaryNode) right).getRight() instanceof Number)
-			return new Nthrt(new Power(left, ((BinaryNode) right).getLeft()), ((Number) ((BinaryNode) right).getRight()).getValue()).expand();
+			return new Nthrt(new Power(left, ((BinaryNode) right).getLeft()), ((Number) ((BinaryNode) right).getRight())).expand();
 
 		// i^0 = 1
 		// i^1 = i
@@ -109,8 +109,10 @@ public class Power extends BinaryNode {
 		Node left = getLeft().collapse();
 		Node right = getRight().collapse();
 
-		if(right instanceof Negative && ((UnaryNode) right).getNode() instanceof Number)
+		if(right instanceof Negative)
 			return new Divide(new Number(1), new Power(left, ((UnaryNode) right).getNode()).simplify()).collapse();
+		if(right instanceof Divide)
+			return new Nthrt(new Power(left, ((BinaryNode) right).getLeft()), ((BinaryNode) right).getRight());
 
 		return new Power(left, right);
 	}
