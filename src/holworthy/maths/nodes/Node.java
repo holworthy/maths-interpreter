@@ -1,6 +1,7 @@
 package holworthy.maths.nodes;
 
-import holworthy.maths.DivideByZeroException;
+import holworthy.maths.exceptions.DivideByZeroException;
+import holworthy.maths.exceptions.MathsInterpreterException;
 
 public abstract class Node {
 	public abstract Node copy();
@@ -29,5 +30,5 @@ public abstract class Node {
 		return normalise().expand().normalise().collapse().normalise();
 	}
 
-	public abstract Node differentiate(Variable wrt);
+	public abstract Node differentiate(Variable wrt) throws MathsInterpreterException;
 }

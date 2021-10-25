@@ -1,6 +1,7 @@
 package holworthy.maths.nodes;
 
-import holworthy.maths.DivideByZeroException;
+import holworthy.maths.exceptions.DivideByZeroException;
+import holworthy.maths.exceptions.MathsInterpreterException;
 
 public class Log extends FunctionNode {
 	private Node base;
@@ -38,8 +39,7 @@ public class Log extends FunctionNode {
 	}
 
 	@Override
-	public Node differentiate(Variable wrt) {
-		// TODO: implement
-		return null;
+	public Node differentiate(Variable wrt) throws MathsInterpreterException {
+		return new Divide(getNode().differentiate(wrt), new Multiply(new Ln(getBase()), getNode())).simplify();
 	}
 }

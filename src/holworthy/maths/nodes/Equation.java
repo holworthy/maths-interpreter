@@ -2,8 +2,9 @@ package holworthy.maths.nodes;
 
 import java.util.ArrayList;
 
-import holworthy.maths.DivideByZeroException;
 import holworthy.maths.Maths;
+import holworthy.maths.exceptions.DivideByZeroException;
+import holworthy.maths.exceptions.MathsInterpreterException;
 
 public class Equation extends BinaryNode {
 	public Equation(Node left, Node right) {
@@ -90,11 +91,16 @@ public class Equation extends BinaryNode {
 						equation = new Equation(((BinaryNode) equation.getLeft()).getRight(), new Subtract(equation.getRight(), ((BinaryNode) equation.getLeft()).getLeft()));
 				
 				// x * a = b -> x = b / a
+				// TODO: check this okay
 				} else if(equation.getLeft() instanceof Multiply) {
 					if(((BinaryNode) equation.getLeft()).getLeft().contains(variable))
 						equation = new Equation(((BinaryNode) equation.getLeft()).getLeft(), new Divide(equation.getRight(), ((BinaryNode) equation.getLeft()).getRight()));
 					else if(((BinaryNode) equation.getLeft()).getRight().contains(variable))
 						equation = new Equation(((BinaryNode) equation.getLeft()).getRight(), new Divide(equation.getRight(), ((BinaryNode) equation.getLeft()).getLeft()));
+
+				// x / a = b -> x = a * b
+				} else if(equation.getLeft() instanceof Divide) {
+					equation = new Equation(((BinaryNode) equation.getLeft()).getLeft(), new Multiply(((BinaryNode) equation.getLeft()).getRight(), equation.getRight()));
 
 				} else {
 					break;
@@ -109,7 +115,7 @@ public class Equation extends BinaryNode {
 	}
 
 	@Override
-	public Node differentiate(Variable wrt) {
+	public Node differentiate(Variable wrt) throws MathsInterpreterException {
 		// TODO: implement
 		return null;
 	}

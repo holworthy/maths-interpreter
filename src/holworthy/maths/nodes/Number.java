@@ -2,6 +2,8 @@ package holworthy.maths.nodes;
 
 import java.math.BigInteger;
 
+import holworthy.maths.exceptions.MathsInterpreterException;
+
 public class Number extends Node {
 	private final BigInteger value;
 
@@ -45,8 +47,7 @@ public class Number extends Node {
 	}
 
 	@Override
-	public Node differentiate(Variable wrt) {
-		// TODO: implement
-		return null;
+	public Node differentiate(Variable wrt) throws MathsInterpreterException {
+		return new Number(0);
 	}
 }

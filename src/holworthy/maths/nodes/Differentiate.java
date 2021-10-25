@@ -1,5 +1,7 @@
 package holworthy.maths.nodes;
 
+import holworthy.maths.exceptions.MathsInterpreterException;
+
 public class Differentiate extends FunctionNode {
 	private Variable wrt;
 
@@ -14,7 +16,12 @@ public class Differentiate extends FunctionNode {
 
 	@Override
 	public boolean isConstant() {
-		return getNode().differentiate(wrt).isConstant();
+		try {
+			return getNode().differentiate(wrt).isConstant();
+		} catch(MathsInterpreterException e) {
+			return false;
+			// TODO: check this is correct
+		}
 	}
 
 	@Override
@@ -23,7 +30,8 @@ public class Differentiate extends FunctionNode {
 	}
 
 	@Override
-	public Node differentiate(Variable wrt) {
+	public Node differentiate(Variable wrt) throws MathsInterpreterException {
+		// TODO: implement
 		return null;
 	}
 }

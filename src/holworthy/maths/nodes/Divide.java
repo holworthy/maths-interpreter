@@ -5,7 +5,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.ListIterator;
 
-import holworthy.maths.DivideByZeroException;
+import holworthy.maths.exceptions.DivideByZeroException;
+import holworthy.maths.exceptions.MathsInterpreterException;
 
 public class Divide extends BinaryNode {
 	public Divide(Node left, Node right) {
@@ -151,8 +152,8 @@ public class Divide extends BinaryNode {
 	}
 
 	@Override
-	public Node differentiate(Variable wrt) {
-		// TODO: implement
-		return null;
+	public Node differentiate(Variable wrt) throws MathsInterpreterException {
+		// TODO: check right is not 0
+		return new Divide(new Subtract(new Multiply(getLeft().differentiate(wrt), getRight()), new Multiply(getLeft(), getRight().differentiate(wrt))), new Power(getRight(), new Number(2)));
 	}
 }

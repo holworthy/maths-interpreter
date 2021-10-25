@@ -1,6 +1,7 @@
 package holworthy.maths.nodes;
 
-import holworthy.maths.DivideByZeroException;
+import holworthy.maths.exceptions.DivideByZeroException;
+import holworthy.maths.exceptions.MathsInterpreterException;
 
 public class Negative extends UnaryNode {
 	public Negative(Node node) {
@@ -47,8 +48,7 @@ public class Negative extends UnaryNode {
 	}
 
 	@Override
-	public Node differentiate(Variable wrt) {
-		// TODO: implement
-		return null;
+	public Node differentiate(Variable wrt) throws MathsInterpreterException {
+		return new Negative(getNode().differentiate(wrt));
 	}
 }

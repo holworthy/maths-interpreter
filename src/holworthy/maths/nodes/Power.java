@@ -2,7 +2,8 @@ package holworthy.maths.nodes;
 
 import java.math.BigInteger;
 
-import holworthy.maths.DivideByZeroException;
+import holworthy.maths.exceptions.DivideByZeroException;
+import holworthy.maths.exceptions.MathsInterpreterException;
 import holworthy.maths.nodes.constant.E;
 import holworthy.maths.nodes.constant.I;
 import holworthy.maths.nodes.constant.Pi;
@@ -86,8 +87,7 @@ public class Power extends BinaryNode {
 	}
 
 	@Override
-	public Node differentiate(Variable wrt) {
-		// TODO: implement
-		return null;
+	public Node differentiate(Variable wrt) throws MathsInterpreterException {
+		return new Multiply(this, new Add(new Multiply(getLeft().differentiate(wrt), new Divide(getRight(), getLeft())), new Multiply(getRight().differentiate(wrt), new Ln(getLeft())))).simplify();
 	}
 }

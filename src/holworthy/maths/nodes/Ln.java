@@ -1,6 +1,5 @@
 package holworthy.maths.nodes;
 
-import holworthy.maths.DivideByZeroException;
 import holworthy.maths.nodes.constant.E;
 
 public class Ln extends Log {
@@ -16,11 +15,5 @@ public class Ln extends Log {
 	@Override
 	public Node copy() {
 		return new Ln(getNode().copy());
-	}
-
-	@Override
-	public Node expand() throws DivideByZeroException {
-		// TODO: convert to log
-		return new Ln(getNode().expand());
 	}
 }

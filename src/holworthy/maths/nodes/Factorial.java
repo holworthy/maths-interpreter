@@ -1,6 +1,8 @@
 package holworthy.maths.nodes;
 
-import holworthy.maths.DivideByZeroException;
+import holworthy.maths.exceptions.DivideByZeroException;
+import holworthy.maths.exceptions.MathsInterpreterException;
+import holworthy.maths.exceptions.NotDifferentiableException;
 
 // TODO: make this a usable function
 public class Factorial extends UnaryNode {
@@ -24,9 +26,12 @@ public class Factorial extends UnaryNode {
 	}
 
 	@Override
-	public Node differentiate(Variable wrt) {
-		// TODO: implement
-		return null;
+	public Node differentiate(Variable wrt) throws MathsInterpreterException {
+		Node node = simplify();
+		if(node instanceof Factorial)
+			throw new NotDifferentiableException("Cannot differentiate a non-constant factorial");
+		
+		return node.differentiate(wrt);
 	}
 
 	@Override

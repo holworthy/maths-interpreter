@@ -1,5 +1,7 @@
 package holworthy.maths.nodes;
 
+import holworthy.maths.exceptions.MathsInterpreterException;
+
 public class Integrate extends FunctionNode {
 	// TODO: add stuff to this
 	public Integrate(Node node) {
@@ -17,7 +19,7 @@ public class Integrate extends FunctionNode {
 	}
 
 	@Override
-	public Node differentiate(Variable wrt) {
+	public Node differentiate(Variable wrt) throws MathsInterpreterException {
 		// TODO: implement
 		return null;
 	}

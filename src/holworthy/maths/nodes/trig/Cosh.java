@@ -1,8 +1,11 @@
 package holworthy.maths.nodes.trig;
 
-import holworthy.maths.DivideByZeroException;
+import holworthy.maths.exceptions.DivideByZeroException;
+import holworthy.maths.exceptions.MathsInterpreterException;
+import holworthy.maths.nodes.Multiply;
 import holworthy.maths.nodes.Node;
 import holworthy.maths.nodes.UnaryNode;
+import holworthy.maths.nodes.Variable;
 
 public class Cosh extends TrigNode {
 	public Cosh(Node arg) {
@@ -20,5 +23,10 @@ public class Cosh extends TrigNode {
 		if(node instanceof Acosh)
 			return ((UnaryNode) node).getNode();
 		return new Cosh(node);
+	}
+
+	@Override
+	public Node differentiate(Variable wrt) throws MathsInterpreterException {
+		return new Multiply(getNode().differentiate(wrt), new Sinh(getNode())).simplify();
 	}
 }

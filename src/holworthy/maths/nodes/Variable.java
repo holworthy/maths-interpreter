@@ -1,5 +1,7 @@
 package holworthy.maths.nodes;
 
+import holworthy.maths.exceptions.MathsInterpreterException;
+
 public class Variable extends Node {
 	private final String name;
 
@@ -42,8 +44,7 @@ public class Variable extends Node {
 	}
 
 	@Override
-	public Node differentiate(Variable wrt) {
-		// TODO: implement
-		return null;
+	public Node differentiate(Variable wrt) throws MathsInterpreterException {
+		return matches(wrt) ? new Number(1) : new Number(0);
 	}
 }

@@ -1,6 +1,7 @@
 package holworthy.maths.nodes;
 
-import holworthy.maths.DivideByZeroException;
+import holworthy.maths.exceptions.DivideByZeroException;
+import holworthy.maths.exceptions.MathsInterpreterException;
 
 public class Subtract extends BinaryNode {
 	public Subtract(Node left, Node right) {
@@ -28,8 +29,7 @@ public class Subtract extends BinaryNode {
 	}
 
 	@Override
-	public Node differentiate(Variable wrt) {
-		// TODO: implement
-		return null;
+	public Node differentiate(Variable wrt) throws MathsInterpreterException {
+		return new Subtract(getLeft().differentiate(wrt), getRight().differentiate(wrt)).simplify();
 	}
 }

@@ -14,6 +14,7 @@ import javax.swing.UIManager;
 import holworthy.maths.Maths;
 import holworthy.maths.nodes.Equation;
 import holworthy.maths.nodes.Node;
+import holworthy.maths.nodes.Variable;
 
 public class GUI {
 	public GUI() {
@@ -77,6 +78,8 @@ public class GUI {
 
 					outputPanel.revalidate();
 					outputPanel.repaint();
+
+					System.out.println(input.differentiate(new Variable("x")));
 				}
 			} catch(Exception e) {
 				e.printStackTrace();

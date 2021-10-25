@@ -3,9 +3,9 @@ package holworthy.maths.nodes;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.ListIterator;
 
-import holworthy.maths.DivideByZeroException;
+import holworthy.maths.exceptions.DivideByZeroException;
+import holworthy.maths.exceptions.MathsInterpreterException;
 
 public class Add extends BinaryNode {
 	public Add(Node left, Node right) {
@@ -276,53 +276,53 @@ public class Add extends BinaryNode {
 		if(left instanceof Variable && right instanceof Variable && left.matches(right))
 			return new Multiply(new Number(2), left);
 
-		if(left instanceof Multiply && right instanceof Multiply){
-			if(((BinaryNode) left).getRight().matches(((BinaryNode) right).getRight())){
-				Add a = new Add(((BinaryNode) left).getLeft(), ((BinaryNode) right).getLeft());
-				return new Multiply(a.collapse(), ((BinaryNode) right).getRight());
-			}
-			if(((BinaryNode) left).getLeft().matches(((BinaryNode) right).getLeft())){
-				Add a = new Add(((BinaryNode) left).getRight(), ((BinaryNode) right).getRight());
-				return new Multiply(((BinaryNode) right).getLeft(), a.collapse());
-			}
+		// TODO: this isn't working
+		// if(left instanceof Multiply && right instanceof Multiply){
+		// 	if(((BinaryNode) left).getRight().matches(((BinaryNode) right).getRight())){
+		// 		Add a = new Add(((BinaryNode) left).getLeft(), ((BinaryNode) right).getLeft());
+		// 		return new Multiply(a.collapse(), ((BinaryNode) right).getRight());
+		// 	}
+		// 	if(((BinaryNode) left).getLeft().matches(((BinaryNode) right).getLeft())){
+		// 		Add a = new Add(((BinaryNode) left).getRight(), ((BinaryNode) right).getRight());
+		// 		return new Multiply(((BinaryNode) right).getLeft(), a.collapse());
+		// 	}
 		
-			ArrayList<Node> leftList = flatten((Multiply) left);
-			ArrayList<Node> rightList = flatten((Multiply) right);
-			ArrayList<Node> removeList = new ArrayList<>();
-			ListIterator<Node> leftItr = leftList.listIterator();
+		// 	ArrayList<Node> leftList = flatten((Multiply) left);
+		// 	ArrayList<Node> rightList = flatten((Multiply) right);
+		// 	ArrayList<Node> removeList = new ArrayList<>();
+		// 	ListIterator<Node> leftItr = leftList.listIterator();
 			
-			while(leftItr.hasNext()){
-				Node n = leftItr.next();
-				ListIterator<Node> rightItr = rightList.listIterator();
-				while(rightItr.hasNext()){
-					Node o = rightItr.next();
-					if(n.matches(o)){
-						removeList.add(o);
-						rightItr.remove();
-						leftItr.remove();
-						break;
-					}
-					if(n instanceof Number && o instanceof Number && gcd(((Number) n).getValue(), ((Number) o).getValue()).compareTo(BigInteger.ONE) == 0){
-						BigInteger gcd = gcd(((Number) n).getValue(), ((Number) o).getValue());
-						removeList.add(new Number(gcd));
-						rightItr.remove();
-						rightItr.add(new Number(((Number) o).getValue().divide(gcd)));
-						leftItr.remove();
-						leftItr.add(new Number(((Number) n).getValue().divide(gcd)));
-						break;
-					}
-				}
-			}
-			if(!(removeList.isEmpty()))
-				return new Multiply(unFlatten(removeList), new Add(unFlatten(leftList), unFlatten(rightList)));
-		}
+		// 	while(leftItr.hasNext()){
+		// 		Node n = leftItr.next();
+		// 		ListIterator<Node> rightItr = rightList.listIterator();
+		// 		while(rightItr.hasNext()){
+		// 			Node o = rightItr.next();
+		// 			if(n.matches(o)){
+		// 				removeList.add(o);
+		// 				rightItr.remove();
+		// 				leftItr.remove();
+		// 				break;
+		// 			}
+		// 			if(n instanceof Number && o instanceof Number && gcd(((Number) n).getValue(), ((Number) o).getValue()).compareTo(BigInteger.ONE) == 0){
+		// 				BigInteger gcd = gcd(((Number) n).getValue(), ((Number) o).getValue());
+		// 				removeList.add(new Number(gcd));
+		// 				rightItr.remove();
+		// 				rightItr.add(new Number(((Number) o).getValue().divide(gcd)));
+		// 				leftItr.remove();
+		// 				leftItr.add(new Number(((Number) n).getValue().divide(gcd)));
+		// 				break;
+		// 			}
+		// 		}
+		// 	}
+		// 	if(!(removeList.isEmpty()))
+		// 		return new Multiply(unFlatten(removeList), new Add(unFlatten(leftList), unFlatten(rightList)));
+		// }
 
 		return new Add(left, right);
 	}
 
 	@Override
-	public Node differentiate(Variable wrt) {
-		// TODO: implement
-		return null;
+	public Node differentiate(Variable wrt) throws MathsInterpreterException {
+		return new Add(getLeft().differentiate(wrt), getRight().differentiate(wrt)).simplify();
 	}
 }

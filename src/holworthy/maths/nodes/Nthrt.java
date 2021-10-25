@@ -2,7 +2,8 @@ package holworthy.maths.nodes;
 
 import java.math.BigInteger;
 
-import holworthy.maths.DivideByZeroException;
+import holworthy.maths.exceptions.DivideByZeroException;
+import holworthy.maths.exceptions.MathsInterpreterException;
 
 public class Nthrt extends FunctionNode {
 	private BigInteger exponent;
@@ -67,7 +68,7 @@ public class Nthrt extends FunctionNode {
 	}
 
 	@Override
-	public Node differentiate(Variable wrt) {
+	public Node differentiate(Variable wrt) throws MathsInterpreterException {
 		// TODO: implement
 		return null;
 	}
