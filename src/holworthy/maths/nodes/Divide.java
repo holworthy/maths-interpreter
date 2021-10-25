@@ -120,6 +120,13 @@ public class Divide extends BinaryNode {
 			return new Multiply(left, new Divide(((BinaryNode) right).getRight(), ((BinaryNode) right).getLeft())).collapse();
 		}
 
+		// x/y / z = (x*z)/y
+		if (left instanceof Divide && !(right instanceof Divide))
+			return new Divide(new Multiply(((BinaryNode) left).getLeft(), right).expand(), ((BinaryNode) left).getRight()).collapse();
+		// x / y/z = (x*z)/y
+		if (!(left instanceof Divide) && right instanceof Divide)
+			return new Divide(new Multiply(left, ((BinaryNode) right).getRight()).expand(), ((BinaryNode) right).getLeft()).collapse();
+
 		// remove common factors
 		if (left instanceof Multiply && right instanceof Multiply){
 			ArrayList<Node> leftList = flatten((Multiply) left);
