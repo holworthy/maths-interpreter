@@ -178,9 +178,10 @@ public class Multiply extends BinaryNode {
 		}
 
 		// (z * x^-1) * y^-1 = z * (x*y)^-1
-		if (left instanceof Multiply && ((BinaryNode) left).getRight() instanceof Power && right instanceof Power && ((BinaryNode) ((BinaryNode) left).getRight()).getRight().matches(((BinaryNode) right).getRight())){
-			return new Multiply(((BinaryNode) left).getLeft(), new Power(new Multiply(((BinaryNode) ((BinaryNode) left).getRight()).getLeft(), ((BinaryNode) right).getLeft()), ((BinaryNode) right).getRight())).expand().collapse();
-		}
+		// TODO: this breaks binomial theorum
+		// if (left instanceof Multiply && ((BinaryNode) left).getRight() instanceof Power && right instanceof Power && ((BinaryNode) ((BinaryNode) left).getRight()).getRight().matches(((BinaryNode) right).getRight())){
+		// 	return new Multiply(((BinaryNode) left).getLeft(), new Power(new Multiply(((BinaryNode) ((BinaryNode) left).getRight()).getLeft(), ((BinaryNode) right).getLeft()), ((BinaryNode) right).getRight())).expand().collapse();
+		// }
 
 		// x * y^-1 = x/y
 		if(right instanceof Power && ((BinaryNode) right).getRight() instanceof Negative){

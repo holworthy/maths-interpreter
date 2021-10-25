@@ -74,8 +74,7 @@ public class Add extends BinaryNode {
 		ArrayList<Node> flattenedLeft = flatten2(left);
 		ArrayList<Node> flattenedRight = flatten2(right);
 
-		int leftIndex = 0;
-		int rightIndex = 0;
+		int index = 0;
 
 		// remove constants
 		while(flattenedLeft.size() > 0 && flattenedLeft.get(0).matches(new Matching.Constant()))
@@ -83,19 +82,17 @@ public class Add extends BinaryNode {
 		while(flattenedRight.size() > 0 && flattenedRight.get(0).matches(new Matching.Constant()))
 			flattenedRight.remove(0);
 
-		while(leftIndex < flattenedLeft.size() && rightIndex < flattenedRight.size()) {
-			Power leftPower = flattenedLeft.get(leftIndex) instanceof Variable ? new Power(flattenedLeft.get(leftIndex), new Number(1)) : (Power) flattenedLeft.get(leftIndex);
-			Power rightPower = flattenedRight.get(rightIndex) instanceof Variable ? new Power(flattenedRight.get(rightIndex), new Number(1)) : (Power) flattenedRight.get(rightIndex);
+		while(index < flattenedLeft.size() && index < flattenedRight.size()) {
+			Power leftPower = flattenedLeft.get(index) instanceof Variable ? new Power(flattenedLeft.get(index), new Number(1)) : (Power) flattenedLeft.get(index);
+			Power rightPower = flattenedRight.get(index) instanceof Variable ? new Power(flattenedRight.get(index), new Number(1)) : (Power) flattenedRight.get(index);
 
 			if(leftPower.getLeft().matches(rightPower.getLeft())) {
-				if(leftPower.matches(rightPower)) {
-					leftIndex++;
-					rightIndex++;
-				} else if(shouldSwap(leftPower.getRight(), rightPower.getRight())) {
+				if(leftPower.matches(rightPower))
+					index++;
+				else if(shouldSwap(leftPower.getRight(), rightPower.getRight()))
 					return true;
-				} else {
+				else
 					return false;
-				}
 			} else {
 				if(shouldSwap(leftPower.getLeft(), rightPower.getLeft()))
 					return true;
@@ -222,10 +219,8 @@ public class Add extends BinaryNode {
 		// sort terms
 		if(!(left instanceof Add) && shouldSwap(left, right))
 			return new Add(right, left).expand();
-		if(left instanceof Add && shouldSwap(((Add) left).getRight(), right)) // {
-			// System.out.println("swapping " + ((BinaryNode) left).getRight() + " with " + right);
+		if(left instanceof Add && shouldSwap(((Add) left).getRight(), right))
 			return new Add(new Add(((Add) left).getLeft(), right), ((Add) left).getRight()).expand();
-		// }
 
 		return new Add(left, right);
 	}

@@ -2,6 +2,7 @@ package holworthy.maths.nodes;
 
 import holworthy.maths.exceptions.DivideByZeroException;
 import holworthy.maths.exceptions.MathsInterpreterException;
+import holworthy.maths.nodes.constant.E;
 
 public class Log extends FunctionNode {
 	private Node base;
@@ -36,6 +37,13 @@ public class Log extends FunctionNode {
 			return ((BinaryNode) node).getRight();
 
 		return new Log(node, base);
+	}
+
+	@Override
+	public Node collapse() throws DivideByZeroException {
+		if(getBase().matches(new E()))
+			return new Ln(getNode());
+		return this;
 	}
 
 	@Override

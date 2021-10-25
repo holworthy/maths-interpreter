@@ -49,6 +49,6 @@ public class Negative extends UnaryNode {
 
 	@Override
 	public Node differentiate(Variable wrt) throws MathsInterpreterException {
-		return new Negative(getNode().differentiate(wrt));
+		return new Negative(getNode().differentiate(wrt)).simplify();
 	}
 }
