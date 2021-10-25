@@ -14,6 +14,7 @@ import holworthy.maths.nodes.Log;
 import holworthy.maths.nodes.Multiply;
 import holworthy.maths.nodes.Negative;
 import holworthy.maths.nodes.Node;
+import holworthy.maths.nodes.Nthrt;
 import holworthy.maths.nodes.Number;
 import holworthy.maths.nodes.Power;
 import holworthy.maths.nodes.Sqrt;
@@ -174,9 +175,7 @@ public abstract class Maths {
 				} else if(params.size() == 2) {
 					switch(name) {
 						case "nthrt":
-							// return new Nthrt(params.get(0), params.get(1));
-							// TODO
-							return null;
+							return new Nthrt(params.get(0), params.get(1));
 						case "log":
 							return new Log(params.get(0), params.get(1));
 						case "differentiate":

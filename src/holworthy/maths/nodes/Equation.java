@@ -2,9 +2,10 @@ package holworthy.maths.nodes;
 
 import java.util.ArrayList;
 
-import holworthy.maths.Maths;
 import holworthy.maths.exceptions.DivideByZeroException;
 import holworthy.maths.exceptions.MathsInterpreterException;
+import holworthy.maths.nodes.trig.Acos;
+import holworthy.maths.nodes.trig.Cos;
 
 public class Equation extends BinaryNode {
 	public Equation(Node left, Node right) {
@@ -64,6 +65,8 @@ public class Equation extends BinaryNode {
 			Equation equation = (Equation) start.copy();
 			
 			while(!equation.getLeft().matches(variable)) {
+				System.out.println(equation);
+
 				// a*x^2 + b*x + c = d
 				if(equation.getLeft().matches(new Add(new Add(new Multiply(new Matching.Constant(), new Power(new Matching.Anything(), new Number(2))), new Multiply(new Matching.Constant(), new Matching.Anything())), new Matching.Constant())) && equation.getRight().matches(new Matching.Constant()) && ((BinaryNode) ((BinaryNode) ((BinaryNode) ((BinaryNode) equation.getLeft()).getLeft()).getLeft()).getRight()).getLeft().matches(((BinaryNode) ((BinaryNode) ((BinaryNode) equation.getLeft()).getLeft()).getRight()).getRight())) {
 					Node a = ((BinaryNode) ((BinaryNode) ((BinaryNode) equation.getLeft()).getLeft()).getLeft()).getLeft();
@@ -102,6 +105,10 @@ public class Equation extends BinaryNode {
 				} else if(equation.getLeft() instanceof Divide) {
 					equation = new Equation(((BinaryNode) equation.getLeft()).getLeft(), new Multiply(((BinaryNode) equation.getLeft()).getRight(), equation.getRight()));
 
+				// cos(x) = a -> x = acos(a)
+				} else if(equation.getLeft() instanceof Cos) {
+					equation = new Equation(((UnaryNode) equation.getLeft()).getNode(), new Acos(equation.getRight()));
+
 				} else {
 					break;
 				}
@@ -116,16 +123,6 @@ public class Equation extends BinaryNode {
 
 	@Override
 	public Node differentiate(Variable wrt) throws MathsInterpreterException {
-		// TODO: implement
-		return null;
-	}
-
-	public static void main(String[] args) throws Exception {
-		Node input = Maths.parseInput("3*x=y/2");
-
-		System.out.println(input);
-		System.out.println(input.simplify());
-
-		System.out.println(((Equation) input).solve());
+		throw new MathsInterpreterException("Can't differentiate a equation");
 	}
 }

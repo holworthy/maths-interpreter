@@ -7,6 +7,8 @@ import java.util.ListIterator;
 
 import holworthy.maths.exceptions.DivideByZeroException;
 import holworthy.maths.exceptions.MathsInterpreterException;
+import holworthy.maths.nodes.constant.ConstantNode;
+import holworthy.maths.nodes.trig.TrigNode;
 
 public class Add extends BinaryNode {
 	public Add(Node left, Node right) {
@@ -56,6 +58,7 @@ public class Add extends BinaryNode {
 		if(left.matches(right))
 			return false;
 
+		// numbers on the right
 		if(left instanceof Number && right instanceof Number)
 			return ((Number) left).getValue().compareTo(((Number) right).getValue()) < 0;
 		if(left instanceof Number && !(right instanceof Number))
@@ -64,8 +67,18 @@ public class Add extends BinaryNode {
 		if(left instanceof Number && (right instanceof Multiply || right instanceof Power))
 			return true;
 
+		// constants before numbers
+		if(left instanceof Number && right instanceof ConstantNode)
+			return true;
+
+		// variables alphabetically
 		if(left instanceof Variable && right instanceof Variable)
 			return ((Variable) left).getName().compareTo(((Variable) right).getName()) > 0;
+		if(left instanceof ConstantNode && right instanceof Variable)
+			return true;
+
+		if(left instanceof TrigNode && right instanceof TrigNode)
+			return ((FunctionNode) left).getName().compareTo(((FunctionNode) right).getName()) > 0;
 
 		if(left instanceof Negative)
 			return shouldSwap(((UnaryNode) left).getNode(), right);
@@ -84,8 +97,8 @@ public class Add extends BinaryNode {
 			flattenedRight.remove(0);
 
 		while(index < flattenedLeft.size() && index < flattenedRight.size()) {
-			Power leftPower = flattenedLeft.get(index) instanceof Variable ? new Power(flattenedLeft.get(index), new Number(1)) : (Power) flattenedLeft.get(index);
-			Power rightPower = flattenedRight.get(index) instanceof Variable ? new Power(flattenedRight.get(index), new Number(1)) : (Power) flattenedRight.get(index);
+			Power leftPower = flattenedLeft.get(index) instanceof Power ? (Power) flattenedLeft.get(index) : new Power(flattenedLeft.get(index), new Number(1));
+			Power rightPower = flattenedRight.get(index) instanceof Power ? (Power) flattenedRight.get(index) : new Power(flattenedRight.get(index), new Number(1));
 
 			if(leftPower.getLeft().matches(rightPower.getLeft())) {
 				if(leftPower.matches(rightPower))

@@ -112,7 +112,7 @@ public class Power extends BinaryNode {
 		if(right instanceof Negative)
 			return new Divide(new Number(1), new Power(left, ((UnaryNode) right).getNode()).simplify()).collapse();
 		if(right instanceof Divide)
-			return new Nthrt(new Power(left, ((BinaryNode) right).getLeft()), ((BinaryNode) right).getRight());
+			return new Nthrt(new Power(left, ((BinaryNode) right).getLeft()).simplify(), ((BinaryNode) right).getRight()).collapse();
 
 		return new Power(left, right);
 	}
