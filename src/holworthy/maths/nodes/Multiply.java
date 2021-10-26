@@ -56,7 +56,7 @@ public class Multiply extends BinaryNode {
 		Node left = getLeft().expand();
 		Node right = getRight().expand();
 
-		// Make tree left leaning
+		// make tree left leaning
 		if(right instanceof Multiply)
 			return new Multiply(new Multiply(left, ((Multiply) right).getLeft()), ((Multiply) right).getRight()).expand();
 
@@ -71,13 +71,14 @@ public class Multiply extends BinaryNode {
 			return right;
 		if(right.matches(new Number(1)))
 			return left;
-		// negative constant handling
-		if(left instanceof Negative && !(right instanceof Negative))
-			return new Negative(new Multiply(((UnaryNode) left).getNode(), right)).expand();
-		if(!(left instanceof Negative) && right instanceof Negative)
-			return new Negative(new Multiply(left, ((UnaryNode) right).getNode())).expand();
+
+		// negative handling
 		if(left instanceof Negative && right instanceof Negative)
 			return new Multiply(((UnaryNode) left).getNode(), ((UnaryNode) right).getNode());
+		if(left instanceof Negative)
+			return new Negative(new Multiply(((UnaryNode) left).getNode(), right)).expand();
+		if(right instanceof Negative)
+			return new Negative(new Multiply(left, ((UnaryNode) right).getNode())).expand();
 
 		// x*x = x^2
 		if(left instanceof Variable && left.matches(right))

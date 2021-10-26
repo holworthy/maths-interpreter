@@ -310,6 +310,7 @@ public abstract class Maths {
 		Scanner scanner = new Scanner(System.in);
 
 		Node input = parseInput(scanner.nextLine());
+		System.out.println(input);
 		Node expanded = input.normalise().expand();
 		System.out.println(expanded);
 		Node collapsed = expanded.normalise().collapse();

@@ -32,6 +32,13 @@ public class Negative extends UnaryNode {
 
 	@Override
 	public Node collapse() throws DivideByZeroException {
+		Node node = getNode().collapse();
+
+		if(node instanceof Multiply)
+			return new Multiply(new Negative(((BinaryNode) node).getLeft()), ((BinaryNode) node).getRight());
+		if(node instanceof Add)
+			return new Add(new Negative(((BinaryNode) node).getLeft()), new Negative(((BinaryNode) node).getRight()));
+
 		return new Negative(getNode().collapse());
 	}
 
