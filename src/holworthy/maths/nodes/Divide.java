@@ -67,7 +67,6 @@ public class Divide extends BinaryNode {
 		if(left.isConstant() && right.isConstant())
 			return new Divide(left, right);
 
-		// TODO: check if this can't be simplified any more
 		if(left instanceof Add || right instanceof Add)
 			return new Divide(left, right);
 

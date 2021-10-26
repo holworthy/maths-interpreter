@@ -305,7 +305,6 @@ public class Add extends BinaryNode {
 		if(right instanceof Negative)
 			return new Subtract(left, ((UnaryNode) right).getNode()).collapse();
 
-		// TODO: this isn't working
 		if(left instanceof Multiply && right instanceof Multiply){
 			if(((BinaryNode) left).getRight().matches(((BinaryNode) right).getRight())){
 				Add a = new Add(((BinaryNode) left).getLeft(), ((BinaryNode) right).getLeft());
