@@ -3,8 +3,10 @@ package holworthy.maths.nodes;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.ListIterator;
 
+import holworthy.maths.Testing;
 import holworthy.maths.exceptions.DivideByZeroException;
 import holworthy.maths.exceptions.MathsInterpreterException;
 import holworthy.maths.nodes.constant.ConstantNode;
@@ -147,7 +149,6 @@ public class Add extends BinaryNode {
 		}
 		if(left instanceof Negative && right instanceof Negative && ((Negative) left).getNode() instanceof Number && ((Negative) right).getNode() instanceof Number)
 			return new Negative(new Number(((Number) ((Negative) left).getNode()).getValue().add(((Number) ((Negative) right).getNode()).getValue())));
-
 		// x+x=2*x
 		if(left.matches(right))
 			return new Multiply(new Number(2), left).expand();
@@ -157,6 +158,21 @@ public class Add extends BinaryNode {
 		// a*x^n+x^n
 		if(left instanceof Multiply && ((Multiply) left).getLeft().isConstant() && ((Multiply) left).getRight().matches(right))
 			return new Multiply(new Add(((Multiply) left).getLeft(), new Number(1)), ((Multiply) left).getRight()).expand();
+		// x+a*x = (1+a)*x
+		if(!(left instanceof Multiply) && right instanceof Multiply && ((BinaryNode) right).getLeft().isConstant() && left.matches(((BinaryNode) right).getRight()))
+			return new Multiply(new Add(new Number(1),((BinaryNode) right).getLeft()), left).expand();
+		// x-x = 0
+		if(right instanceof Negative && left.matches(((UnaryNode) right).getNode()))
+			return new Number(0);
+		// -x+x = 0
+		if(left instanceof Negative && right.matches(((UnaryNode) left).getNode()))
+			return new Number(0);
+		// x + -a*x = (1-a)*x
+		if (right instanceof Negative && ((UnaryNode) right).getNode() instanceof Multiply && ((BinaryNode) ((UnaryNode) right).getNode()).getRight().matches(left))
+			return new Multiply(new Add(new Number(1), new Negative(((BinaryNode) ((UnaryNode) right).getNode()).getLeft())), left).expand();
+		// -a*x + x = (1-a)*x
+		if(left instanceof Negative && ((UnaryNode) left).getNode() instanceof Multiply && ((BinaryNode) ((UnaryNode) left).getNode()).getRight().matches(right))
+			return new Multiply(new Add(new Number(1), new Negative(((BinaryNode) ((UnaryNode) left).getNode()).getLeft())), right).expand();
 		// a+b*x^n+x^n
 		if(left instanceof Add && ((Add) left).getRight() instanceof Multiply && ((Multiply) ((Add) left).getRight()).getLeft().isConstant() && ((Multiply) ((Add) left).getRight()).getRight().matches(right))
 			return new Add(((Add) left).getLeft(), new Multiply(new Add(((Multiply) ((Add) left).getRight()).getLeft(), new Number(1)), ((Multiply) ((Add) left).getRight()).getRight())).expand();
@@ -334,5 +350,51 @@ public class Add extends BinaryNode {
 	@Override
 	public Node differentiate(Variable wrt) throws MathsInterpreterException {
 		return new Add(getLeft().differentiate(wrt), getRight().differentiate(wrt)).simplify();
+	}
+
+	public static void main(String[] args) throws Exception {
+		LinkedHashMap<String, String> tests = new LinkedHashMap<>();
+        // var + var
+		tests.put("x+x","2*x");
+		// var + mul(var)
+		tests.put("x+2*x", "3*x");
+		// var + neg(var)
+		tests.put("x+-x","0");
+		tests.put("2*x+-x","x");
+		// var + neg(mul(var))
+		tests.put("x+-2*x","-x");
+		// mul(var) + var
+		tests.put("2*x+x","3*x");
+		// mul(var) + mul(var)
+		tests.put("2*x+2*x","4*x");
+		// mul(var) + neg(var)
+		tests.put("2*x-x","x");
+		tests.put("3*x-x","2*x");
+		// mul(var) + neg(mul(var))
+		tests.put("4*x+-2*x","2*x");
+		tests.put("4*x-2*x","2*x");
+		tests.put("2*x-3*x","-x");
+		tests.put("2*x-4*x","-2*x");
+		// neg(var) + var
+		tests.put("-x+x","0");
+		// neg(var) + mul(var)
+		tests.put("-x+2*x","x");
+		// neg(var) + neg(var)
+		tests.put("-x+-x","-2*x");
+		tests.put("-x-x","-2*x");
+		// neg(var) + neg(mul(var))
+		tests.put("-x+-4*x","-5*x");
+		tests.put("-x-4*x","-5*x");
+		// neg(mul(var)) + var
+		tests.put("-2*x+x","-x");
+		// neg(mul(var)) + mul(var)
+		tests.put("-2*x+2*x","0");
+		tests.put("-2*x+3*x","x");
+		// neg(mul(var)) + neg(var)
+		tests.put("-2*x-x","-3*x");
+		// neg(mul(var)) + neg(mul(var))
+		tests.put("-2*x-2*x","-4*x");
+
+		Testing.runTests(tests);
 	}
 }
