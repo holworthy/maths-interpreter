@@ -1,6 +1,5 @@
 package holworthy.maths.nodes.trig;
 
-import holworthy.maths.exceptions.DivideByZeroException;
 import holworthy.maths.exceptions.MathsInterpreterException;
 import holworthy.maths.nodes.Divide;
 import holworthy.maths.nodes.Multiply;
@@ -24,7 +23,7 @@ public class Acsc extends TrigNode {
 	}
 
 	@Override
-	public Node expand() throws DivideByZeroException {
+	public Node expand() throws MathsInterpreterException {
 		Node node = getNode().expand();
 		if(node instanceof Csc)
 			return ((UnaryNode) node).getNode();

@@ -1,6 +1,5 @@
 package holworthy.maths.nodes;
 
-import holworthy.maths.exceptions.DivideByZeroException;
 import holworthy.maths.exceptions.MathsInterpreterException;
 
 public abstract class Node {
@@ -21,17 +20,17 @@ public abstract class Node {
 	// adds common terms
 	// expands brackets
 	// moves negatives towards the leaves
-	public Node expand() throws DivideByZeroException {
+	public Node expand() throws MathsInterpreterException {
 		return this;
 	}
 
 	// takes out common factors
 	// moves negatives towards the root
-	public Node collapse() throws DivideByZeroException {
+	public Node collapse() throws MathsInterpreterException {
 		return this;
 	}
 
-	public final Node simplify() throws DivideByZeroException {
+	public final Node simplify() throws MathsInterpreterException {
 		return normalise().expand().normalise().collapse().normalise();
 	}
 

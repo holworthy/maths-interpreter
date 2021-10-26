@@ -2,7 +2,6 @@ package holworthy.maths.nodes;
 
 import java.util.ArrayList;
 
-import holworthy.maths.exceptions.DivideByZeroException;
 import holworthy.maths.exceptions.MathsInterpreterException;
 import holworthy.maths.nodes.trig.Acos;
 import holworthy.maths.nodes.trig.Cos;
@@ -23,12 +22,12 @@ public class Equation extends BinaryNode {
 	}
 
 	@Override
-	public Node expand() throws DivideByZeroException {
+	public Node expand() throws MathsInterpreterException {
 		return new Equation(getLeft().expand(), getRight().expand());
 	}
 
 	@Override
-	public Node collapse() throws DivideByZeroException {
+	public Node collapse() throws MathsInterpreterException {
 		return new Equation(getLeft().collapse(), getRight().collapse());
 	}
 
@@ -55,7 +54,7 @@ public class Equation extends BinaryNode {
 		return variables;
 	}
 
-	public ArrayList<Equation> solve() throws DivideByZeroException {
+	public ArrayList<Equation> solve() throws MathsInterpreterException {
 		Node start = new Equation(new Subtract(getLeft(), getRight()).simplify(), new Number(0));
 		ArrayList<Variable> variables = getVariables(start);
 		variables.sort((a, b) -> a.getName().compareTo(b.getName()));

@@ -24,7 +24,7 @@ public class Power extends BinaryNode {
 	}
 
 	@Override
-	public Node expand() throws DivideByZeroException {
+	public Node expand() throws MathsInterpreterException {
 		Node left = getLeft().expand();
 		Node right = getRight().expand();
 
@@ -105,7 +105,7 @@ public class Power extends BinaryNode {
 	}
 
 	@Override
-	public Node collapse() throws DivideByZeroException {
+	public Node collapse() throws MathsInterpreterException {
 		Node left = getLeft().collapse();
 		Node right = getRight().collapse();
 

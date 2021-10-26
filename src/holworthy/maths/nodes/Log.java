@@ -1,6 +1,5 @@
 package holworthy.maths.nodes;
 
-import holworthy.maths.exceptions.DivideByZeroException;
 import holworthy.maths.exceptions.MathsInterpreterException;
 import holworthy.maths.nodes.constant.E;
 
@@ -27,7 +26,7 @@ public class Log extends FunctionNode {
 	}
 
 	@Override
-	public Node expand() throws DivideByZeroException {
+	public Node expand() throws MathsInterpreterException {
 		Node node = getNode().expand();
 		Node base = getBase().expand();
 
@@ -40,7 +39,7 @@ public class Log extends FunctionNode {
 	}
 
 	@Override
-	public Node collapse() throws DivideByZeroException {
+	public Node collapse() throws MathsInterpreterException {
 		if(getBase().matches(new E()))
 			return new Ln(getNode());
 		return this;

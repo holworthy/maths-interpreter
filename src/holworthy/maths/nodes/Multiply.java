@@ -1,6 +1,5 @@
 package holworthy.maths.nodes;
 
-import holworthy.maths.exceptions.DivideByZeroException;
 import holworthy.maths.exceptions.MathsInterpreterException;
 import holworthy.maths.nodes.constant.ConstantNode;
 import holworthy.maths.nodes.constant.I;
@@ -52,7 +51,7 @@ public class Multiply extends BinaryNode {
 	}
 
 	@Override
-	public Node expand() throws DivideByZeroException{
+	public Node expand() throws MathsInterpreterException{
 		Node left = getLeft().expand();
 		Node right = getRight().expand();
 
@@ -160,7 +159,7 @@ public class Multiply extends BinaryNode {
 	}
 
 	@Override
-	public Node collapse() throws DivideByZeroException{
+	public Node collapse() throws MathsInterpreterException{
 		Node left = getLeft().collapse();
 		Node right = getRight().collapse();
 
