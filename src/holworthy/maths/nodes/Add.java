@@ -3,10 +3,8 @@ package holworthy.maths.nodes;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.ListIterator;
 
-import holworthy.maths.Testing;
 import holworthy.maths.exceptions.DivideByZeroException;
 import holworthy.maths.exceptions.MathsInterpreterException;
 import holworthy.maths.nodes.constant.ConstantNode;
@@ -183,7 +181,7 @@ public class Add extends BinaryNode {
 		if (left instanceof Negative && !(((UnaryNode) left).getNode() instanceof Multiply)){
 			left = new Negative(new Multiply(new Number(1), ((UnaryNode) left).getNode()));
 		}
-		if (left instanceof Add && ((BinaryNode) left).getRight() instanceof Negative && !(((UnaryNode) ((BinaryNode) left).getRight()).getNode() instanceof Multiply)){
+		if (left instanceof Add && ((BinaryNode) left).getRight() instanceof Negative && !(((UnaryNode) ((BinaryNode) left).getRight()).getNode() instanceof Multiply) && !(((UnaryNode) ((BinaryNode) left).getRight()).getNode().isConstant())){
 			left = new Add(((BinaryNode) left).getLeft(), new Negative(new Multiply(new Number(1), ((UnaryNode) ((BinaryNode) left).getRight()).getNode())));
 		}
 		if (right instanceof Negative && !(((UnaryNode) right).getNode() instanceof Multiply)){
@@ -352,49 +350,49 @@ public class Add extends BinaryNode {
 		return new Add(getLeft().differentiate(wrt), getRight().differentiate(wrt)).simplify();
 	}
 
-	public static void main(String[] args) throws Exception {
-		LinkedHashMap<String, String> tests = new LinkedHashMap<>();
-        // var + var
-		tests.put("x+x","2*x");
-		// var + mul(var)
-		tests.put("x+2*x", "3*x");
-		// var + neg(var)
-		tests.put("x+-x","0");
-		tests.put("2*x+-x","x");
-		// var + neg(mul(var))
-		tests.put("x+-2*x","-x");
-		// mul(var) + var
-		tests.put("2*x+x","3*x");
-		// mul(var) + mul(var)
-		tests.put("2*x+2*x","4*x");
-		// mul(var) + neg(var)
-		tests.put("2*x-x","x");
-		tests.put("3*x-x","2*x");
-		// mul(var) + neg(mul(var))
-		tests.put("4*x+-2*x","2*x");
-		tests.put("4*x-2*x","2*x");
-		tests.put("2*x-3*x","-x");
-		tests.put("2*x-4*x","-2*x");
-		// neg(var) + var
-		tests.put("-x+x","0");
-		// neg(var) + mul(var)
-		tests.put("-x+2*x","x");
-		// neg(var) + neg(var)
-		tests.put("-x+-x","-2*x");
-		tests.put("-x-x","-2*x");
-		// neg(var) + neg(mul(var))
-		tests.put("-x+-4*x","-5*x");
-		tests.put("-x-4*x","-5*x");
-		// neg(mul(var)) + var
-		tests.put("-2*x+x","-x");
-		// neg(mul(var)) + mul(var)
-		tests.put("-2*x+2*x","0");
-		tests.put("-2*x+3*x","x");
-		// neg(mul(var)) + neg(var)
-		tests.put("-2*x-x","-3*x");
-		// neg(mul(var)) + neg(mul(var))
-		tests.put("-2*x-2*x","-4*x");
+	// public static void main(String[] args) throws Exception {
+	// 	LinkedHashMap<String, String> tests = new LinkedHashMap<>();
+    //     // var + var
+	// 	tests.put("x+x","2*x");
+	// 	// var + mul(var)
+	// 	tests.put("x+2*x", "3*x");
+	// 	// var + neg(var)
+	// 	tests.put("x+-x","0");
+	// 	tests.put("2*x+-x","x");
+	// 	// var + neg(mul(var))
+	// 	tests.put("x+-2*x","-x");
+	// 	// mul(var) + var
+	// 	tests.put("2*x+x","3*x");
+	// 	// mul(var) + mul(var)
+	// 	tests.put("2*x+2*x","4*x");
+	// 	// mul(var) + neg(var)
+	// 	tests.put("2*x-x","x");
+	// 	tests.put("3*x-x","2*x");
+	// 	// mul(var) + neg(mul(var))
+	// 	tests.put("4*x+-2*x","2*x");
+	// 	tests.put("4*x-2*x","2*x");
+	// 	tests.put("2*x-3*x","-x");
+	// 	tests.put("2*x-4*x","-2*x");
+	// 	// neg(var) + var
+	// 	tests.put("-x+x","0");
+	// 	// neg(var) + mul(var)
+	// 	tests.put("-x+2*x","x");
+	// 	// neg(var) + neg(var)
+	// 	tests.put("-x+-x","-2*x");
+	// 	tests.put("-x-x","-2*x");
+	// 	// neg(var) + neg(mul(var))
+	// 	tests.put("-x+-4*x","-5*x");
+	// 	tests.put("-x-4*x","-5*x");
+	// 	// neg(mul(var)) + var
+	// 	tests.put("-2*x+x","-x");
+	// 	// neg(mul(var)) + mul(var)
+	// 	tests.put("-2*x+2*x","0");
+	// 	tests.put("-2*x+3*x","x");
+	// 	// neg(mul(var)) + neg(var)
+	// 	tests.put("-2*x-x","-3*x");
+	// 	// neg(mul(var)) + neg(mul(var))
+	// 	tests.put("-2*x-2*x","-4*x");
 
-		Testing.runTests(tests);
-	}
+	// 	Testing.runTests(tests);
+	// }
 }
