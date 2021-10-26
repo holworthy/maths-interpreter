@@ -21,8 +21,7 @@ public abstract class Matching {
 
 		@Override
 		public Node differentiate(Variable wrt) throws MathsInterpreterException {
-			// TODO: throw error here
-			return null;
+			throw new MathsInterpreterException("Matching classes are not meant to be used!");
 		}
 	}
 	
