@@ -54,12 +54,12 @@ public class Testing {
 		tests.put("a*a", "a^2");
 		tests.put("a*a^7", "a^8");
 		tests.put("b*a*b^3*c*a^2", "a^3*b^4*c");
-		tests.put("(x+3)*(x-2)", "x^2+x+(-6)"); // TODO: change this to print as -6 instead of + -6
+		tests.put("(x+3)*(x-2)", "x^2+x-6");
 		tests.put("2*j+3*k+10*k+9*j+8*j", "17*j+13*k");
-		tests.put("-8*t+6*v-t-7*v+8*v", "-9*t+7*v");
-		tests.put("k-9*k-5*n+3*m-k", "-9*k+3*m-5*n");
+		tests.put("-8*t+6*v-t-7*v+8*v", "-(9*t)+7*v");
+		tests.put("k-9*k-5*n+3*m-k", "-(9*k)+3*m-5*n");
 		tests.put("5*(4*h-7)-4*(3*h-6)", "8*h-11");
-		tests.put("8*(7*x^2-8*y)-8*(3*x^2-9*y)", "32*x^2+8*y");
+		tests.put("8*(7*x^2-8*y)-8*(3*x^2-9*y)", "8*(4*x^2+y)");
 		tests.put("5*(13*j-3*k^2)-9*(7*j-6*k^2)", "2*j+39*k^2");
 
 		// negatives

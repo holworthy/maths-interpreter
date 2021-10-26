@@ -334,7 +334,7 @@ public class Add extends BinaryNode {
 						leftItr.remove();
 						break;
 					}
-					if(n instanceof Number && o instanceof Number && gcd(((Number) n).getValue(), ((Number) o).getValue()).compareTo(BigInteger.ONE) == 0){
+					if(n instanceof Number && o instanceof Number && !(gcd(((Number) n).getValue(), ((Number) o).getValue()).equals(BigInteger.ONE))){
 						BigInteger gcd = gcd(((Number) n).getValue(), ((Number) o).getValue());
 						removeList.add(new Number(gcd));
 						rightItr.remove();
