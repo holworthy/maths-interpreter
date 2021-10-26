@@ -9,6 +9,7 @@ import java.util.Scanner;
 import holworthy.maths.nodes.Add;
 import holworthy.maths.nodes.Divide;
 import holworthy.maths.nodes.Equation;
+import holworthy.maths.nodes.Factorial;
 import holworthy.maths.nodes.Ln;
 import holworthy.maths.nodes.Log;
 import holworthy.maths.nodes.Multiply;
@@ -73,7 +74,7 @@ import holworthy.maths.nodes.trig.Tanh;
 
 public abstract class Maths {
 	private static ArrayList<String> CONSTANTS = new ArrayList<>(Arrays.asList(new String[]{"e", "i", "pi"}));
-	private static ArrayList<String> FUNCTIONS = new ArrayList<>(Arrays.asList(new String[]{"nthrt", "sqrt", "log", "ln", "acos", "acosh", "acot", "acoth", "acsc", "acsch", "asec", "asech", "asin", "asinh", "atan", "atanh", "cos", "cosh", "cot", "coth", "csc", "csch", "sec", "sech", "sin", "sinh", "tan", "tanh", "differentiate", "integrate"}));
+	private static ArrayList<String> FUNCTIONS = new ArrayList<>(Arrays.asList(new String[]{"nthrt", "sqrt", "log", "ln", "factorial", "acos", "acosh", "acot", "acoth", "acsc", "acsch", "asec", "asech", "asin", "asinh", "atan", "atanh", "cos", "cosh", "cot", "coth", "csc", "csch", "sec", "sech", "sin", "sinh", "tan", "tanh", "differentiate", "integrate"}));
 
 	private static Node parseValue(Parser parser) throws Exception {
 		if(parser.hasMore() && parser.getChar() == '(') {
@@ -123,6 +124,9 @@ public abstract class Maths {
 							return new Sqrt(params.get(0));
 						case "ln":
 							return new Ln(params.get(0));
+						// TODO: also add 5! as corect syntax
+						case "factorial":
+							return new Factorial(params.get(0));
 						case "acos":
 							return new Acos(params.get(0));
 						case "acosh":
