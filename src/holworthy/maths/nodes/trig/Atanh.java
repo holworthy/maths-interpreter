@@ -1,6 +1,5 @@
 package holworthy.maths.nodes.trig;
 
-import holworthy.maths.exceptions.DivideByZeroException;
 import holworthy.maths.exceptions.MathsInterpreterException;
 import holworthy.maths.nodes.Divide;
 import holworthy.maths.nodes.Node;
@@ -21,7 +20,7 @@ public class Atanh extends TrigNode {
 	}
 
 	@Override
-	public Node expand() throws DivideByZeroException {
+	public Node expand() throws MathsInterpreterException {
 		Node node = getNode().expand();
 		if(node instanceof Tanh)
 			return ((UnaryNode) node).getNode();

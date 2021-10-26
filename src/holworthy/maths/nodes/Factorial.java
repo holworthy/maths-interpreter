@@ -1,6 +1,5 @@
 package holworthy.maths.nodes;
 
-import holworthy.maths.exceptions.DivideByZeroException;
 import holworthy.maths.exceptions.MathsInterpreterException;
 import holworthy.maths.exceptions.NotDifferentiableException;
 
@@ -16,7 +15,7 @@ public class Factorial extends UnaryNode {
 	}
 
 	@Override
-	public Node expand() throws DivideByZeroException {
+	public Node expand() throws MathsInterpreterException {
 		Node node = getNode().expand();
 		if(node.matches(new Number(0)) || node.matches(new Number(1)))
 			return new Number(1);

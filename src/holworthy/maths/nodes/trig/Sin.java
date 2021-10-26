@@ -1,6 +1,5 @@
 package holworthy.maths.nodes.trig;
 
-import holworthy.maths.exceptions.DivideByZeroException;
 import holworthy.maths.exceptions.MathsInterpreterException;
 import holworthy.maths.nodes.BinaryNode;
 import holworthy.maths.nodes.Divide;
@@ -23,7 +22,7 @@ public class Sin extends TrigNode {
 	}
 
 	@Override
-	public Node expand() throws DivideByZeroException {
+	public Node expand() throws MathsInterpreterException {
 		Node node = getNode().expand();
 
 		if(node.matches(new Number(0)))

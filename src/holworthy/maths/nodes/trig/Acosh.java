@@ -1,6 +1,5 @@
 package holworthy.maths.nodes.trig;
 
-import holworthy.maths.exceptions.DivideByZeroException;
 import holworthy.maths.exceptions.MathsInterpreterException;
 import holworthy.maths.nodes.Add;
 import holworthy.maths.nodes.Divide;
@@ -23,7 +22,7 @@ public class Acosh extends TrigNode {
 	}
 
 	@Override
-	public Node expand() throws DivideByZeroException {
+	public Node expand() throws MathsInterpreterException {
 		Node node = getNode().expand();
 		if(node instanceof Cosh)
 			return ((UnaryNode) node).getNode();

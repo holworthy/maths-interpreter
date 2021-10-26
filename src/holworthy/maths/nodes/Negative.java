@@ -1,6 +1,5 @@
 package holworthy.maths.nodes;
 
-import holworthy.maths.exceptions.DivideByZeroException;
 import holworthy.maths.exceptions.MathsInterpreterException;
 import holworthy.maths.nodes.constant.ConstantNode;
 
@@ -22,7 +21,7 @@ public class Negative extends UnaryNode {
 	}
 
 	@Override
-	public Node expand() throws DivideByZeroException{
+	public Node expand() throws MathsInterpreterException{
 		Node node = getNode().expand();
 		if(node.matches(new Number(0)))
 			return new Number(0);
@@ -34,7 +33,7 @@ public class Negative extends UnaryNode {
 	}
 
 	@Override
-	public Node collapse() throws DivideByZeroException {
+	public Node collapse() throws MathsInterpreterException {
 		Node node = getNode().collapse();
 		if(node instanceof Negative)
 			return ((UnaryNode) node).getNode();

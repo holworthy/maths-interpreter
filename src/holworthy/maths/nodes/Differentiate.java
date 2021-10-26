@@ -20,7 +20,6 @@ public class Differentiate extends FunctionNode {
 			return getNode().differentiate(wrt).isConstant();
 		} catch(MathsInterpreterException e) {
 			return false;
-			// TODO: check this is correct
 		}
 	}
 

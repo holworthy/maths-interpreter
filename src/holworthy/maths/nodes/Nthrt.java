@@ -2,7 +2,6 @@ package holworthy.maths.nodes;
 
 import java.math.BigInteger;
 
-import holworthy.maths.exceptions.DivideByZeroException;
 import holworthy.maths.exceptions.MathsInterpreterException;
 
 public class Nthrt extends FunctionNode {
@@ -44,15 +43,15 @@ public class Nthrt extends FunctionNode {
 	}
 
 	@Override
-	public Node expand() throws DivideByZeroException{
+	public Node expand() throws MathsInterpreterException {
 		Node node = getNode().expand();
 		Node degree = getDegree().expand();
 
-		// TODO: check degree is number
-		
-		if(node instanceof Negative)
-			throw new Error("negative in nth root idk what maths is");
+		if(degree.matches(new Number(0)))
+			throw new MathsInterpreterException("Cannot have a 0th root");
 
+		// TODO: nthroots containing negatives
+		
 		// nth root where n is 1 does nothing
 		if(degree.matches(new Number(1)))
 			return node;
@@ -68,7 +67,7 @@ public class Nthrt extends FunctionNode {
 	}
 	
 	@Override
-	public Node collapse() throws DivideByZeroException {
+	public Node collapse() throws MathsInterpreterException {
 		Node node = getNode().collapse();
 		if(degree.matches(new Number(2)))
 			return new Sqrt(node);
@@ -80,7 +79,7 @@ public class Nthrt extends FunctionNode {
 		return new Divide(new Multiply(new Power(getNode(), new Subtract(new Divide(new Number(1), degree), new Number(1))), getNode().differentiate(wrt)), degree).simplify();
 	}
 
-	public static void main(String[] args) throws DivideByZeroException {
+	public static void main(String[] args) throws MathsInterpreterException {
 		System.out.println(new Nthrt(new Number(5), new Number(2)).simplify());
 	}
 }

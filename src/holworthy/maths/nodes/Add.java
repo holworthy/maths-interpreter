@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.ListIterator;
 
-import holworthy.maths.exceptions.DivideByZeroException;
 import holworthy.maths.exceptions.MathsInterpreterException;
 import holworthy.maths.nodes.constant.ConstantNode;
 import holworthy.maths.nodes.trig.TrigNode;
@@ -119,7 +118,7 @@ public class Add extends BinaryNode {
 	}
 
 	@Override
-	public Node expand() throws DivideByZeroException {
+	public Node expand() throws MathsInterpreterException {
 		Node left = getLeft().expand();
 		Node right = getRight().expand();
 
@@ -132,7 +131,7 @@ public class Add extends BinaryNode {
 		if(left instanceof Number && right instanceof Number)
 			return new Number(((Number) left).getValue().add(((Number) right).getValue()));
 		
-		// TODO: what on earth is this
+		// x + number + number = x + number
 		if(left instanceof Add && right instanceof Number && (((Add) left).getRight() instanceof Number || ((Add) left).getRight() instanceof Negative))
 			return new Add(((Add) left).getLeft(), new Add(((Add) left).getRight(), right)).expand();
 		
@@ -286,7 +285,7 @@ public class Add extends BinaryNode {
 	}
 
 	@Override
-	public Node collapse() throws DivideByZeroException{
+	public Node collapse() throws MathsInterpreterException{
 		Node left = getLeft().collapse();
 		Node right = getRight().collapse();
 

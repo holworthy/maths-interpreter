@@ -30,7 +30,7 @@ public class Divide extends BinaryNode {
 	}
 
 	@Override
-	public Node expand() throws DivideByZeroException{
+	public Node expand() throws MathsInterpreterException{
 		Node left = getLeft().expand();
 		Node right = getRight().expand();
 
@@ -100,7 +100,7 @@ public class Divide extends BinaryNode {
 	}
 
 	@Override
-	public Node collapse() throws DivideByZeroException{
+	public Node collapse() throws MathsInterpreterException {
 		Node left = getLeft().collapse();
 		Node right = getRight().collapse();
 
@@ -166,7 +166,8 @@ public class Divide extends BinaryNode {
 
 	@Override
 	public Node differentiate(Variable wrt) throws MathsInterpreterException {
-		// TODO: check right is not 0
+		if(getRight().matches(new Number(0)))
+			throw new DivideByZeroException("Cannot differentiate a function which divides by 0");
 		return new Divide(new Subtract(new Multiply(getLeft().differentiate(wrt), getRight()), new Multiply(getLeft(), getRight().differentiate(wrt))), new Power(getRight(), new Number(2))).simplify();
 	}
 }
