@@ -15,7 +15,7 @@ public class Subtract extends BinaryNode {
 
 	@Override
 	public Node expand() throws DivideByZeroException{
-		return new Add(getLeft(), new Negative(getRight()));
+		return new Add(getLeft(), new Negative(getRight())).expand();
 	}
 
 	@Override
