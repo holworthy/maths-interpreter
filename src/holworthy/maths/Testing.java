@@ -6,7 +6,7 @@ import holworthy.maths.nodes.Node;
 
 public class Testing {
 
-	private static void runTests(LinkedHashMap<String, String> tests) throws Exception {
+	public static void runTests(LinkedHashMap<String, String> tests) throws Exception {
 		boolean passingAll = true;
 		for(String test : tests.keySet()) {
 			Node before = Maths.parseInput(test);
