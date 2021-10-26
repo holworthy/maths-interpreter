@@ -3,7 +3,6 @@ package holworthy.maths.nodes;
 import holworthy.maths.exceptions.MathsInterpreterException;
 import holworthy.maths.exceptions.NotDifferentiableException;
 
-// TODO: make this a usable function
 public class Factorial extends UnaryNode {
 	public Factorial(Node node) {
 		super(node);
