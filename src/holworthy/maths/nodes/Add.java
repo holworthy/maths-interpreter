@@ -131,22 +131,28 @@ public class Add extends BinaryNode {
 		// constant folding
 		if(left instanceof Number && right instanceof Number)
 			return new Number(((Number) left).getValue().add(((Number) right).getValue()));
+		
+		// TODO: what on earth is this
 		if(left instanceof Add && right instanceof Number && (((Add) left).getRight() instanceof Number || ((Add) left).getRight() instanceof Negative))
 			return new Add(((Add) left).getLeft(), new Add(((Add) left).getRight(), right)).expand();
+		
+		// number + -number
 		if(left instanceof Number && right instanceof Negative && ((Negative) right).getNode() instanceof Number) {
 			if(((Number) ((Negative) right).getNode()).getValue().compareTo(((Number) left).getValue())  <= 0)
 				return new Number(((Number) left).getValue().subtract(((Number) ((Negative) right).getNode()).getValue()));
 			else
 				return new Negative(new Number(((Number) ((Negative) right).getNode()).getValue().subtract(((Number) left).getValue())));
 		}
+		// -number + number
 		if(left instanceof Negative && right instanceof Number && ((Negative) left).getNode() instanceof Number) {
 			if(((Number) ((Negative) left).getNode()).getValue().compareTo(((Number) right).getValue()) <= 0)
 				return new Number(((Number) right).getValue().subtract(((Number) ((Negative) left).getNode()).getValue()));
 			else
 				return new Negative(new Number(((Number) ((Negative) left).getNode()).getValue().subtract(((Number) right).getValue())));
 		}
-		if(left instanceof Negative && right instanceof Negative && ((Negative) left).getNode() instanceof Number && ((Negative) right).getNode() instanceof Number)
-			return new Negative(new Number(((Number) ((Negative) left).getNode()).getValue().add(((Number) ((Negative) right).getNode()).getValue())));
+		// -number + -number = -(number + number)
+		if(left instanceof Negative && right instanceof Negative && ((UnaryNode) left).getNode() instanceof Number && ((UnaryNode) right).getNode() instanceof Number)
+			return new Negative(new Add(((UnaryNode) left).getNode(), ((UnaryNode) right).getNode())).expand();
 
 		// x+x=2*x
 		if(left.matches(right))
@@ -280,6 +286,10 @@ public class Add extends BinaryNode {
 
 		if(left instanceof Variable && right instanceof Variable && left.matches(right))
 			return new Multiply(new Number(2), left);
+
+		// a + -b = a - b
+		if(right instanceof Negative)
+			return new Subtract(left, ((UnaryNode) right).getNode()).collapse();
 
 		// TODO: this isn't working
 		if(left instanceof Multiply && right instanceof Multiply){

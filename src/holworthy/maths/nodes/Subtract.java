@@ -14,13 +14,8 @@ public class Subtract extends BinaryNode {
 	}
 
 	@Override
-	public Node normalise() {
-		return new Add(getLeft(), new Negative(getRight()));
-	}
-
-	@Override
 	public Node expand() throws DivideByZeroException{
-		return normalise().expand();
+		return new Add(getLeft(), new Negative(getRight()));
 	}
 
 	@Override

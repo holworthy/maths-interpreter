@@ -18,10 +18,15 @@ public abstract class Node {
 		return this;
 	}
 
+	// adds common terms
+	// expands brackets
+	// moves negatives towards the leaves
 	public Node expand() throws DivideByZeroException {
 		return this;
 	}
 
+	// takes out common factors
+	// moves negatives towards the root
 	public Node collapse() throws DivideByZeroException {
 		return this;
 	}
