@@ -29,6 +29,8 @@ public class Negative extends UnaryNode {
 			return ((Negative) node).getNode();
 		if(node instanceof Add)
 			return new Add(new Negative(((BinaryNode) node).getLeft()), new Negative(((BinaryNode) node).getRight())).expand();
+		if(node instanceof Multiply)
+			return new Multiply(new Negative(((BinaryNode) node).getLeft()), ((BinaryNode) node).getRight()).expand();
 		return new Negative(node);
 	}
 

@@ -11,7 +11,7 @@ public class Multiply extends BinaryNode {
 
 	@Override
 	public String toString() {
-		return (getLeft() instanceof Add ? "(" + getLeft() + ")" : getLeft()) + "*" + (getRight() instanceof Add ? "(" + getRight() + ")" : getRight());
+		return ((getLeft() instanceof Add || getLeft() instanceof Subtract) ? "(" + getLeft() + ")" : getLeft()) + "*" + ((getRight() instanceof Add || getRight() instanceof Subtract) ? "(" + getRight() + ")" : getRight());
 	}
 
 	@Override
@@ -39,14 +39,14 @@ public class Multiply extends BinaryNode {
 			return right;
 		if(right.matches(new Number(1)))
 			return left;
+		if(left.matches(new Negative(new Number(1))))
+			return new Negative(right).expand();
+		if(right.matches(new Negative(new Number(1))))
+			return new Negative(left).expand();
 
 		// negative handling
 		if(left instanceof Negative && right instanceof Negative)
 			return new Multiply(((UnaryNode) left).getNode(), ((UnaryNode) right).getNode());
-		if(left instanceof Negative)
-			return new Negative(new Multiply(((UnaryNode) left).getNode(), right)).expand();
-		if(right instanceof Negative)
-			return new Negative(new Multiply(left, ((UnaryNode) right).getNode())).expand();
 
 		// x*x = x^2
 		if(left instanceof Variable && left.matches(right))
@@ -131,6 +131,11 @@ public class Multiply extends BinaryNode {
 	public Node collapse() throws MathsInterpreterException{
 		Node left = getLeft().collapse();
 		Node right = getRight().collapse();
+
+		if(left instanceof Negative)
+			return new Negative(new Multiply(((UnaryNode) left).getNode(), right)).collapse();
+		if(right instanceof Negative)
+			return new Negative(new Multiply(left, ((UnaryNode) right).getNode())).collapse();
 
 		// x * y/z = (x*y)/z
 		if (right instanceof Divide && !(left instanceof Divide))
