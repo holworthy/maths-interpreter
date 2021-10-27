@@ -81,9 +81,9 @@ public class Power extends BinaryNode {
 		if(right.matches(new Number(1)))
 			return left;
 
-		// binomial theorum
-		// TODO: expand this into multinomial theorum
-		if(left instanceof Add && !(((BinaryNode) left).getLeft() instanceof Add) && right instanceof Number) {
+		// binomial theorum which works as multinomial theorum
+		// TODO: verify
+		if(left instanceof Add && right instanceof Number) {
 			Node temp = new Number(0);
 			for(BigInteger k = BigInteger.ZERO; k.compareTo(((Number) right).getValue().add(BigInteger.ONE)) < 0; k = k.add(BigInteger.ONE))
 				temp = new Add(temp, new Multiply(new Multiply(new Divide(new Factorial(right), new Multiply(new Factorial(new Number(k)), new Factorial(new Subtract(right, new Number(k))))), new Power(((BinaryNode) left).getLeft(), new Subtract(right, new Number(k)))), new Power(((BinaryNode) left).getRight(), new Number(k))).expand());
