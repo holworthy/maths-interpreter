@@ -20,37 +20,6 @@ public class Multiply extends BinaryNode {
 	}
 
 	@Override
-	public Node normalise() {
-		Node left = getLeft().normalise();
-		Node right = getRight().normalise();
-
-		// constant folding
-		if(left instanceof Number && right instanceof Number)
-			return new Number(((Number) left).getValue().multiply(((Number) right).getValue()));
-		if(left.matches(new Number(0)))
-			return new Number(0);
-		if(left.matches(new Number(1)))
-			return right;
-
-		// move constants to left
-		if(right.matches(new Matching.Constant()) && !left.matches(new Matching.Constant()))
-			return new Multiply(right, left).normalise();
-		
-		// Make tree left leaning
-		if(right instanceof Multiply)
-			return new Multiply(new Multiply(left, ((Multiply) right).getLeft().normalise()).normalise(), ((Multiply) right).getRight());
-
-		// x*x = x^2
-		if(left instanceof Variable && left.matches(right))
-			return new Power(left, new Number(2)).normalise();
-		// x*x^n = x^(n+1)
-		if(left instanceof Variable && right instanceof Power && ((Power) right).getLeft().matches(left))
-			return new Power(left, new Add(new Number(1), ((Power) right).getRight())).normalise();
-
-		return new Multiply(left, right);
-	}
-
-	@Override
 	public Node expand() throws MathsInterpreterException{
 		Node left = getLeft().expand();
 		Node right = getRight().expand();
@@ -176,9 +145,8 @@ public class Multiply extends BinaryNode {
 		}
 
 		// x^-1 * y^-1 = (x*y)^-1
-		if (left instanceof Power && right instanceof Power && ((BinaryNode) left).getRight().matches(((BinaryNode) right).getRight())){
-			return new Power(new Multiply(((BinaryNode) left).getLeft(), ((BinaryNode) right).getLeft()), ((BinaryNode) left).getRight()).expand().collapse();
-		}
+		if (left instanceof Power && right instanceof Power && ((BinaryNode) left).getRight().matches(((BinaryNode) right).getRight()))
+			return new Power(new Multiply(((BinaryNode) left).getLeft(), ((BinaryNode) right).getLeft()), ((BinaryNode) left).getRight()).collapse();
 
 		// (z * x^-1) * y^-1 = z * (x*y)^-1
 		if (left instanceof Multiply && ((BinaryNode) left).getRight() instanceof Power && right instanceof Power && ((BinaryNode) ((BinaryNode) left).getRight()).getRight().matches(((BinaryNode) right).getRight()))

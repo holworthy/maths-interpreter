@@ -24,18 +24,6 @@ public class Add extends BinaryNode {
 		return new Add(getLeft().copy(), getRight().copy());
 	}
 
-	@Override
-	public Node normalise() {
-		Node left = getLeft().normalise();
-		Node right = getRight().normalise();
-
-		// make tree left leaning
-		if(right instanceof Add)
-			return new Add(new Add(left, ((Add) right).getLeft().normalise()).normalise(), ((Add) right).getRight().normalise());
-
-		return new Add(left, right);
-	}
-
 	private ArrayList<Node> flatten2(Node node) {
 		if(node instanceof Multiply && ((BinaryNode) node).getLeft() instanceof Multiply) {
 			ArrayList<Node> items = flatten2(((Multiply) node).getLeft());
@@ -122,12 +110,15 @@ public class Add extends BinaryNode {
 		Node left = getLeft().expand();
 		Node right = getRight().expand();
 
+		// make tree left leaning
+		if(right instanceof Add)
+			return new Add(new Add(left, ((Add) right).getLeft()), ((Add) right).getRight()).expand();
+
+		// constant folding
 		if(left.matches(new Number(0)))
 			return right;
 		if(right.matches(new Number(0)))
 			return left;
-
-		// constant folding
 		if(left instanceof Number && right instanceof Number)
 			return new Number(((Number) left).getValue().add(((Number) right).getValue()));
 		
@@ -344,7 +335,7 @@ public class Add extends BinaryNode {
 				}
 			}
 			if(!(removeList.isEmpty()))
-				return new Multiply(unFlatten(removeList), new Add(unFlatten(leftList), unFlatten(rightList)));
+				return new Multiply(unFlatten(removeList), new Add(unFlatten(leftList), unFlatten(rightList)).simplify());
 		}
 
 		return new Add(left, right);

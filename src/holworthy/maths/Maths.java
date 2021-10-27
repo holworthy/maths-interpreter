@@ -315,11 +315,9 @@ public abstract class Maths {
 
 		Node input = parseInput(scanner.nextLine());
 		System.out.println(input);
-		Node expanded = input.normalise().expand();
+		Node expanded = input.expand();
 		System.out.println(expanded);
-		Node collapsed = expanded.normalise().collapse();
-		System.out.println(collapsed);
-		Node simplified = input.simplify();
+		Node simplified = expanded.collapse();
 		System.out.println(simplified);
 
 		scanner.close();

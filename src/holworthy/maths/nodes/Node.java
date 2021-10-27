@@ -13,10 +13,6 @@ public abstract class Node {
 
 	public abstract boolean contains(Variable variable);
 
-	public Node normalise() {
-		return this;
-	}
-
 	// adds common terms
 	// expands brackets
 	// moves negatives towards the leaves
@@ -31,7 +27,7 @@ public abstract class Node {
 	}
 
 	public final Node simplify() throws MathsInterpreterException {
-		return normalise().expand().normalise().collapse().normalise();
+		return expand().collapse();
 	}
 
 	public abstract Node differentiate(Variable wrt) throws MathsInterpreterException;

@@ -65,6 +65,8 @@ public class Equation extends BinaryNode {
 			
 			while(!equation.getLeft().matches(variable)) {
 				System.out.println(equation);
+				equation = (Equation) equation.simplify();
+				System.out.println(equation);
 
 				// a*x^2 + b*x + c = d
 				if(equation.getLeft().matches(new Add(new Add(new Multiply(new Matching.Constant(), new Power(new Matching.Anything(), new Number(2))), new Multiply(new Matching.Constant(), new Matching.Anything())), new Matching.Constant())) && equation.getRight().matches(new Matching.Constant()) && ((BinaryNode) ((BinaryNode) ((BinaryNode) ((BinaryNode) equation.getLeft()).getLeft()).getLeft()).getRight()).getLeft().matches(((BinaryNode) ((BinaryNode) ((BinaryNode) equation.getLeft()).getLeft()).getRight()).getRight())) {
@@ -91,6 +93,12 @@ public class Equation extends BinaryNode {
 						equation = new Equation(((BinaryNode) equation.getLeft()).getLeft(), new Subtract(equation.getRight(), ((BinaryNode) equation.getLeft()).getRight()));
 					else if(((BinaryNode) equation.getLeft()).getRight().contains(variable))
 						equation = new Equation(((BinaryNode) equation.getLeft()).getRight(), new Subtract(equation.getRight(), ((BinaryNode) equation.getLeft()).getLeft()));
+
+				// x - a = b -> x = b + a
+				} else if(equation.getLeft() instanceof Subtract) {
+					if(((BinaryNode) equation.getLeft()).getLeft().contains(variable)) {
+						equation = new Equation(((BinaryNode) equation.getLeft()).getLeft(), new Add(equation.getRight(), ((BinaryNode) equation.getLeft()).getRight()));
+					}
 				
 				// x * a = b -> x = b / a
 				// TODO: check this okay
@@ -102,7 +110,10 @@ public class Equation extends BinaryNode {
 
 				// x / a = b -> x = a * b
 				} else if(equation.getLeft() instanceof Divide) {
-					equation = new Equation(((BinaryNode) equation.getLeft()).getLeft(), new Multiply(((BinaryNode) equation.getLeft()).getRight(), equation.getRight()));
+					if(((BinaryNode) equation.getLeft()).getLeft().contains(variable) && ((BinaryNode) equation.getLeft()).getRight().contains(variable))
+						equation = new Equation(new Subtract(((BinaryNode) equation.getLeft()).getLeft(), new Multiply(equation.getRight(), ((BinaryNode) equation.getLeft()).getRight())), new Number(0));
+					else
+						equation = new Equation(((BinaryNode) equation.getLeft()).getLeft(), new Multiply(((BinaryNode) equation.getLeft()).getRight(), equation.getRight()));
 
 				// cos(x) = a -> x = acos(a)
 				} else if(equation.getLeft() instanceof Cos) {
