@@ -1,5 +1,7 @@
 package holworthy.maths.nodes;
 
+import java.math.BigInteger;
+
 import holworthy.maths.exceptions.MathsInterpreterException;
 import holworthy.maths.exceptions.NotDifferentiableException;
 
@@ -18,8 +20,12 @@ public class Factorial extends UnaryNode {
 		Node node = getNode().expand();
 		if(node.matches(new Number(0)) || node.matches(new Number(1)))
 			return new Number(1);
-		if(node instanceof Number)
-			return new Multiply(node, new Factorial(new Subtract(node, new Number(1)))).expand();
+		if(node instanceof Number) {
+			BigInteger sum = BigInteger.ONE;
+			for(BigInteger i = BigInteger.TWO; i.compareTo(((Number) node).getValue()) <= 0; i = i.add(BigInteger.ONE))
+				sum = sum.multiply(i);
+			return new Number(sum);
+		}
 		return new Factorial(node);
 	}
 

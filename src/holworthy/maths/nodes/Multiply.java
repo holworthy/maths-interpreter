@@ -47,6 +47,10 @@ public class Multiply extends BinaryNode {
 		// negative handling
 		if(left instanceof Negative && right instanceof Negative)
 			return new Multiply(((UnaryNode) left).getNode(), ((UnaryNode) right).getNode());
+		if(left instanceof Negative && ((UnaryNode) left).getNode() instanceof Number && right instanceof Number)
+			return new Negative(new Multiply(((UnaryNode) left).getNode(), right)).expand();
+		if(right instanceof Negative)
+			return new Multiply(new Negative(left), ((UnaryNode) right).getNode()).expand();
 
 		// x*x = x^2
 		if(left instanceof Variable && left.matches(right))
@@ -67,10 +71,10 @@ public class Multiply extends BinaryNode {
 		if(left instanceof Multiply && ((Multiply) left).getRight() instanceof Power && right instanceof Power && ((Power) ((Multiply) left).getRight()).getLeft().matches(((Power) right).getLeft()))
 			return new Multiply(((Multiply) left).getLeft(), new Power(((Power) ((Multiply) left).getRight()).getLeft(), new Add(((Power) ((Multiply) left).getRight()).getRight(), ((Power) right).getRight()))).expand();
 
-		// Expanding brackets
+		// expanding brackets
 		if(right instanceof Add)
 			return new Add(new Multiply(left, ((Add) right).getLeft()), new Multiply(left, ((Add) right).getRight())).expand();
-		// Putting brackets on the right (which then calls the rule above)
+		// putting brackets on the right (which then calls the rule above)
 		if(left instanceof Add)
 			return new Multiply(right, left).expand();
 
@@ -154,8 +158,9 @@ public class Multiply extends BinaryNode {
 			return new Power(new Multiply(((BinaryNode) left).getLeft(), ((BinaryNode) right).getLeft()), ((BinaryNode) left).getRight()).collapse();
 
 		// (z * x^-1) * y^-1 = z * (x*y)^-1
-		if (left instanceof Multiply && ((BinaryNode) left).getRight() instanceof Power && right instanceof Power && ((BinaryNode) ((BinaryNode) left).getRight()).getRight().matches(((BinaryNode) right).getRight()))
-			return new Multiply(((BinaryNode) left).getLeft(), new Power(new Multiply(((BinaryNode) ((BinaryNode) left).getRight()).getLeft(), ((BinaryNode) right).getLeft()), ((BinaryNode) right).getRight())).expand().collapse();
+		// TODO: this breaks binomial theorum for some reason i dont yet understand
+		// if (left instanceof Multiply && ((BinaryNode) left).getRight() instanceof Power && right instanceof Power && ((BinaryNode) ((BinaryNode) left).getRight()).getRight().matches(((BinaryNode) right).getRight()))
+		// 	return new Multiply(((BinaryNode) left).getLeft(), new Power(new Multiply(((BinaryNode) ((BinaryNode) left).getRight()).getLeft(), ((BinaryNode) right).getLeft()), ((BinaryNode) right).getRight())).expand().collapse();
 
 		// x * y^-1 = x/y
 		if(right instanceof Power && ((BinaryNode) right).getRight() instanceof Negative){
@@ -175,4 +180,3 @@ public class Multiply extends BinaryNode {
 		return new Add(new Multiply(getLeft().differentiate(wrt), getRight()), new Multiply(getLeft(), getRight().differentiate(wrt))).simplify();
 	}
 }
-

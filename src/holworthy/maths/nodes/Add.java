@@ -41,6 +41,15 @@ public class Add extends BinaryNode {
 		}
 	}
 
+	private Node unflatten2(ArrayList<Node> list) {
+		if(list.size() == 1)
+			return list.get(0);
+		Node node = new Multiply(list.get(0), list.get(1));
+		for(int i = 2; i < list.size(); i++)
+			node = new Multiply(node, list.get(i));
+		return node;
+	}
+
 	private boolean shouldSwap(Node left, Node right) {
 		if(left.matches(right))
 			return false;
@@ -105,6 +114,52 @@ public class Add extends BinaryNode {
 		return false;
 	}
 
+	private boolean canCombine(Node left, Node right) {
+		if(left instanceof Negative)
+			return canCombine(new Multiply(new Negative(new Number(1)), ((UnaryNode) left).getNode()), right);
+		if(right instanceof Negative)
+			return canCombine(left, new Multiply(new Negative(new Number(1)), ((UnaryNode) right).getNode()));
+
+		ArrayList<Node> flattenedLeft = flatten2(left);
+		ArrayList<Node> flattenedRight = flatten2(right);
+
+		while(flattenedLeft.size() > 0 && flattenedLeft.get(0).matches(new Matching.Constant()))
+			flattenedLeft.remove(0);
+		while(flattenedRight.size() > 0 && flattenedRight.get(0).matches(new Matching.Constant()))
+			flattenedRight.remove(0);
+
+		if(flattenedLeft.size() != flattenedRight.size())
+			return false;
+		for(int i = 0; i < flattenedLeft.size(); i++)
+			if(!flattenedLeft.get(i).matches(flattenedRight.get(i)))
+				return false;
+		return true;
+	}
+
+	private Node combine(Node left, Node right) throws MathsInterpreterException {
+		if(!canCombine(left, right))
+			throw new MathsInterpreterException("Cannot combine " + left + " and " + right);
+		if(left instanceof Negative)
+			return combine(new Multiply(new Negative(new Number(1)), ((UnaryNode) left).getNode()), right);
+		if(right instanceof Negative)
+			return combine(left, new Multiply(new Negative(new Number(1)), ((UnaryNode) right).getNode()));
+
+		ArrayList<Node> flattenedLeft = flatten2(left);
+		ArrayList<Node> flattenedRight = flatten2(right);
+
+		ArrayList<Node> leftConstants = new ArrayList<>();
+		leftConstants.add(new Number(1));
+		ArrayList<Node> rightConstants = new ArrayList<>();
+		rightConstants.add(new Number(1));
+
+		while(flattenedLeft.size() > 0 && flattenedLeft.get(0).matches(new Matching.Constant()))
+			leftConstants.add(flattenedLeft.remove(0));
+		while(flattenedRight.size() > 0 && flattenedRight.get(0).matches(new Matching.Constant()))
+			rightConstants.add(flattenedRight.remove(0));
+
+		return new Multiply(new Add(unflatten2(leftConstants), unflatten2(rightConstants)), unflatten2(flattenedLeft)).expand();
+	}
+
 	@Override
 	public Node expand() throws MathsInterpreterException {
 		Node left = getLeft().expand();
@@ -147,89 +202,90 @@ public class Add extends BinaryNode {
 		// x+x=2*x
 		if(left.matches(right))
 			return new Multiply(new Number(2), left).expand();
-		// a+b+b=a+2*b
-		if(left instanceof Add && ((Add) left).getRight().matches(right))
-			return new Add(((Add) left).getLeft(), new Multiply(new Number(2), ((Add) left).getRight())).expand();
-		// a*x^n+x^n
-		if(left instanceof Multiply && ((Multiply) left).getLeft().isConstant() && ((Multiply) left).getRight().matches(right))
-			return new Multiply(new Add(((Multiply) left).getLeft(), new Number(1)), ((Multiply) left).getRight()).expand();
-		// x+a*x = (1+a)*x
-		if(!(left instanceof Multiply) && right instanceof Multiply && ((BinaryNode) right).getLeft().isConstant() && left.matches(((BinaryNode) right).getRight()))
-			return new Multiply(new Add(new Number(1),((BinaryNode) right).getLeft()), left).expand();
-		// x-x = 0
-		if(right instanceof Negative && left.matches(((UnaryNode) right).getNode()))
-			return new Number(0);
-		// -x+x = 0
-		if(left instanceof Negative && right.matches(((UnaryNode) left).getNode()))
-			return new Number(0);
-		// x + -a*x = (1-a)*x
-		if (right instanceof Negative && ((UnaryNode) right).getNode() instanceof Multiply && ((BinaryNode) ((UnaryNode) right).getNode()).getRight().matches(left))
-			return new Multiply(new Add(new Number(1), new Negative(((BinaryNode) ((UnaryNode) right).getNode()).getLeft())), left).expand();
-		// -a*x + x = (1-a)*x
-		if(left instanceof Negative && ((UnaryNode) left).getNode() instanceof Multiply && ((BinaryNode) ((UnaryNode) left).getNode()).getRight().matches(right))
-			return new Multiply(new Add(new Number(1), new Negative(((BinaryNode) ((UnaryNode) left).getNode()).getLeft())), right).expand();
-		// a+b*x^n+x^n
-		if(left instanceof Add && ((Add) left).getRight() instanceof Multiply && ((Multiply) ((Add) left).getRight()).getLeft().isConstant() && ((Multiply) ((Add) left).getRight()).getRight().matches(right))
-			return new Add(((Add) left).getLeft(), new Multiply(new Add(((Multiply) ((Add) left).getRight()).getLeft(), new Number(1)), ((Multiply) ((Add) left).getRight()).getRight())).expand();
-		// a*x^n+b*x^n=(a+b)*x^n
-		if(left instanceof Multiply && ((BinaryNode) left).getLeft().isConstant() && right instanceof Multiply && ((BinaryNode) right).getLeft().isConstant() && ((BinaryNode) left).getRight().matches(((BinaryNode) right).getRight()))
-			return new Multiply(new Add(((BinaryNode) left).getLeft(), ((BinaryNode) right).getLeft()), ((BinaryNode) left).getRight()).expand();
-		// make negative(x) = negative(1*x) for next few checks to avoid duplication logic
-		if (left instanceof Negative && !(((UnaryNode) left).getNode() instanceof Multiply)){
-			left = new Negative(new Multiply(new Number(1), ((UnaryNode) left).getNode()));
-		}
-		if (left instanceof Add && ((BinaryNode) left).getRight() instanceof Negative && !(((UnaryNode) ((BinaryNode) left).getRight()).getNode() instanceof Multiply) && !(((UnaryNode) ((BinaryNode) left).getRight()).getNode().isConstant())){
-			left = new Add(((BinaryNode) left).getLeft(), new Negative(new Multiply(new Number(1), ((UnaryNode) ((BinaryNode) left).getRight()).getNode())));
-		}
-		if (right instanceof Negative && !(((UnaryNode) right).getNode() instanceof Multiply)){
-			right = new Negative(new Multiply(new Number(1), ((UnaryNode) right).getNode()));
-		}
-		// a*x^n+-b*x^n=(a-b)*x^n
-		if (left instanceof Multiply && ((BinaryNode) left).getLeft().isConstant() && right instanceof Negative && ((UnaryNode) right).getNode() instanceof Multiply && ((BinaryNode) ((UnaryNode) right).getNode()).getLeft().isConstant() && ((BinaryNode) left).getRight().matches(((BinaryNode) ((UnaryNode) right).getNode()).getRight())){
-			return new Multiply(new Add(((BinaryNode) left).getLeft(), new Negative(((BinaryNode) ((UnaryNode) right).getNode()).getLeft())), ((BinaryNode) left).getRight()).expand();
-		}
-		// -a*x^n+b*x^n=(a-b)*x^n
-		if (right instanceof Multiply && ((BinaryNode) right).getLeft().isConstant() && left instanceof Negative && ((UnaryNode) left).getNode() instanceof Multiply && ((BinaryNode) ((UnaryNode) left).getNode()).getLeft().isConstant() && ((BinaryNode) right).getRight().matches(((BinaryNode) ((UnaryNode) left).getNode()).getRight())){
-			return new Multiply(new Add(((BinaryNode) right).getLeft(), new Negative(((BinaryNode) ((UnaryNode) left).getNode()).getLeft())), ((BinaryNode) right).getRight()).expand();
-		}
-		// -a*x + -b*x = (-a-b)*x
-		if (left instanceof Negative && ((UnaryNode) left).getNode() instanceof Multiply && ((BinaryNode) ((UnaryNode) left).getNode()).getLeft().isConstant() && right instanceof Negative && ((UnaryNode) right).getNode() instanceof Multiply && ((BinaryNode) ((UnaryNode) right).getNode()).getLeft().isConstant() && ((BinaryNode) ((UnaryNode) left).getNode()).getRight().matches(((BinaryNode) ((UnaryNode) right).getNode()).getRight())){
-			return new Multiply(new Add(new Negative(((BinaryNode) ((UnaryNode) left).getNode()).getLeft()), new Negative(((BinaryNode) ((UnaryNode) right).getNode()).getLeft())), ((BinaryNode) ((UnaryNode) right).getNode()).getRight()).expand();
-		}
-		// (c + a*x^n) + -b*x^n=(a-b)*x^n
-		if (left instanceof Add && ((BinaryNode) left).getRight() instanceof Multiply && ((BinaryNode) ((BinaryNode) left).getRight()).getLeft().isConstant() && right instanceof Negative && ((UnaryNode) right).getNode() instanceof Multiply && ((BinaryNode) ((UnaryNode) right).getNode()).getLeft().isConstant() && ((BinaryNode) ((BinaryNode) left).getRight()).getRight().matches(((BinaryNode) ((UnaryNode) right).getNode()).getRight())){
-			return new Add(((BinaryNode) left).getLeft(), new Multiply(new Add(((BinaryNode) ((BinaryNode) left).getRight()).getLeft(), new Negative(((BinaryNode) ((UnaryNode) right).getNode()).getLeft())), ((BinaryNode) ((BinaryNode) left).getRight()).getRight())).expand();
-		}
-		// (c + -a*x^n) + b*x^n=(a-b)*x^n
-		if (right instanceof Multiply && ((BinaryNode) right).getLeft().isConstant() && left instanceof Add && ((BinaryNode) left).getRight() instanceof Negative && ((UnaryNode) ((BinaryNode) left).getRight()).getNode() instanceof Multiply && ((BinaryNode) ((UnaryNode) ((BinaryNode) left).getRight()).getNode()).getLeft().isConstant() && ((BinaryNode) right).getRight().matches(((BinaryNode) ((UnaryNode) ((BinaryNode) left).getRight()).getNode()).getRight())){
-			return new Add(((BinaryNode) left).getLeft(), new Multiply(new Add(((BinaryNode) right).getLeft(), new Negative(((BinaryNode) ((UnaryNode) ((BinaryNode) left).getRight()).getNode()).getLeft())), ((BinaryNode) right).getRight())).expand();
-		}
-		// (c + -a*x) + -b*x = c + (-a-b)*x
-		if (left instanceof Add && ((BinaryNode) left).getRight() instanceof Negative && ((UnaryNode) ((BinaryNode) left).getRight()).getNode() instanceof Multiply && ((BinaryNode) ((UnaryNode) ((BinaryNode) left).getRight()).getNode()).getLeft().isConstant() && right instanceof Negative && ((UnaryNode) right).getNode() instanceof Multiply && ((BinaryNode) ((UnaryNode) right).getNode()).getLeft().isConstant() && ((BinaryNode) ((UnaryNode) ((BinaryNode) left).getRight()).getNode()).getRight().matches(((BinaryNode) ((UnaryNode) right).getNode()).getRight())){
-			return new Add(((BinaryNode) left).getLeft(), new Multiply(new Add(new Negative(((BinaryNode) ((UnaryNode) ((BinaryNode) left).getRight()).getNode()).getLeft()), new Negative(((BinaryNode) ((UnaryNode) right).getNode()).getLeft())), ((BinaryNode) ((UnaryNode) right).getNode()).getRight()));
-		}
-		// make negative(1*x) = negative(x) after previous few checks to avoid duplication logic
-		if (left instanceof Negative && ((UnaryNode) left).getNode() instanceof Multiply && ((BinaryNode) ((UnaryNode) left).getNode()).getLeft() instanceof Number && ((Number) ((BinaryNode) ((UnaryNode) left).getNode()).getLeft()).getValue().equals(BigInteger.ONE)){
-			left = new Negative(((BinaryNode) ((UnaryNode) left).getNode()).getRight());
-		}
-		if (left instanceof Add && ((BinaryNode) left).getRight() instanceof Negative && ((UnaryNode) ((BinaryNode) left).getRight()).getNode() instanceof Multiply && ((BinaryNode) ((UnaryNode) ((BinaryNode) left).getRight()).getNode()).getLeft() instanceof Number && ((Number) ((BinaryNode) ((UnaryNode) ((BinaryNode) left).getRight()).getNode()).getLeft()).getValue().equals(BigInteger.ONE)){
-			left = new Add(((BinaryNode) left).getLeft(), new Negative(((BinaryNode) left).getRight()));
-		}
-		if (right instanceof Negative && ((UnaryNode) right).getNode() instanceof Multiply && ((BinaryNode) ((UnaryNode) right).getNode()).getLeft() instanceof Number && ((Number) ((BinaryNode) ((UnaryNode) right).getNode()).getLeft()).getValue().equals(BigInteger.ONE)){
-			right = new Negative(((BinaryNode) ((UnaryNode) right).getNode()).getRight());
-		}
-		// TODO: literally what is this garbage doing
-		// if(left instanceof Add && ((BinaryNode) left).getRight() instanceof Multiply && ((BinaryNode) ((BinaryNode) left).getRight()).getLeft().isConstant() && right instanceof Multiply && ((BinaryNode) right).getLeft().isConstant() && ((BinaryNode) ((BinaryNode) left).getRight()).getRight().matches(((BinaryNode) right).getRight()))
-		// 	return new Multiply(new Add(((BinaryNode) ((BinaryNode) left).getRight()).getLeft(), ((BinaryNode) right).getLeft()), ((BinaryNode) ((BinaryNode) left).getRight()).getRight()).expand();
-		// 2*x + -(3*x)
-		if(left instanceof Multiply && right instanceof Negative && ((UnaryNode) right).getNode() instanceof Multiply && ((BinaryNode) left).getLeft().isConstant() && ((BinaryNode) ((UnaryNode) right).getNode()).getLeft().isConstant() && ((BinaryNode) left).getRight().matches(((BinaryNode) ((UnaryNode) right).getNode()).getRight()))
-			return new Multiply(new Subtract(((BinaryNode) left).getLeft(), ((BinaryNode) ((UnaryNode) right).getNode()).getLeft()), ((BinaryNode) left).getRight()).expand();
-		// a + 2*x - 3*x
-		if(left instanceof Add && ((BinaryNode) left).getRight() instanceof Multiply && right instanceof Negative && ((UnaryNode) right).getNode() instanceof Multiply && ((BinaryNode) ((BinaryNode) left).getRight()).getLeft().isConstant() && ((BinaryNode) ((UnaryNode) right).getNode()).getLeft().isConstant() && ((BinaryNode) ((BinaryNode) left).getRight()).getRight().matches(((BinaryNode) ((UnaryNode) right).getNode()).getRight()))
-			return new Add(((BinaryNode) left).getLeft(), new Multiply(new Subtract(((BinaryNode) ((BinaryNode) left).getRight()).getLeft(), ((BinaryNode) ((UnaryNode) right).getNode()).getLeft()), ((BinaryNode) ((BinaryNode) left).getRight()).getRight())).expand();
-		// c+a*x^n+b*x^n=c+(a+b)*x^n
-		if(left instanceof Add && ((Add) left).getRight() instanceof Multiply && ((BinaryNode) ((BinaryNode) left).getRight()).getLeft().isConstant() && right instanceof Multiply && ((BinaryNode) right).getLeft().isConstant() && ((BinaryNode) ((BinaryNode) left).getRight()).getRight().matches(((BinaryNode) right).getRight()))
-			return new Add(((Add) left).getLeft(), new Multiply(new Add(((BinaryNode) ((BinaryNode) left).getRight()).getLeft(), ((BinaryNode) right).getLeft()), ((BinaryNode) ((BinaryNode) left).getRight()).getRight())).expand();
+
+		// TODO: i think this can go
+		// // a+b+b=a+2*b
+		// if(left instanceof Add && ((Add) left).getRight().matches(right))
+		// 	return new Add(((Add) left).getLeft(), new Multiply(new Number(2), ((Add) left).getRight())).expand();
+		// // a*x^n+x^n
+		// if(left instanceof Multiply && ((Multiply) left).getLeft().isConstant() && ((Multiply) left).getRight().matches(right))
+		// 	return new Multiply(new Add(((Multiply) left).getLeft(), new Number(1)), ((Multiply) left).getRight()).expand();
+		// // x+a*x = (1+a)*x
+		// if(!(left instanceof Multiply) && right instanceof Multiply && ((BinaryNode) right).getLeft().isConstant() && left.matches(((BinaryNode) right).getRight()))
+		// 	return new Multiply(new Add(new Number(1),((BinaryNode) right).getLeft()), left).expand();
+		// // x-x = 0
+		// if(right instanceof Negative && left.matches(((UnaryNode) right).getNode()))
+		// 	return new Number(0);
+		// // -x+x = 0
+		// if(left instanceof Negative && right.matches(((UnaryNode) left).getNode()))
+		// 	return new Number(0);
+		// // x + -a*x = (1-a)*x
+		// if (right instanceof Negative && ((UnaryNode) right).getNode() instanceof Multiply && ((BinaryNode) ((UnaryNode) right).getNode()).getRight().matches(left))
+		// 	return new Multiply(new Add(new Number(1), new Negative(((BinaryNode) ((UnaryNode) right).getNode()).getLeft())), left).expand();
+		// // -a*x + x = (1-a)*x
+		// if(left instanceof Negative && ((UnaryNode) left).getNode() instanceof Multiply && ((BinaryNode) ((UnaryNode) left).getNode()).getRight().matches(right))
+		// 	return new Multiply(new Add(new Number(1), new Negative(((BinaryNode) ((UnaryNode) left).getNode()).getLeft())), right).expand();
+		// // a+b*x^n+x^n
+		// if(left instanceof Add && ((Add) left).getRight() instanceof Multiply && ((Multiply) ((Add) left).getRight()).getLeft().isConstant() && ((Multiply) ((Add) left).getRight()).getRight().matches(right))
+		// 	return new Add(((Add) left).getLeft(), new Multiply(new Add(((Multiply) ((Add) left).getRight()).getLeft(), new Number(1)), ((Multiply) ((Add) left).getRight()).getRight())).expand();
+		// // a*x^n+b*x^n=(a+b)*x^n
+		// // if(left instanceof Multiply && ((BinaryNode) left).getLeft().isConstant() && right instanceof Multiply && ((BinaryNode) right).getLeft().isConstant() && ((BinaryNode) left).getRight().matches(((BinaryNode) right).getRight()))
+		// // 	return new Multiply(new Add(((BinaryNode) left).getLeft(), ((BinaryNode) right).getLeft()), ((BinaryNode) left).getRight()).expand();
+		// // make negative(x) = negative(1*x) for next few checks to avoid duplication logic
+		// if (left instanceof Negative && !(((UnaryNode) left).getNode() instanceof Multiply)){
+		// 	left = new Negative(new Multiply(new Number(1), ((UnaryNode) left).getNode()));
+		// }
+		// if (left instanceof Add && ((BinaryNode) left).getRight() instanceof Negative && !(((UnaryNode) ((BinaryNode) left).getRight()).getNode() instanceof Multiply) && !(((UnaryNode) ((BinaryNode) left).getRight()).getNode().isConstant())){
+		// 	left = new Add(((BinaryNode) left).getLeft(), new Negative(new Multiply(new Number(1), ((UnaryNode) ((BinaryNode) left).getRight()).getNode())));
+		// }
+		// if (right instanceof Negative && !(((UnaryNode) right).getNode() instanceof Multiply)){
+		// 	right = new Negative(new Multiply(new Number(1), ((UnaryNode) right).getNode()));
+		// }
+		// // a*x^n+-b*x^n=(a-b)*x^n
+		// if (left instanceof Multiply && ((BinaryNode) left).getLeft().isConstant() && right instanceof Negative && ((UnaryNode) right).getNode() instanceof Multiply && ((BinaryNode) ((UnaryNode) right).getNode()).getLeft().isConstant() && ((BinaryNode) left).getRight().matches(((BinaryNode) ((UnaryNode) right).getNode()).getRight())){
+		// 	return new Multiply(new Add(((BinaryNode) left).getLeft(), new Negative(((BinaryNode) ((UnaryNode) right).getNode()).getLeft())), ((BinaryNode) left).getRight()).expand();
+		// }
+		// // -a*x^n+b*x^n=(a-b)*x^n
+		// if (right instanceof Multiply && ((BinaryNode) right).getLeft().isConstant() && left instanceof Negative && ((UnaryNode) left).getNode() instanceof Multiply && ((BinaryNode) ((UnaryNode) left).getNode()).getLeft().isConstant() && ((BinaryNode) right).getRight().matches(((BinaryNode) ((UnaryNode) left).getNode()).getRight())){
+		// 	return new Multiply(new Add(((BinaryNode) right).getLeft(), new Negative(((BinaryNode) ((UnaryNode) left).getNode()).getLeft())), ((BinaryNode) right).getRight()).expand();
+		// }
+		// // -a*x + -b*x = (-a-b)*x
+		// if (left instanceof Negative && ((UnaryNode) left).getNode() instanceof Multiply && ((BinaryNode) ((UnaryNode) left).getNode()).getLeft().isConstant() && right instanceof Negative && ((UnaryNode) right).getNode() instanceof Multiply && ((BinaryNode) ((UnaryNode) right).getNode()).getLeft().isConstant() && ((BinaryNode) ((UnaryNode) left).getNode()).getRight().matches(((BinaryNode) ((UnaryNode) right).getNode()).getRight())){
+		// 	return new Multiply(new Add(new Negative(((BinaryNode) ((UnaryNode) left).getNode()).getLeft()), new Negative(((BinaryNode) ((UnaryNode) right).getNode()).getLeft())), ((BinaryNode) ((UnaryNode) right).getNode()).getRight()).expand();
+		// }
+		// // (c + a*x^n) + -b*x^n=(a-b)*x^n
+		// if (left instanceof Add && ((BinaryNode) left).getRight() instanceof Multiply && ((BinaryNode) ((BinaryNode) left).getRight()).getLeft().isConstant() && right instanceof Negative && ((UnaryNode) right).getNode() instanceof Multiply && ((BinaryNode) ((UnaryNode) right).getNode()).getLeft().isConstant() && ((BinaryNode) ((BinaryNode) left).getRight()).getRight().matches(((BinaryNode) ((UnaryNode) right).getNode()).getRight())){
+		// 	return new Add(((BinaryNode) left).getLeft(), new Multiply(new Add(((BinaryNode) ((BinaryNode) left).getRight()).getLeft(), new Negative(((BinaryNode) ((UnaryNode) right).getNode()).getLeft())), ((BinaryNode) ((BinaryNode) left).getRight()).getRight())).expand();
+		// }
+		// // (c + -a*x^n) + b*x^n=(a-b)*x^n
+		// if (right instanceof Multiply && ((BinaryNode) right).getLeft().isConstant() && left instanceof Add && ((BinaryNode) left).getRight() instanceof Negative && ((UnaryNode) ((BinaryNode) left).getRight()).getNode() instanceof Multiply && ((BinaryNode) ((UnaryNode) ((BinaryNode) left).getRight()).getNode()).getLeft().isConstant() && ((BinaryNode) right).getRight().matches(((BinaryNode) ((UnaryNode) ((BinaryNode) left).getRight()).getNode()).getRight())){
+		// 	return new Add(((BinaryNode) left).getLeft(), new Multiply(new Add(((BinaryNode) right).getLeft(), new Negative(((BinaryNode) ((UnaryNode) ((BinaryNode) left).getRight()).getNode()).getLeft())), ((BinaryNode) right).getRight())).expand();
+		// }
+		// // (c + -a*x) + -b*x = c + (-a-b)*x
+		// if (left instanceof Add && ((BinaryNode) left).getRight() instanceof Negative && ((UnaryNode) ((BinaryNode) left).getRight()).getNode() instanceof Multiply && ((BinaryNode) ((UnaryNode) ((BinaryNode) left).getRight()).getNode()).getLeft().isConstant() && right instanceof Negative && ((UnaryNode) right).getNode() instanceof Multiply && ((BinaryNode) ((UnaryNode) right).getNode()).getLeft().isConstant() && ((BinaryNode) ((UnaryNode) ((BinaryNode) left).getRight()).getNode()).getRight().matches(((BinaryNode) ((UnaryNode) right).getNode()).getRight())){
+		// 	return new Add(((BinaryNode) left).getLeft(), new Multiply(new Add(new Negative(((BinaryNode) ((UnaryNode) ((BinaryNode) left).getRight()).getNode()).getLeft()), new Negative(((BinaryNode) ((UnaryNode) right).getNode()).getLeft())), ((BinaryNode) ((UnaryNode) right).getNode()).getRight()));
+		// }
+		// // make negative(1*x) = negative(x) after previous few checks to avoid duplication logic
+		// if (left instanceof Negative && ((UnaryNode) left).getNode() instanceof Multiply && ((BinaryNode) ((UnaryNode) left).getNode()).getLeft() instanceof Number && ((Number) ((BinaryNode) ((UnaryNode) left).getNode()).getLeft()).getValue().equals(BigInteger.ONE)){
+		// 	left = new Negative(((BinaryNode) ((UnaryNode) left).getNode()).getRight());
+		// }
+		// if (left instanceof Add && ((BinaryNode) left).getRight() instanceof Negative && ((UnaryNode) ((BinaryNode) left).getRight()).getNode() instanceof Multiply && ((BinaryNode) ((UnaryNode) ((BinaryNode) left).getRight()).getNode()).getLeft() instanceof Number && ((Number) ((BinaryNode) ((UnaryNode) ((BinaryNode) left).getRight()).getNode()).getLeft()).getValue().equals(BigInteger.ONE)){
+		// 	left = new Add(((BinaryNode) left).getLeft(), new Negative(((BinaryNode) left).getRight()));
+		// }
+		// if (right instanceof Negative && ((UnaryNode) right).getNode() instanceof Multiply && ((BinaryNode) ((UnaryNode) right).getNode()).getLeft() instanceof Number && ((Number) ((BinaryNode) ((UnaryNode) right).getNode()).getLeft()).getValue().equals(BigInteger.ONE)){
+		// 	right = new Negative(((BinaryNode) ((UnaryNode) right).getNode()).getRight());
+		// }
+		// // if(left instanceof Add && ((BinaryNode) left).getRight() instanceof Multiply && ((BinaryNode) ((BinaryNode) left).getRight()).getLeft().isConstant() && right instanceof Multiply && ((BinaryNode) right).getLeft().isConstant() && ((BinaryNode) ((BinaryNode) left).getRight()).getRight().matches(((BinaryNode) right).getRight()))
+		// // 	return new Multiply(new Add(((BinaryNode) ((BinaryNode) left).getRight()).getLeft(), ((BinaryNode) right).getLeft()), ((BinaryNode) ((BinaryNode) left).getRight()).getRight()).expand();
+		// // 2*x + -(3*x)
+		// if(left instanceof Multiply && right instanceof Negative && ((UnaryNode) right).getNode() instanceof Multiply && ((BinaryNode) left).getLeft().isConstant() && ((BinaryNode) ((UnaryNode) right).getNode()).getLeft().isConstant() && ((BinaryNode) left).getRight().matches(((BinaryNode) ((UnaryNode) right).getNode()).getRight()))
+		// 	return new Multiply(new Subtract(((BinaryNode) left).getLeft(), ((BinaryNode) ((UnaryNode) right).getNode()).getLeft()), ((BinaryNode) left).getRight()).expand();
+		// // a + 2*x - 3*x
+		// if(left instanceof Add && ((BinaryNode) left).getRight() instanceof Multiply && right instanceof Negative && ((UnaryNode) right).getNode() instanceof Multiply && ((BinaryNode) ((BinaryNode) left).getRight()).getLeft().isConstant() && ((BinaryNode) ((UnaryNode) right).getNode()).getLeft().isConstant() && ((BinaryNode) ((BinaryNode) left).getRight()).getRight().matches(((BinaryNode) ((UnaryNode) right).getNode()).getRight()))
+		// 	return new Add(((BinaryNode) left).getLeft(), new Multiply(new Subtract(((BinaryNode) ((BinaryNode) left).getRight()).getLeft(), ((BinaryNode) ((UnaryNode) right).getNode()).getLeft()), ((BinaryNode) ((BinaryNode) left).getRight()).getRight())).expand();
+		// // c+a*x^n+b*x^n=c+(a+b)*x^n
+		// if(left instanceof Add && ((Add) left).getRight() instanceof Multiply && ((BinaryNode) ((BinaryNode) left).getRight()).getLeft().isConstant() && right instanceof Multiply && ((BinaryNode) right).getLeft().isConstant() && ((BinaryNode) ((BinaryNode) left).getRight()).getRight().matches(((BinaryNode) right).getRight()))
+		// 	return new Add(((Add) left).getLeft(), new Multiply(new Add(((BinaryNode) ((BinaryNode) left).getRight()).getLeft(), ((BinaryNode) right).getLeft()), ((BinaryNode) ((BinaryNode) left).getRight()).getRight())).expand();
 
 		// a/b+c/d
 		if(left instanceof Divide && right instanceof Divide){
@@ -238,9 +294,11 @@ public class Add extends BinaryNode {
 			return new Divide(new Add(newLeft.getLeft(), newRight.getLeft()), newLeft.getRight()).expand();
 		}
 
-		// make tree left leaning
-		if(right instanceof Add)
-			return new Add(new Add(left, ((Add) right).getLeft()), ((Add) right).getRight()).expand();
+		// combine terms which can be combined
+		if(canCombine(left, right))
+			return combine(left, right);
+		if(left instanceof Add && canCombine(((BinaryNode) left).getRight(), right))
+			return new Add(((BinaryNode) left).getLeft(), combine(((BinaryNode) left).getRight(), right)).expand();
 
 		// sort terms
 		if(!(left instanceof Add) && shouldSwap(left, right))
@@ -353,7 +411,7 @@ public class Add extends BinaryNode {
 
 	// public static void main(String[] args) throws Exception {
 	// 	LinkedHashMap<String, String> tests = new LinkedHashMap<>();
-    //     // var + var
+	//	// var + var
 	// 	tests.put("x+x","2*x");
 	// 	// var + mul(var)
 	// 	tests.put("x+2*x", "3*x");
@@ -373,26 +431,26 @@ public class Add extends BinaryNode {
 	// 	tests.put("4*x+-2*x","2*x");
 	// 	tests.put("4*x-2*x","2*x");
 	// 	tests.put("2*x-3*x","-x");
-	// 	tests.put("2*x-4*x","-2*x");
+	// 	tests.put("2*x-4*x","-(2*x)");
 	// 	// neg(var) + var
 	// 	tests.put("-x+x","0");
 	// 	// neg(var) + mul(var)
 	// 	tests.put("-x+2*x","x");
 	// 	// neg(var) + neg(var)
-	// 	tests.put("-x+-x","-2*x");
-	// 	tests.put("-x-x","-2*x");
+	// 	tests.put("-x+-x","-(2*x)");
+	// 	tests.put("-x-x","-(2*x)");
 	// 	// neg(var) + neg(mul(var))
-	// 	tests.put("-x+-4*x","-5*x");
-	// 	tests.put("-x-4*x","-5*x");
+	// 	tests.put("-x+-4*x","-(5*x)");
+	// 	tests.put("-x-4*x","-(5*x)");
 	// 	// neg(mul(var)) + var
 	// 	tests.put("-2*x+x","-x");
 	// 	// neg(mul(var)) + mul(var)
 	// 	tests.put("-2*x+2*x","0");
 	// 	tests.put("-2*x+3*x","x");
 	// 	// neg(mul(var)) + neg(var)
-	// 	tests.put("-2*x-x","-3*x");
+	// 	tests.put("-2*x-x","-(3*x)");
 	// 	// neg(mul(var)) + neg(mul(var))
-	// 	tests.put("-2*x-2*x","-4*x");
+	// 	tests.put("-2*x-2*x","-(4*x)");
 
 	// 	Testing.runTests(tests);
 	// }
