@@ -61,6 +61,8 @@ public class Multiply extends BinaryNode {
 		// x*x^n = x^(n+1)
 		if(left instanceof Variable && right instanceof Power && ((Power) right).getLeft().matches(left))
 			return new Power(left, new Add(new Number(1), ((Power) right).getRight())).expand();
+		if(left instanceof Multiply && right instanceof Variable && ((BinaryNode) left).getRight() instanceof Power && ((BinaryNode) ((BinaryNode) left).getRight()).getLeft().matches(right))
+			return new Multiply(((BinaryNode) left).getLeft(), new Power(right, new Add(new Number(1), ((BinaryNode) ((BinaryNode) left).getRight()).getRight()))).expand();
 		// a*x*x^n = a*x^(n+1)
 		if(left instanceof Multiply && ((Multiply) left).getRight() instanceof Variable && right instanceof Power && ((Power) right).getLeft().matches(((Multiply) left).getRight()))
 			return new Multiply(((Multiply) left).getLeft(), new Power(((Multiply) left).getRight(), new Add(new Number(1), ((Power) right).getRight()))).expand();
