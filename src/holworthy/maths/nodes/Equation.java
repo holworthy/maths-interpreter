@@ -54,6 +54,10 @@ public class Equation extends BinaryNode {
 		return variables;
 	}
 
+	public int numVariables() {
+		return getVariables(this).size();
+	}
+
 	public ArrayList<Equation> solve() throws MathsInterpreterException {
 		Node start = new Equation(new Subtract(getLeft(), getRight()).simplify(), new Number(0));
 		ArrayList<Variable> variables = getVariables(start);

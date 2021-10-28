@@ -67,8 +67,8 @@ public class GUI {
 					simplifiedPanel.add(new JLabel(simplified.toString()));
 					outputPanel.add(simplifiedPanel);
 
-					// solutions
 					if(simplified instanceof Equation) {
+						// solutions
 						JPanel solutionsPanel = new JPanel();
 						solutionsPanel.setLayout(new BoxLayout(solutionsPanel, BoxLayout.PAGE_AXIS));
 						solutionsPanel.add(new JLabel("Solutions:"));
@@ -76,6 +76,21 @@ public class GUI {
 						for(Equation solution : solutions)
 							solutionsPanel.add(new JLabel(solution.toString()));
 						outputPanel.add(solutionsPanel);
+
+						if(((Equation) simplified).numVariables() == 2) {
+							// graphs
+							JPanel graphPanel = new JPanel();
+							graphPanel.setLayout(new BoxLayout(graphPanel, BoxLayout.PAGE_AXIS));
+							graphPanel.add(new JLabel("Graph:"));
+							Graph graph = new Graph(simplified.toString());
+
+							// graph.setXAxis();
+							// graph.setYAxis();
+
+
+							graphPanel.add(graph);
+							outputPanel.add(graphPanel);
+						}
 					}
 
 					// derivative
