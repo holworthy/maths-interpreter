@@ -33,16 +33,33 @@ public class Graph {
 		for (int x = lowerBound; x < upperBound + 1; x++){
 			String replaced = equation.replaceAll("x", "("+Integer.toString(x)+")");
 			Node answer = Maths.parseInput(replaced).simplify();
+			// y = 5
 			if(answer instanceof Number){
 				values.put((double) x,  ((Number) answer).getValue().doubleValue());
 			}
+			// y = -5
 			else if(answer instanceof Negative && ((UnaryNode) answer).getNode() instanceof Number){
 				values.put((double) x,  -((Number) ((UnaryNode) answer).getNode()).getValue().doubleValue());
 			}
-			else if(answer instanceof Divide && ((BinaryNode) answer).getLeft() instanceof Number && ((BinaryNode) answer).getRight() instanceof Number){
-				Double value = ((Number) ((BinaryNode) answer).getLeft()).getValue().doubleValue() / ((Number) ((BinaryNode) answer).getRight()).getValue().doubleValue();
-				values.put((double) x, value);
+			// y = a/b
+			else if(answer instanceof Divide){
+				// a = 1 b = 2
+				if(((BinaryNode) answer).getLeft() instanceof Number && ((BinaryNode) answer).getRight() instanceof Number){
+					Double value = ((Number) ((BinaryNode) answer).getLeft()).getValue().doubleValue() / ((Number) ((BinaryNode) answer).getRight()).getValue().doubleValue();
+					values.put((double) x, value);
+				}
+				// a = -1 b = 2
+				if(((BinaryNode) answer).getLeft() instanceof Negative && ((UnaryNode) ((BinaryNode) answer).getLeft()).getNode() instanceof Number && ((BinaryNode) answer).getRight() instanceof Number){
+					Double value = -((Number) ((UnaryNode) ((BinaryNode) answer).getLeft()).getNode()).getValue().doubleValue() / ((Number) ((BinaryNode) answer).getRight()).getValue().doubleValue();
+					values.put((double) x, value);
+				}
+				// a = 1 b = -2
+				if(((BinaryNode) answer).getLeft() instanceof Number && ((BinaryNode) answer).getRight() instanceof Negative && ((UnaryNode) ((BinaryNode) answer).getRight()).getNode() instanceof Number){
+					Double value = ((Number) ((BinaryNode) answer).getLeft()).getValue().doubleValue() / -((Number) ((UnaryNode) ((BinaryNode) answer).getRight()).getNode()).getValue().doubleValue();
+					values.put((double) x, value);
+				}
 			}
+			// y = -(a/b)
 			else if(answer instanceof Negative && ((UnaryNode) answer).getNode() instanceof Divide && ((BinaryNode) ((UnaryNode) answer).getNode()).getLeft() instanceof Number && ((BinaryNode) ((UnaryNode) answer).getNode()).getRight() instanceof Number){
 				Double value = -((Number) ((BinaryNode) ((UnaryNode) answer).getNode()).getLeft()).getValue().doubleValue() / ((Number) ((BinaryNode) ((UnaryNode) answer).getNode()).getRight()).getValue().doubleValue();
 				values.put((double) x, value);
