@@ -95,9 +95,12 @@ public class Equation extends BinaryNode {
 						equation = new Equation(((BinaryNode) equation.getLeft()).getRight(), new Subtract(equation.getRight(), ((BinaryNode) equation.getLeft()).getLeft()));
 
 				// x - a = b -> x = b + a
+				// a - x = b -> -x = b - a
 				} else if(equation.getLeft() instanceof Subtract) {
 					if(((BinaryNode) equation.getLeft()).getLeft().contains(variable)) {
 						equation = new Equation(((BinaryNode) equation.getLeft()).getLeft(), new Add(equation.getRight(), ((BinaryNode) equation.getLeft()).getRight()));
+					} else if(((BinaryNode) equation.getLeft()).getRight().contains(variable)) {
+						equation = new Equation(new Negative(((BinaryNode) equation.getLeft()).getRight()), new Subtract(equation.getRight(), ((BinaryNode) equation.getLeft()).getLeft()));
 					}
 				
 				// x * a = b -> x = b / a
@@ -115,11 +118,19 @@ public class Equation extends BinaryNode {
 					else
 						equation = new Equation(((BinaryNode) equation.getLeft()).getLeft(), new Multiply(((BinaryNode) equation.getLeft()).getRight(), equation.getRight()));
 
+				// 
+				} else if(equation.getLeft() instanceof Power) {
+					if(((BinaryNode) equation.getLeft()).getLeft().contains(variable)) {
+						equation = new Equation(((BinaryNode) equation.getLeft()).getLeft(), new Nthrt(equation.getRight(), ((BinaryNode) equation.getLeft()).getRight()));
+					}
+					// TODO: logs
+
 				// cos(x) = a -> x = acos(a)
 				} else if(equation.getLeft() instanceof Cos) {
 					equation = new Equation(((UnaryNode) equation.getLeft()).getNode(), new Acos(equation.getRight()));
 
 				} else {
+					System.out.println("cannot handle " + equation);
 					break;
 				}
 			}
