@@ -3,10 +3,15 @@ package holworthy.maths.gui;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.util.HashMap;
 
 import javax.swing.JPanel;
-import java.awt.event.*;
 
 import holworthy.maths.Maths;
 import holworthy.maths.exceptions.MathsInterpreterException;
@@ -21,12 +26,18 @@ public class Graph extends JPanel implements MouseListener, MouseMotionListener,
 	private HashMap<Double, Double> values = new HashMap<>();
 	private String equation;
 	private Dimension size = new Dimension(400, 400);
+	private boolean mouseEntered = false;
+	private Point mousePoint;
 
 	public Graph(String equation){
 		this.equation = equation;
 		setPreferredSize(size);
 		setMaximumSize(size);
 		setMinimumSize(size);
+
+		addMouseListener(this);
+		addMouseMotionListener(this);
+		addMouseWheelListener(this);
 	}
 
 	public HashMap<Double, Double> getValues() {
@@ -93,6 +104,12 @@ public class Graph extends JPanel implements MouseListener, MouseMotionListener,
 		
 		g.setColor(Color.BLUE);
 		g.drawLine(0, 100, getWidth(), 300);
+
+		if(mouseEntered) {
+			g.setColor(new Color(160, 160, 160));
+			g.drawLine(0, (int) mousePoint.getY(), getWidth(), (int) mousePoint.getY());
+			g.drawLine((int) mousePoint.getX(), 0, (int) mousePoint.getX(), getHeight());
+		}
 	}
 
 	public static void main(String[] args) throws Exception {
@@ -121,14 +138,14 @@ public class Graph extends JPanel implements MouseListener, MouseMotionListener,
 
 	@Override
 	public void mouseEntered(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
+		mouseEntered = true;
+		repaint();
 	}
 
 	@Override
 	public void mouseExited(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
+		mouseEntered = false;
+		repaint();
 	}
 
 	@Override
@@ -139,8 +156,8 @@ public class Graph extends JPanel implements MouseListener, MouseMotionListener,
 
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
+		mousePoint = e.getPoint();
+		repaint();
 	}
 
 	@Override

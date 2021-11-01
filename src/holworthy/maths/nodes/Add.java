@@ -3,6 +3,7 @@ package holworthy.maths.nodes;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.ListIterator;
 
 import holworthy.maths.exceptions.MathsInterpreterException;
@@ -454,4 +455,9 @@ public class Add extends BinaryNode {
 
 	// 	Testing.runTests(tests);
 	// }
+
+	@Override
+	public double evaluate(HashMap<Variable, Node> values) {
+		return getLeft().evaluate(values) + getRight().evaluate(values);
+	}
 }

@@ -1,5 +1,13 @@
 package holworthy.maths.nodes.constant;
 
-public class I extends ConstantNode {
+import java.util.HashMap;
 
+import holworthy.maths.nodes.Node;
+import holworthy.maths.nodes.Variable;
+
+public class I extends ConstantNode {
+	@Override
+	public double evaluate(HashMap<Variable, Node> values) {
+		return Double.NaN;
+	}
 }

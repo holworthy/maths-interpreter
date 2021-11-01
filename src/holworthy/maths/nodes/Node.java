@@ -1,5 +1,7 @@
 package holworthy.maths.nodes;
 
+import java.util.HashMap;
+
 import holworthy.maths.exceptions.MathsInterpreterException;
 
 public abstract class Node {
@@ -31,4 +33,6 @@ public abstract class Node {
 	}
 
 	public abstract Node differentiate(Variable wrt) throws MathsInterpreterException;
+
+	public abstract double evaluate(HashMap<Variable, Node> values);
 }
