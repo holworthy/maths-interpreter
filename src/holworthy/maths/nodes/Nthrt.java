@@ -1,15 +1,30 @@
 package holworthy.maths.nodes;
 
 import java.math.BigInteger;
+import java.util.HashMap;
 
-import holworthy.maths.DivideByZeroException;
+import holworthy.maths.exceptions.MathsInterpreterException;
 
 public class Nthrt extends FunctionNode {
-	private int exponent;
+	private Node degree;
 
-	public Nthrt(Node node, int exponent) {
+	public Nthrt(Node node, Node degree) {
 		super(node);
-		this.exponent = exponent;
+		this.degree = degree;
+	}
+
+	public Node getDegree() {
+		return degree;
+	}
+
+	@Override
+	public String toString() {
+		return "nthrt(" + getNode() + ", " + degree + ")";
+	}
+
+	@Override
+	public Node copy() {
+		return new Nthrt(getNode().copy(), degree);
 	}
 
 	@Override
@@ -17,47 +32,64 @@ public class Nthrt extends FunctionNode {
 		return getNode().isConstant();
 	}
 
-	@Override
-	public String toString() {
-		return exponent+"rt(" + getNode() + ")";
-	}
-
-	@Override
-	public Node expand() throws DivideByZeroException{
-		Node node = getNode().expand();
-		
-		if(node instanceof Negative)
-			throw new Error("negative in nth root idk what maths is");
-
-		if(node instanceof Number) {
-			// int n = ((Number) node).getValue();
-			// int s = (int) Math.floor(Math.pow(n, 1f/exponent));
-			// if(Math.pow(s, exponent) == n)
-			// 	return new Number(s);
-			BigInteger n = ((Number) node).getValue();
-			if(n.pow(iroot(n, BigInteger.valueOf(exponent))).compareTo(n) == 0)
-				return new Number(iroot(n, BigInteger.valueOf(exponent)));
-				
-			// TODO: fix this to work with larger numbers even tho TB of data
-		}
-
-		return new Nthrt(node, exponent);
-	}
-
-	public int iroot(BigInteger k, BigInteger n){
+	public BigInteger iroot(BigInteger k, BigInteger n){
 		BigInteger k1 = k.subtract(BigInteger.ONE);
 		BigInteger s = n.add(BigInteger.ONE);
 		BigInteger u = n;
 		while(u.compareTo(s) < 0){
 			s = u;
-			u = ((u.multiply(k1)).add(n)).divide((u.multiply(k1))).divide(k);
+			u = (u.multiply(k1).add(n.divide(u.pow(k1.intValue())))).divide(k);
 		}
-		return s.intValue();
+		return s;
 	}
 
 	@Override
-	public Node differentiate(Variable wrt) {
-		// TODO: implement
-		return null;
+	public Node expand() throws MathsInterpreterException {
+		Node node = getNode().expand();
+		Node degree = getDegree().expand();
+
+		if(degree.matches(new Number(0)))
+			throw new MathsInterpreterException("Cannot have a 0th root");
+
+		if(node instanceof Negative && !(((UnaryNode) node).getNode().matches(new Number(1)))){
+			return new Multiply(new Nthrt(((UnaryNode) node).getNode(), degree), new Nthrt(new Negative(new Number(1)), degree)).expand();
+		}
+		
+		// nth root where n is 1 does nothing
+		if(degree.matches(new Number(1)))
+			return node;
+
+		if(node instanceof Number && degree instanceof Number && ((Number) degree).getValue().compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) < 0) {
+			BigInteger exponent = ((Number) degree).getValue();
+			BigInteger n = ((Number) node).getValue();
+			if(iroot(exponent, n).pow(exponent.intValue()).compareTo(n) == 0)
+				return new Number(iroot(exponent, n));
+		}
+
+		return new Nthrt(node, degree);
 	}
+	
+	@Override
+	public Node collapse() throws MathsInterpreterException {
+		Node node = getNode().collapse();
+		if(degree.matches(new Number(2)))
+			return new Sqrt(node);
+		return new Nthrt(node, degree);
+	}
+
+	@Override
+	public Node differentiate(Variable wrt) throws MathsInterpreterException {
+		if(getNode().isConstant())
+			return new Number(0);
+		return new Divide(new Multiply(new Power(getNode(), new Subtract(new Divide(new Number(1), degree), new Number(1))), getNode().differentiate(wrt)), degree).simplify();
+	}
+
+	@Override
+	public double evaluate(HashMap<Variable, Node> values) {
+		return Math.pow(getNode().evaluate(values), 1.0 / degree.evaluate(values));
+	}
+
+	// public static void main(String[] args) throws MathsInterpreterException {
+	// 	// System.out.println(new Nthrt(new Number(5), new Number(2)).simplify());
+	// }
 }

@@ -2,7 +2,7 @@ package holworthy.maths.nodes.trig;
 
 import holworthy.maths.nodes.FunctionNode;
 import holworthy.maths.nodes.Node;
-import holworthy.maths.nodes.Variable;
+import holworthy.maths.nodes.UnaryNode;
 
 public abstract class TrigNode extends FunctionNode {
 	public TrigNode(Node node) {
@@ -10,12 +10,12 @@ public abstract class TrigNode extends FunctionNode {
 	}
 
 	@Override
-	public Node differentiate(Variable wrt) {
-		return null;
+	public boolean matches(Node node) {
+		return super.matches(node) || (node.getClass().equals(getClass()) && getNode().matches(((UnaryNode) node).getNode()));
 	}
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName().toLowerCase() + "(" + getNode() + ")";
+		return getName() + "(" + getNode() + ")";
 	}
 }

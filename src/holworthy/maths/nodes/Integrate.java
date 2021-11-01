@@ -1,5 +1,9 @@
 package holworthy.maths.nodes;
 
+import java.util.HashMap;
+
+import holworthy.maths.exceptions.MathsInterpreterException;
+
 public class Integrate extends FunctionNode {
 	// TODO: add stuff to this
 	public Integrate(Node node) {
@@ -12,8 +16,19 @@ public class Integrate extends FunctionNode {
 	}
 
 	@Override
-	public Node differentiate(Variable wrt) {
+	public Node copy() {
+		return new Integrate(getNode().copy());
+	}
+
+	@Override
+	public Node differentiate(Variable wrt) throws MathsInterpreterException {
 		// TODO: implement
 		return null;
+	}
+
+	@Override
+	public double evaluate(HashMap<Variable, Node> values) {
+		// What?
+		return Double.NaN;
 	}
 }

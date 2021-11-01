@@ -1,5 +1,13 @@
 package holworthy.maths.nodes.constant;
 
+import java.util.HashMap;
+
+import holworthy.maths.nodes.Node;
+import holworthy.maths.nodes.Variable;
+
 public class E extends ConstantNode {
-	// TODO: e^(pi*i) = -1
+	@Override
+	public double evaluate(HashMap<Variable, Node> values) {
+		return Math.E;
+	}
 }

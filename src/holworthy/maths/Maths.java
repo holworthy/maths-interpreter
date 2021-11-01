@@ -7,14 +7,15 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 import holworthy.maths.nodes.Add;
-import holworthy.maths.nodes.BinaryNode;
 import holworthy.maths.nodes.Divide;
 import holworthy.maths.nodes.Equation;
+import holworthy.maths.nodes.Factorial;
 import holworthy.maths.nodes.Ln;
 import holworthy.maths.nodes.Log;
 import holworthy.maths.nodes.Multiply;
 import holworthy.maths.nodes.Negative;
 import holworthy.maths.nodes.Node;
+import holworthy.maths.nodes.Nthrt;
 import holworthy.maths.nodes.Number;
 import holworthy.maths.nodes.Power;
 import holworthy.maths.nodes.Sqrt;
@@ -54,7 +55,8 @@ import holworthy.maths.nodes.trig.Tanh;
 <expression> ::= <add-or-subtract>
 <add-or-subtract> ::= <add-or-subtract> "+" <multiply-or-divide> | <add-or-subtract> "-" <multiply-or-divide> | <multiply-or-divide>
 <multiply-or-divide> ::= <multiply-or-divide> "*" <negative> | <multiply-or-divide> "/" <negative> | <negative>
-<negative> ::= "-" <negative> | <value>
+<negative> ::= "-" <negative> | <power>
+<power> ::= <value> "^" <negative> | <value>
 <value> ::= <number> | <brackets> | <variable> | <function>
 <brackets> ::= "(" <expression> ")"
 
@@ -72,7 +74,7 @@ import holworthy.maths.nodes.trig.Tanh;
 
 public abstract class Maths {
 	private static ArrayList<String> CONSTANTS = new ArrayList<>(Arrays.asList(new String[]{"e", "i", "pi"}));
-	private static ArrayList<String> FUNCTIONS = new ArrayList<>(Arrays.asList(new String[]{"nthrt", "sqrt", "log", "ln", "acos", "acosh", "acot", "acoth", "acsc", "acsch", "asec", "asech", "asin", "asinh", "atan", "atanh", "cos", "cosh", "cot", "coth", "csc", "csch", "sec", "sech", "sin", "sinh", "tan", "tanh", "differentiate", "integrate"}));
+	private static ArrayList<String> FUNCTIONS = new ArrayList<>(Arrays.asList(new String[]{"nthrt", "sqrt", "log", "ln", "factorial", "acos", "acosh", "acot", "acoth", "acsc", "acsch", "asec", "asech", "asin", "asinh", "atan", "atanh", "cos", "cosh", "cot", "coth", "csc", "csch", "sec", "sech", "sin", "sinh", "tan", "tanh", "differentiate", "integrate"}));
 
 	private static Node parseValue(Parser parser) throws Exception {
 		if(parser.hasMore() && parser.getChar() == '(') {
@@ -122,6 +124,9 @@ public abstract class Maths {
 							return new Sqrt(params.get(0));
 						case "ln":
 							return new Ln(params.get(0));
+						// TODO: also add 5! as corect syntax
+						case "factorial":
+							return new Factorial(params.get(0));
 						case "acos":
 							return new Acos(params.get(0));
 						case "acosh":
@@ -174,9 +179,7 @@ public abstract class Maths {
 				} else if(params.size() == 2) {
 					switch(name) {
 						case "nthrt":
-							// return new Nthrt(params.get(0), params.get(1));
-							// TODO
-							return null;
+							return new Nthrt(params.get(0), params.get(1));
 						case "log":
 							return new Log(params.get(0), params.get(1));
 						case "differentiate":
@@ -235,7 +238,7 @@ public abstract class Maths {
 		Node left = parseValue(parser);
 		if(parser.hasMore() && parser.getChar() == '^') {
 			parser.incrementCursor();
-			Node right = parsePower(parser);
+			Node right = parseNegative(parser);
 			return new Power(left, right);
 		}
 		return left;
@@ -311,89 +314,12 @@ public abstract class Maths {
 		Scanner scanner = new Scanner(System.in);
 
 		Node input = parseInput(scanner.nextLine());
-		Node expanded = input.normalise().expand();
+		System.out.println(input);
+		Node expanded = input.expand();
 		System.out.println(expanded);
-		Node collapsed = expanded.normalise().collapse();
-		System.out.println(collapsed);
-		Node simplified = input.simplify();
+		Node simplified = expanded.collapse();
 		System.out.println(simplified);
-
-		if(simplified instanceof Equation) {
-			Equation before = (Equation) simplified;
-			if(before.isQuadratic()) {
-				Equation after = new Equation(
-					new Variable("x"),
-					new Divide(
-						new Add(
-							new Negative(
-								((BinaryNode) ((BinaryNode) ((BinaryNode) before.getLeft()).getLeft()).getRight()).getLeft()
-							),
-							new Sqrt(
-								new Subtract(
-									new Power(
-										((BinaryNode) ((BinaryNode) ((BinaryNode) before.getLeft()).getLeft()).getRight()).getLeft(),
-										new Number(2)
-									),
-									new Multiply(
-										new Multiply(
-											new Number(4),
-											((BinaryNode) ((BinaryNode) ((BinaryNode) before.getLeft()).getLeft()).getLeft()).getLeft()
-										),
-										((BinaryNode) before.getLeft()).getRight()
-									)
-								)
-							)
-						),
-						new Multiply(
-							new Number(2),
-							((BinaryNode) ((BinaryNode) ((BinaryNode) before.getLeft()).getLeft()).getLeft()).getLeft()
-						)
-					)
-				);
-
-				System.out.println(after);
-				System.out.println(after.simplify());
-
-				after = new Equation(
-					new Variable("x"),
-					new Divide(
-						new Subtract(
-							new Negative(
-								((BinaryNode) ((BinaryNode) ((BinaryNode) before.getLeft()).getLeft()).getRight()).getLeft()
-							),
-							new Sqrt(
-								new Subtract(
-									new Power(
-										((BinaryNode) ((BinaryNode) ((BinaryNode) before.getLeft()).getLeft()).getRight()).getLeft(),
-										new Number(2)
-									),
-									new Multiply(
-										new Multiply(
-											new Number(4),
-											((BinaryNode) ((BinaryNode) ((BinaryNode) before.getLeft()).getLeft()).getLeft()).getLeft()
-										),
-										((BinaryNode) before.getLeft()).getRight()
-									)
-								)
-							)
-						),
-						new Multiply(
-							new Number(2),
-							((BinaryNode) ((BinaryNode) ((BinaryNode) before.getLeft()).getLeft()).getLeft()).getLeft()
-						)
-					)
-				);
-
-				System.out.println(after);
-				System.out.println(after.simplify());
-			}
-		}
 
 		scanner.close();
 	}
 }
-
-
-// expr = expr + mul
-// mul = mul * num
-// num = digit

@@ -1,9 +1,12 @@
 package holworthy.maths.nodes;
 
 import java.math.BigInteger;
+import java.util.HashMap;
+
+import holworthy.maths.exceptions.MathsInterpreterException;
 
 public class Number extends Node {
-	private BigInteger value;
+	private final BigInteger value;
 
 	public Number(BigInteger value) {
 		this.value = value;
@@ -25,10 +28,13 @@ public class Number extends Node {
 	}
 
 	@Override
+	public Node copy() {
+		return this;
+	}
+
+	@Override
 	public boolean matches(Node node) {
-		if(node instanceof Matching.Constant)
-			return isConstant();
-		return node instanceof Number && ((Number) node).getValue().equals(getValue());
+		return (node instanceof Number && ((Number) node).getValue().equals(getValue())) || super.matches(node);
 	}
 
 	@Override
@@ -37,8 +43,17 @@ public class Number extends Node {
 	}
 
 	@Override
-	public Node differentiate(Variable wrt) {
-		// TODO: implement
-		return null;
+	public boolean contains(Variable variable) {
+		return false;
+	}
+
+	@Override
+	public Node differentiate(Variable wrt) throws MathsInterpreterException {
+		return new Number(0);
+	}
+
+	@Override
+	public double evaluate(HashMap<Variable, Node> values) {
+		return getValue().doubleValue();
 	}
 }

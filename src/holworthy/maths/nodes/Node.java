@@ -1,28 +1,38 @@
 package holworthy.maths.nodes;
 
-import holworthy.maths.DivideByZeroException;
+import java.util.HashMap;
+
+import holworthy.maths.exceptions.MathsInterpreterException;
 
 public abstract class Node {
-	public Node normalise() {
-		return this;
-	}
-
-	public Node expand() throws DivideByZeroException {
-		return this;
-	}
-
-	public Node collapse() throws DivideByZeroException{
-		return this;
-	}
-
-	public final Node simplify() throws DivideByZeroException {
-		return normalise().expand().normalise().collapse().normalise();
-	}
+	public abstract Node copy();
 
 	public boolean matches(Node node) {
-		return node == this;
+		return node == this || node instanceof Matching.Anything || (node instanceof Matching.Constant && isConstant());
 	}
 
 	public abstract boolean isConstant();
-	public abstract Node differentiate(Variable wrt);
+
+	public abstract boolean contains(Variable variable);
+
+	// adds common terms
+	// expands brackets
+	// moves negatives towards the leaves
+	public Node expand() throws MathsInterpreterException {
+		return this;
+	}
+
+	// takes out common factors
+	// moves negatives towards the root
+	public Node collapse() throws MathsInterpreterException {
+		return this;
+	}
+
+	public final Node simplify() throws MathsInterpreterException {
+		return expand().collapse();
+	}
+
+	public abstract Node differentiate(Variable wrt) throws MathsInterpreterException;
+
+	public abstract double evaluate(HashMap<Variable, Node> values);
 }

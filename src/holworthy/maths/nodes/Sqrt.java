@@ -1,11 +1,11 @@
 package holworthy.maths.nodes;
 
-import holworthy.maths.DivideByZeroException;
+import holworthy.maths.exceptions.MathsInterpreterException;
 import holworthy.maths.nodes.constant.I;
 
 public class Sqrt extends Nthrt {
 	public Sqrt(Node node) {
-		super(node, 2);
+		super(node, new Number(2));
 	}
 
 	@Override
@@ -19,22 +19,19 @@ public class Sqrt extends Nthrt {
 	}
 
 	@Override
-	public Node expand() throws DivideByZeroException{
-		Node node = getNode().expand();
+	public Node copy() {
+		return new Sqrt(getNode().copy());
+	}
 
+	@Override
+	public Node expand() throws MathsInterpreterException {
+		Node node = getNode().expand();
+		if(node.matches(new Number(0)))
+			return new Number(0);
+		if(node.matches(new Number(1)))
+			return new Number(1);
 		if(node instanceof Negative)
 			return new Multiply(new I(), new Sqrt(((Negative) node).getNode())).expand();
-
-		super.expand();
-		// TODO: check this is ok
-
-		// if(node instanceof Number) {
-		// 	int n = ((Number) node).getValue();
-		// 	int s = (int) Math.floor(Math.sqrt(n));
-		// 	if(Math.pow(s, 2) == n)
-		// 		return new Number(s);
-		// }
-
-		return new Sqrt(node);
+		return super.expand();
 	}
 }

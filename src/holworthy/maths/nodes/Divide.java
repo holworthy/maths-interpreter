@@ -3,9 +3,11 @@ package holworthy.maths.nodes;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.ListIterator;
 
-import holworthy.maths.DivideByZeroException;
+import holworthy.maths.exceptions.DivideByZeroException;
+import holworthy.maths.exceptions.MathsInterpreterException;
 
 public class Divide extends BinaryNode {
 	public Divide(Node left, Node right) {
@@ -16,9 +18,12 @@ public class Divide extends BinaryNode {
 	public boolean matches(Node node) {
 		if(node instanceof Divide)
 			return super.matches(node);
-		if(node instanceof Matching.Constant)
-			return this.isConstant();
 		return super.matches(node);
+	}
+
+	@Override
+	public Node copy() {
+		return new Divide(getLeft().copy(), getRight().copy());
 	}
 
 	private BigInteger gcd(BigInteger a, BigInteger b) {
@@ -26,12 +31,18 @@ public class Divide extends BinaryNode {
 	}
 
 	@Override
-	public Node expand() throws DivideByZeroException{
+	public Node expand() throws MathsInterpreterException{
 		Node left = getLeft().expand();
 		Node right = getRight().expand();
 
-		if (right instanceof Number && ((Number) right).getValue().compareTo(BigInteger.ZERO) == 0)
+		// undefined behaviour
+		if(right instanceof Number && ((Number) right).getValue().compareTo(BigInteger.ZERO) == 0)
 			throw new DivideByZeroException("You Can't divide by zero");
+
+		if(right.matches(new Number(1)))
+			return left;
+		if(left.matches(new Number(0)))
+			return new Number(0);
 		if(left.matches(right))
 			return new Number(1);
 		if(left instanceof Negative && right instanceof Negative)
@@ -51,7 +62,13 @@ public class Divide extends BinaryNode {
 			return new Divide(new Number(a.divide(divisor)), new Number(b.divide(divisor)));
 		}
 
+		if(left instanceof Divide)
+			return new Divide(((BinaryNode) left).getLeft(), new Multiply(((BinaryNode) left).getRight(), right)).expand();
+
 		if(left.isConstant() && right.isConstant())
+			return new Divide(left, right);
+
+		if(left instanceof Add || right instanceof Add)
 			return new Divide(left, right);
 
 		return new Multiply(left, new Power(right, new Negative(new Number(1)))).expand();
@@ -83,10 +100,34 @@ public class Divide extends BinaryNode {
 	}
 
 	@Override
-	public Node collapse() throws DivideByZeroException{
+	public Node collapse() throws MathsInterpreterException {
 		Node left = getLeft().collapse();
 		Node right = getRight().collapse();
 
+		// simplify fraction
+		if(left instanceof Number && right instanceof Number) {
+			BigInteger a = ((Number) left).getValue();
+			BigInteger b = ((Number) right).getValue();
+			BigInteger divisor = gcd(a, b);
+			if(a.mod(b).compareTo(BigInteger.ZERO) == 0)
+				return new Number(a.divide(b));
+
+			return new Divide(new Number(a.divide(divisor)), new Number(b.divide(divisor)));
+		}
+
+		// x/y / z/w = x/y * w/z.collapse()
+		if (left instanceof Divide && right instanceof Divide){
+			return new Multiply(left, new Divide(((BinaryNode) right).getRight(), ((BinaryNode) right).getLeft())).collapse();
+		}
+
+		// x/y / z = (x*z)/y
+		if (left instanceof Divide && !(right instanceof Divide))
+			return new Divide(new Multiply(((BinaryNode) left).getLeft(), right).expand(), ((BinaryNode) left).getRight()).collapse();
+		// x / y/z = (x*z)/y
+		if (!(left instanceof Divide) && right instanceof Divide)
+			return new Divide(new Multiply(left, ((BinaryNode) right).getRight()).expand(), ((BinaryNode) right).getLeft()).collapse();
+
+		// remove common factors
 		if (left instanceof Multiply && right instanceof Multiply){
 			ArrayList<Node> leftList = flatten((Multiply) left);
 			ArrayList<Node> rightList = flatten((Multiply) right);
@@ -115,7 +156,7 @@ public class Divide extends BinaryNode {
 			return new Divide(unFlatten(leftList), unFlatten(rightList));
 		}
 
-		return new Divide(getLeft().collapse(), getRight().collapse());
+		return new Divide(left, right);
 	}
 
 	@Override
@@ -124,8 +165,14 @@ public class Divide extends BinaryNode {
 	}
 
 	@Override
-	public Node differentiate(Variable wrt) {
-		// TODO: implement
-		return null;
+	public Node differentiate(Variable wrt) throws MathsInterpreterException {
+		if(getRight().matches(new Number(0)))
+			throw new DivideByZeroException("Cannot differentiate a function which divides by 0");
+		return new Divide(new Subtract(new Multiply(getLeft().differentiate(wrt), getRight()), new Multiply(getLeft(), getRight().differentiate(wrt))), new Power(getRight(), new Number(2))).simplify();
+	}
+
+	@Override
+	public double evaluate(HashMap<Variable, Node> values) {
+		return getLeft().evaluate(values) / getRight().evaluate(values);
 	}
 }

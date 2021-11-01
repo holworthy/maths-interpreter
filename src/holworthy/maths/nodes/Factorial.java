@@ -1,6 +1,10 @@
 package holworthy.maths.nodes;
 
-import holworthy.maths.DivideByZeroException;
+import java.math.BigInteger;
+import java.util.HashMap;
+
+import holworthy.maths.exceptions.MathsInterpreterException;
+import holworthy.maths.exceptions.NotDifferentiableException;
 
 public class Factorial extends UnaryNode {
 	public Factorial(Node node) {
@@ -8,23 +12,41 @@ public class Factorial extends UnaryNode {
 	}
 
 	@Override
-	public Node expand() throws DivideByZeroException {
+	public Node copy() {
+		return new Factorial(getNode().copy());
+	}
+
+	@Override
+	public Node expand() throws MathsInterpreterException {
 		Node node = getNode().expand();
 		if(node.matches(new Number(0)) || node.matches(new Number(1)))
 			return new Number(1);
-		if(node instanceof Number)
-			return new Multiply(node, new Factorial(new Subtract(node, new Number(1)))).expand();
+		if(node instanceof Number) {
+			BigInteger sum = BigInteger.ONE;
+			for(BigInteger i = BigInteger.TWO; i.compareTo(((Number) node).getValue()) <= 0; i = i.add(BigInteger.ONE))
+				sum = sum.multiply(i);
+			return new Number(sum);
+		}
 		return new Factorial(node);
 	}
 
 	@Override
-	public Node differentiate(Variable wrt) {
-		// TODO: implement
-		return null;
+	public Node differentiate(Variable wrt) throws MathsInterpreterException {
+		Node node = simplify();
+		if(node instanceof Factorial)
+			throw new NotDifferentiableException("Cannot differentiate a non-constant factorial");
+		
+		return node.differentiate(wrt);
 	}
 
 	@Override
 	public String toString() {
 		return "(" + getNode() + ")!";
+	}
+
+	@Override
+	public double evaluate(HashMap<Variable, Node> values) {
+		// TODO: figure this out
+		return Double.NaN;
 	}
 }

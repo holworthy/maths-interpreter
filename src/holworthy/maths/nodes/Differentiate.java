@@ -1,5 +1,9 @@
 package holworthy.maths.nodes;
 
+import java.util.HashMap;
+
+import holworthy.maths.exceptions.MathsInterpreterException;
+
 public class Differentiate extends FunctionNode {
 	private Variable wrt;
 
@@ -8,13 +12,33 @@ public class Differentiate extends FunctionNode {
 		this.wrt = wrt;
 	}
 
-	@Override
-	public boolean isConstant() {
-		return getNode().differentiate(wrt).isConstant();
+	public Variable getWrt() {
+		return wrt;
 	}
 
 	@Override
-	public Node differentiate(Variable wrt) {
+	public boolean isConstant() {
+		try {
+			return getNode().differentiate(wrt).isConstant();
+		} catch(MathsInterpreterException e) {
+			return false;
+		}
+	}
+
+	@Override
+	public Node copy() {
+		return new Differentiate(getNode().copy(), (Variable) getWrt().copy());
+	}
+
+	@Override
+	public Node differentiate(Variable wrt) throws MathsInterpreterException {
+		// TODO: implement
 		return null;
+	}
+
+	@Override
+	public double evaluate(HashMap<Variable, Node> values) {
+		// TODO: what?
+		return 0;
 	}
 }

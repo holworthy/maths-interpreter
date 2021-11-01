@@ -1,6 +1,8 @@
 package holworthy.maths.nodes;
 
-import holworthy.maths.DivideByZeroException;
+import java.util.HashMap;
+
+import holworthy.maths.exceptions.MathsInterpreterException;
 import holworthy.maths.nodes.constant.ConstantNode;
 import holworthy.maths.nodes.constant.I;
 
@@ -11,46 +13,20 @@ public class Multiply extends BinaryNode {
 
 	@Override
 	public String toString() {
-		return (getLeft() instanceof Add ? "(" + getLeft() + ")" : getLeft()) + "*" + (getRight() instanceof Add ? "(" + getRight() + ")" : getRight());
+		return ((getLeft() instanceof Add || getLeft() instanceof Subtract) ? "(" + getLeft() + ")" : getLeft()) + "*" + ((getRight() instanceof Add || getRight() instanceof Subtract) ? "(" + getRight() + ")" : getRight());
 	}
 
 	@Override
-	public Node normalise() {
-		Node left = getLeft().normalise();
-		Node right = getRight().normalise();
-
-		// constant folding
-		if(left instanceof Number && right instanceof Number)
-			return new Number(((Number) left).getValue().multiply(((Number) right).getValue()));
-		if(left.matches(new Number(0)))
-			return new Number(0);
-		if(left.matches(new Number(1)))
-			return right;
-
-		// move constants to left
-		if(right.matches(new Matching.Constant()) && !left.matches(new Matching.Constant()))
-			return new Multiply(right, left).normalise();
-		
-		// Make tree left leaning
-		if(right instanceof Multiply)
-			return new Multiply(new Multiply(left, ((Multiply) right).getLeft().normalise()).normalise(), ((Multiply) right).getRight());
-
-		// x*x = x^2
-		if(left instanceof Variable && left.matches(right))
-			return new Power(left, new Number(2)).normalise();
-		// x*x^n = x^(n+1)
-		if(left instanceof Variable && right instanceof Power && ((Power) right).getLeft().matches(left))
-			return new Power(left, new Add(new Number(1), ((Power) right).getRight())).normalise();
-
-		return new Multiply(left, right);
+	public Node copy() {
+		return new Multiply(getLeft().copy(), getRight().copy());
 	}
 
 	@Override
-	public Node expand() throws DivideByZeroException{
+	public Node expand() throws MathsInterpreterException{
 		Node left = getLeft().expand();
 		Node right = getRight().expand();
 
-		// Make tree left leaning
+		// make tree left leaning
 		if(right instanceof Multiply)
 			return new Multiply(new Multiply(left, ((Multiply) right).getLeft()), ((Multiply) right).getRight()).expand();
 
@@ -65,13 +41,18 @@ public class Multiply extends BinaryNode {
 			return right;
 		if(right.matches(new Number(1)))
 			return left;
-		// negative constant handling
-		if(left instanceof Negative && !(right instanceof Negative))
-			return new Negative(new Multiply(((UnaryNode) left).getNode(), right)).expand();
-		if(!(left instanceof Negative) && right instanceof Negative)
-			return new Negative(new Multiply(left, ((UnaryNode) right).getNode())).expand();
+		if(left.matches(new Negative(new Number(1))))
+			return new Negative(right).expand();
+		if(right.matches(new Negative(new Number(1))))
+			return new Negative(left).expand();
+
+		// negative handling
 		if(left instanceof Negative && right instanceof Negative)
 			return new Multiply(((UnaryNode) left).getNode(), ((UnaryNode) right).getNode());
+		if(left instanceof Negative && ((UnaryNode) left).getNode() instanceof Number && right instanceof Number)
+			return new Negative(new Multiply(((UnaryNode) left).getNode(), right)).expand();
+		if(right instanceof Negative)
+			return new Multiply(new Negative(left), ((UnaryNode) right).getNode()).expand();
 
 		// x*x = x^2
 		if(left instanceof Variable && left.matches(right))
@@ -82,6 +63,8 @@ public class Multiply extends BinaryNode {
 		// x*x^n = x^(n+1)
 		if(left instanceof Variable && right instanceof Power && ((Power) right).getLeft().matches(left))
 			return new Power(left, new Add(new Number(1), ((Power) right).getRight())).expand();
+		if(left instanceof Multiply && right instanceof Variable && ((BinaryNode) left).getRight() instanceof Power && ((BinaryNode) ((BinaryNode) left).getRight()).getLeft().matches(right))
+			return new Multiply(((BinaryNode) left).getLeft(), new Power(right, new Add(new Number(1), ((BinaryNode) ((BinaryNode) left).getRight()).getRight()))).expand();
 		// a*x*x^n = a*x^(n+1)
 		if(left instanceof Multiply && ((Multiply) left).getRight() instanceof Variable && right instanceof Power && ((Power) right).getLeft().matches(((Multiply) left).getRight()))
 			return new Multiply(((Multiply) left).getLeft(), new Power(((Multiply) left).getRight(), new Add(new Number(1), ((Power) right).getRight()))).expand();
@@ -92,21 +75,21 @@ public class Multiply extends BinaryNode {
 		if(left instanceof Multiply && ((Multiply) left).getRight() instanceof Power && right instanceof Power && ((Power) ((Multiply) left).getRight()).getLeft().matches(((Power) right).getLeft()))
 			return new Multiply(((Multiply) left).getLeft(), new Power(((Power) ((Multiply) left).getRight()).getLeft(), new Add(((Power) ((Multiply) left).getRight()).getRight(), ((Power) right).getRight()))).expand();
 
-		// Expanding brackets
+		// expanding brackets
 		if(right instanceof Add)
 			return new Add(new Multiply(left, ((Add) right).getLeft()), new Multiply(left, ((Add) right).getRight())).expand();
-		// Putting brackets on the right (which then calls the rule above)
+		// putting brackets on the right (which then calls the rule above)
 		if(left instanceof Add)
 			return new Multiply(right, left).expand();
 
 		// sort terms
-		if(needSwitching(left, right))
+		if(shouldSwap(left, right))
 			return new Multiply(right, left);
 		else if(left instanceof Power && right instanceof Variable)
 			return new Multiply(right, left).expand();
 		// swap with lower multiply nodes
 		if(left instanceof Multiply){
-			if(needSwitching(((BinaryNode) left).getRight(), right))
+			if(shouldSwap(((BinaryNode) left).getRight(), right))
 				return new Multiply(new Multiply(((BinaryNode) left).getLeft(), right), ((BinaryNode) left).getRight()).expand();
 			// else if(((BinaryNode) left).getRight() instanceof Power && right instanceof Variable)
 			// 	return new Multiply(new Multiply(((BinaryNode) left).getLeft(), right), ((BinaryNode) left).getRight()).expand();
@@ -121,14 +104,17 @@ public class Multiply extends BinaryNode {
 		return new Multiply(left, right);
 	}
 
-	public boolean needSwitching(Node left, Node right){
+	public boolean shouldSwap(Node left, Node right) {
+		// swap numbers and other constants
+		if(left instanceof ConstantNode && right.isConstant() && !(right instanceof ConstantNode))
+			return true;
 		// swap variables and numbers
 		if((left instanceof Variable && (right instanceof Number || right instanceof Negative)) || (left instanceof Power && (right instanceof Number || right instanceof Negative)))
 			return true;
 		// swap powers by variables
 		if(left instanceof Variable && right instanceof Power && ((BinaryNode) right).getLeft() instanceof Variable && ((Variable) left).getName().compareTo(((Variable) ((BinaryNode) right).getLeft()).getName()) > 0)
 			return true;
-		if(left instanceof Power && right instanceof Power && ((Variable) ((BinaryNode) left).getLeft()).getName().compareTo(((Variable) ((BinaryNode) right).getLeft()).getName()) > 0)
+		if(left instanceof Power && right instanceof Power && ((BinaryNode) right).getLeft() instanceof Variable && ((BinaryNode) left).getLeft() instanceof Variable && ((Variable) ((BinaryNode) left).getLeft()).getName().compareTo(((Variable) ((BinaryNode) right).getLeft()).getName()) > 0)
 			return true;
 		// swap variables
 		if(left instanceof Variable && right instanceof Variable)
@@ -136,25 +122,70 @@ public class Multiply extends BinaryNode {
 				return true;
 		if(left instanceof ConstantNode && right instanceof ConstantNode)
 			return left.toString().compareTo(right.toString()) > 0;
+		// swap functions and constants
+		if(left instanceof FunctionNode && right.isConstant())
+			return true;
+		// swap functions and variables
+		if(left instanceof FunctionNode && right instanceof Variable)
+			return true;
+		// sort functions alphabetically
+		if(left instanceof FunctionNode && right instanceof FunctionNode)
+			return ((FunctionNode) left).getName().compareTo(((FunctionNode) right).getName()) > 0;
+
 		return false;
 	}
 
 	@Override
-	public Node collapse() throws DivideByZeroException{
+	public Node collapse() throws MathsInterpreterException{
 		Node left = getLeft().collapse();
 		Node right = getRight().collapse();
 
+		if(left instanceof Negative)
+			return new Negative(new Multiply(((UnaryNode) left).getNode(), right)).collapse();
+		if(right instanceof Negative)
+			return new Negative(new Multiply(left, ((UnaryNode) right).getNode())).collapse();
+
+		// x * y/z = (x*y)/z
+		if (right instanceof Divide && !(left instanceof Divide))
+			return new Divide(new Multiply(left, ((BinaryNode) right).getLeft()).expand(), ((BinaryNode) right).getRight()).collapse();
+
+		if (left instanceof Divide && !(right instanceof Divide))
+			return new Divide(new Multiply(((BinaryNode) left).getLeft(), right).expand(), ((BinaryNode) left).getRight()).collapse();
+
+		// x/y * z/w = x*z / y*w
+		if (left instanceof Divide && right instanceof Divide){
+			return new Divide(new Multiply(((BinaryNode) left).getLeft(), ((BinaryNode) right).getLeft()).expand(), new Multiply(((BinaryNode) left).getRight(), ((BinaryNode) right).getRight()).expand()).collapse();
+		}
+
+		// x^-1 * y^-1 = (x*y)^-1
+		if (left instanceof Power && right instanceof Power && ((BinaryNode) left).getRight().matches(((BinaryNode) right).getRight()))
+			return new Power(new Multiply(((BinaryNode) left).getLeft(), ((BinaryNode) right).getLeft()), ((BinaryNode) left).getRight()).collapse();
+
+		// (z * x^-1) * y^-1 = z * (x*y)^-1
+		// TODO: this breaks binomial theorum for some reason i dont yet understand
+		// if (left instanceof Multiply && ((BinaryNode) left).getRight() instanceof Power && right instanceof Power && ((BinaryNode) ((BinaryNode) left).getRight()).getRight().matches(((BinaryNode) right).getRight()))
+		// 	return new Multiply(((BinaryNode) left).getLeft(), new Power(new Multiply(((BinaryNode) ((BinaryNode) left).getRight()).getLeft(), ((BinaryNode) right).getLeft()), ((BinaryNode) right).getRight())).expand().collapse();
+
+		// x * y^-1 = x/y
 		if(right instanceof Power && ((BinaryNode) right).getRight() instanceof Negative){
-			return new Divide(left, new Power(((BinaryNode) right).getLeft(), ((UnaryNode) ((BinaryNode) right).getRight()).getNode()).expand()).collapse();
+			return new Divide(left, new Power(((BinaryNode) right).getLeft(), ((UnaryNode) ((BinaryNode) right).getRight()).getNode())).expand().collapse();
+		}
+
+		// x^-1 * y = y/x
+		if(left instanceof Power && ((BinaryNode) left).getRight() instanceof Negative){
+			return new Divide(right, new Power(((BinaryNode) left).getLeft(), ((UnaryNode) ((BinaryNode) left).getRight()).getNode())).expand().collapse();
 		}
 
 		return new Multiply(left, right);
 	}
 
 	@Override
-	public Node differentiate(Variable wrt) {
-		// TODO: implement
-		return null;
+	public Node differentiate(Variable wrt) throws MathsInterpreterException {
+		return new Add(new Multiply(getLeft().differentiate(wrt), getRight()), new Multiply(getLeft(), getRight().differentiate(wrt))).simplify();
+	}
+
+	@Override
+	public double evaluate(HashMap<Variable, Node> values) {
+		return getLeft().evaluate(values) * getRight().evaluate(values);
 	}
 }
-

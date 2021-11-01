@@ -1,6 +1,8 @@
 package holworthy.maths.nodes.trig;
 
-import holworthy.maths.DivideByZeroException;
+import java.util.HashMap;
+
+import holworthy.maths.exceptions.MathsInterpreterException;
 import holworthy.maths.nodes.BinaryNode;
 import holworthy.maths.nodes.Divide;
 import holworthy.maths.nodes.Multiply;
@@ -8,6 +10,7 @@ import holworthy.maths.nodes.Negative;
 import holworthy.maths.nodes.Node;
 import holworthy.maths.nodes.Number;
 import holworthy.maths.nodes.UnaryNode;
+import holworthy.maths.nodes.Variable;
 import holworthy.maths.nodes.constant.Pi;
 
 public class Sin extends TrigNode {
@@ -16,7 +19,12 @@ public class Sin extends TrigNode {
 	}
 
 	@Override
-	public Node expand() throws DivideByZeroException {
+	public Node copy() {
+		return new Sin(getNode().copy());
+	}
+
+	@Override
+	public Node expand() throws MathsInterpreterException {
 		Node node = getNode().expand();
 
 		if(node.matches(new Number(0)))
@@ -44,5 +52,15 @@ public class Sin extends TrigNode {
 			return ((UnaryNode) node).getNode();
 
 		return new Sin(node);
+	}
+
+	@Override
+	public Node differentiate(Variable wrt) throws MathsInterpreterException {
+		return new Multiply(getNode().differentiate(wrt), new Cos(getNode())).simplify();
+	}
+
+	@Override
+	public double evaluate(HashMap<Variable, Node> values) {
+		return Math.sin(getNode().evaluate(values));
 	}
 }
