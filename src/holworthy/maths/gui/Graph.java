@@ -15,23 +15,22 @@ import java.util.HashMap;
 
 import javax.swing.JPanel;
 
-import holworthy.maths.Maths;
-import holworthy.maths.exceptions.MathsInterpreterException;
-import holworthy.maths.nodes.BinaryNode;
-import holworthy.maths.nodes.Divide;
 import holworthy.maths.nodes.Equation;
-import holworthy.maths.nodes.Negative;
+import holworthy.maths.nodes.InputDouble;
 import holworthy.maths.nodes.Node;
-import holworthy.maths.nodes.Number;
-import holworthy.maths.nodes.UnaryNode;
 import holworthy.maths.nodes.Variable;
 
 public class Graph extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener {
-	private HashMap<Double, Double> values = new HashMap<>();
+	private HashMap<InputDouble, InputDouble> values = new HashMap<>();
 	private Equation equation;
 	private Dimension size = new Dimension(400, 400);
 	private boolean mouseEntered = false;
 	private Point mousePoint;
+
+	private double startX = -10;
+	private double endX = 10;
+	private double startY = -10;
+	private double endY = 10;
 
 	public Graph(Equation equation){
 		this.equation = equation;
@@ -44,55 +43,13 @@ public class Graph extends JPanel implements MouseListener, MouseMotionListener,
 		addMouseWheelListener(this);
 	}
 
-	public HashMap<Double, Double> getValues() {
+	public HashMap<InputDouble, InputDouble> getValues() {
 		return values;
 	}
 
 	@Override
 	public String toString() {
 		return values.toString();
-	}
-
-	// Assumes y = equation
-	public void findValues(int upperBound, int lowerBound) throws Exception{
-		for (int x = lowerBound; x < upperBound + 1; x++){
-			String replaced = ""; //equation.replaceAll("x", "("+Integer.toString(x)+")");
-			Node answer = Maths.parseInput(replaced).simplify();
-			// y = 5
-			if(answer instanceof Number){
-				values.put((double) x,  ((Number) answer).getValue().doubleValue());
-			}
-			// y = -5
-			else if(answer instanceof Negative && ((UnaryNode) answer).getNode() instanceof Number){
-				values.put((double) x,  -((Number) ((UnaryNode) answer).getNode()).getValue().doubleValue());
-			}
-			// y = a/b
-			else if(answer instanceof Divide){
-				// a = 1 b = 2
-				if(((BinaryNode) answer).getLeft() instanceof Number && ((BinaryNode) answer).getRight() instanceof Number){
-					Double value = ((Number) ((BinaryNode) answer).getLeft()).getValue().doubleValue() / ((Number) ((BinaryNode) answer).getRight()).getValue().doubleValue();
-					values.put((double) x, value);
-				}
-				// a = -1 b = 2
-				if(((BinaryNode) answer).getLeft() instanceof Negative && ((UnaryNode) ((BinaryNode) answer).getLeft()).getNode() instanceof Number && ((BinaryNode) answer).getRight() instanceof Number){
-					Double value = -((Number) ((UnaryNode) ((BinaryNode) answer).getLeft()).getNode()).getValue().doubleValue() / ((Number) ((BinaryNode) answer).getRight()).getValue().doubleValue();
-					values.put((double) x, value);
-				}
-				// a = 1 b = -2
-				if(((BinaryNode) answer).getLeft() instanceof Number && ((BinaryNode) answer).getRight() instanceof Negative && ((UnaryNode) ((BinaryNode) answer).getRight()).getNode() instanceof Number){
-					Double value = ((Number) ((BinaryNode) answer).getLeft()).getValue().doubleValue() / -((Number) ((UnaryNode) ((BinaryNode) answer).getRight()).getNode()).getValue().doubleValue();
-					values.put((double) x, value);
-				}
-			}
-			// y = -(a/b)
-			else if(answer instanceof Negative && ((UnaryNode) answer).getNode() instanceof Divide && ((BinaryNode) ((UnaryNode) answer).getNode()).getLeft() instanceof Number && ((BinaryNode) ((UnaryNode) answer).getNode()).getRight() instanceof Number){
-				Double value = -((Number) ((BinaryNode) ((UnaryNode) answer).getNode()).getLeft()).getValue().doubleValue() / ((Number) ((BinaryNode) ((UnaryNode) answer).getNode()).getRight()).getValue().doubleValue();
-				values.put((double) x, value);
-			}
-			else{
-				throw new MathsInterpreterException("Something is very wrong with this equation.");
-			}
-		}
 	}
 
 	@Override
@@ -110,17 +67,22 @@ public class Graph extends JPanel implements MouseListener, MouseMotionListener,
 			g.drawLine(0, y, getWidth(), y);
 		
 		g.setColor(Color.BLUE);
-		double lastX = 0;
+		double lastX = Double.NEGATIVE_INFINITY;
 		double lastY = 0;
 		
 		// TODO: move somewhere else
 		try {
 			HashMap<Variable, Node> values = new HashMap<>();
-			for(double x = 0; x < 100; x += 1) {
-				values.put(new Variable("x"), Maths.parseInput("" + x));
+			for(double x = startX; x <= endX; x += (endX - startX) / getWidth()) {
+				values.put(new Variable("x"), new InputDouble(x));
 				double y = equation.evaluate(values);
 
-				g.drawLine((int) lastX, (int) (getHeight() - lastY), (int) x, (int) (getHeight() - y));
+				g.drawLine(
+					(int) (((lastX - startX) / (endX - startX)) * getWidth()),
+					(int) ((1.0 - (lastY - startY) / (endY - startY)) * getHeight()),
+					(int) (((x - startX) / (endX - startX)) * getWidth()),
+					(int) ((1.0 - (y - startY) / (endY - startY)) * getHeight())
+				);
 				lastX = x;
 				lastY = y;
 			}

@@ -69,10 +69,8 @@ public class Equation extends BinaryNode {
 			Equation equation = (Equation) start.copy();
 			
 			while(!equation.getLeft().matches(variable)) {
-				System.out.println(equation);
 				equation = (Equation) equation.simplify();
-				System.out.println(equation);
-
+				
 				// a*x^2 + b*x + c = d
 				if(equation.getLeft().matches(new Add(new Add(new Multiply(new Matching.Constant(), new Power(new Matching.Anything(), new Number(2))), new Multiply(new Matching.Constant(), new Matching.Anything())), new Matching.Constant())) && equation.getRight().matches(new Matching.Constant()) && ((BinaryNode) ((BinaryNode) ((BinaryNode) ((BinaryNode) equation.getLeft()).getLeft()).getLeft()).getRight()).getLeft().matches(((BinaryNode) ((BinaryNode) ((BinaryNode) equation.getLeft()).getLeft()).getRight()).getRight())) {
 					Node a = ((BinaryNode) ((BinaryNode) ((BinaryNode) equation.getLeft()).getLeft()).getLeft()).getLeft();
