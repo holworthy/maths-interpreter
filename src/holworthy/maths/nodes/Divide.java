@@ -3,6 +3,7 @@ package holworthy.maths.nodes;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.ListIterator;
 
 import holworthy.maths.exceptions.DivideByZeroException;
@@ -168,5 +169,10 @@ public class Divide extends BinaryNode {
 		if(getRight().matches(new Number(0)))
 			throw new DivideByZeroException("Cannot differentiate a function which divides by 0");
 		return new Divide(new Subtract(new Multiply(getLeft().differentiate(wrt), getRight()), new Multiply(getLeft(), getRight().differentiate(wrt))), new Power(getRight(), new Number(2))).simplify();
+	}
+
+	@Override
+	public double evaluate(HashMap<Variable, Node> values) {
+		return getLeft().evaluate(values) / getRight().evaluate(values);
 	}
 }

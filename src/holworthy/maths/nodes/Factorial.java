@@ -1,6 +1,7 @@
 package holworthy.maths.nodes;
 
 import java.math.BigInteger;
+import java.util.HashMap;
 
 import holworthy.maths.exceptions.MathsInterpreterException;
 import holworthy.maths.exceptions.NotDifferentiableException;
@@ -41,5 +42,11 @@ public class Factorial extends UnaryNode {
 	@Override
 	public String toString() {
 		return "(" + getNode() + ")!";
+	}
+
+	@Override
+	public double evaluate(HashMap<Variable, Node> values) {
+		// TODO: figure this out
+		return Double.NaN;
 	}
 }

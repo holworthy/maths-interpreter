@@ -1,5 +1,7 @@
 package holworthy.maths.nodes;
 
+import java.util.HashMap;
+
 import holworthy.maths.exceptions.MathsInterpreterException;
 
 public class Variable extends Node {
@@ -46,5 +48,10 @@ public class Variable extends Node {
 	@Override
 	public Node differentiate(Variable wrt) throws MathsInterpreterException {
 		return matches(wrt) ? new Number(1) : new Number(0);
+	}
+
+	@Override
+	public double evaluate(HashMap<Variable, Node> values) {
+		return values.get(this).evaluate(values);
 	}
 }

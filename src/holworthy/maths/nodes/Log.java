@@ -1,5 +1,7 @@
 package holworthy.maths.nodes;
 
+import java.util.HashMap;
+
 import holworthy.maths.exceptions.MathsInterpreterException;
 import holworthy.maths.nodes.constant.E;
 
@@ -48,5 +50,10 @@ public class Log extends FunctionNode {
 	@Override
 	public Node differentiate(Variable wrt) throws MathsInterpreterException {
 		return new Divide(getNode().differentiate(wrt), new Multiply(new Ln(getBase()), getNode())).simplify();
+	}
+
+	@Override
+	public double evaluate(HashMap<Variable, Node> values) {
+		return Math.log(getNode().evaluate(values)) / Math.log(getBase().evaluate(values));
 	}
 }
