@@ -1,5 +1,7 @@
 package holworthy.maths.nodes;
 
+import java.util.HashMap;
+
 import holworthy.maths.exceptions.MathsInterpreterException;
 
 public abstract class Matching {
@@ -22,6 +24,11 @@ public abstract class Matching {
 		@Override
 		public Node differentiate(Variable wrt) throws MathsInterpreterException {
 			throw new MathsInterpreterException("Matching classes are not meant to be used!");
+		}
+
+		@Override
+		public double evaluate(HashMap<Variable, Node> values) {
+			return Double.NaN;
 		}
 	}
 	

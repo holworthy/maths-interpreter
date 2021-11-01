@@ -1,5 +1,7 @@
 package holworthy.maths.nodes;
 
+import java.util.HashMap;
+
 import holworthy.maths.exceptions.MathsInterpreterException;
 import holworthy.maths.nodes.constant.ConstantNode;
 import holworthy.maths.nodes.constant.I;
@@ -180,5 +182,10 @@ public class Multiply extends BinaryNode {
 	@Override
 	public Node differentiate(Variable wrt) throws MathsInterpreterException {
 		return new Add(new Multiply(getLeft().differentiate(wrt), getRight()), new Multiply(getLeft(), getRight().differentiate(wrt))).simplify();
+	}
+
+	@Override
+	public double evaluate(HashMap<Variable, Node> values) {
+		return getLeft().evaluate(values) * getRight().evaluate(values);
 	}
 }

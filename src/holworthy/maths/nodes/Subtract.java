@@ -1,5 +1,7 @@
 package holworthy.maths.nodes;
 
+import java.util.HashMap;
+
 import holworthy.maths.exceptions.MathsInterpreterException;
 
 public class Subtract extends BinaryNode {
@@ -25,5 +27,10 @@ public class Subtract extends BinaryNode {
 	@Override
 	public Node differentiate(Variable wrt) throws MathsInterpreterException {
 		return new Subtract(getLeft().differentiate(wrt), getRight().differentiate(wrt)).simplify();
+	}
+
+	@Override
+	public double evaluate(HashMap<Variable, Node> values) {
+		return getLeft().evaluate(values) - getRight().evaluate(values);
 	}
 }

@@ -1,6 +1,7 @@
 package holworthy.maths.nodes;
 
 import java.math.BigInteger;
+import java.util.HashMap;
 
 import holworthy.maths.exceptions.MathsInterpreterException;
 
@@ -79,6 +80,11 @@ public class Nthrt extends FunctionNode {
 	@Override
 	public Node differentiate(Variable wrt) throws MathsInterpreterException {
 		return new Divide(new Multiply(new Power(getNode(), new Subtract(new Divide(new Number(1), degree), new Number(1))), getNode().differentiate(wrt)), degree).simplify();
+	}
+
+	@Override
+	public double evaluate(HashMap<Variable, Node> values) {
+		return Math.pow(getNode().evaluate(values), 1.0 / degree.evaluate(values));
 	}
 
 	// public static void main(String[] args) throws MathsInterpreterException {

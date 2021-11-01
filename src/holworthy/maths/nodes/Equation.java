@@ -1,6 +1,7 @@
 package holworthy.maths.nodes;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import holworthy.maths.exceptions.MathsInterpreterException;
 import holworthy.maths.nodes.trig.Acos;
@@ -149,5 +150,10 @@ public class Equation extends BinaryNode {
 	@Override
 	public Node differentiate(Variable wrt) throws MathsInterpreterException {
 		throw new MathsInterpreterException("Can't differentiate a equation");
+	}
+
+	@Override
+	public double evaluate(HashMap<Variable, Node> values) {
+		return getRight().evaluate(values);
 	}
 }

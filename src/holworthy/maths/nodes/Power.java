@@ -1,6 +1,7 @@
 package holworthy.maths.nodes;
 
 import java.math.BigInteger;
+import java.util.HashMap;
 
 import holworthy.maths.exceptions.DivideByZeroException;
 import holworthy.maths.exceptions.MathsInterpreterException;
@@ -120,5 +121,10 @@ public class Power extends BinaryNode {
 	@Override
 	public Node differentiate(Variable wrt) throws MathsInterpreterException {
 		return new Multiply(this, new Add(new Multiply(getLeft().differentiate(wrt), new Divide(getRight(), getLeft())), new Multiply(getRight().differentiate(wrt), new Ln(getLeft())))).simplify();
+	}
+
+	@Override
+	public double evaluate(HashMap<Variable, Node> values) {
+		return Math.pow(getLeft().evaluate(values), getRight().evaluate(values));
 	}
 }
