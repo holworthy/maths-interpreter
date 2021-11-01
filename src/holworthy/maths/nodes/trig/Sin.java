@@ -1,5 +1,7 @@
 package holworthy.maths.nodes.trig;
 
+import java.util.HashMap;
+
 import holworthy.maths.exceptions.MathsInterpreterException;
 import holworthy.maths.nodes.BinaryNode;
 import holworthy.maths.nodes.Divide;
@@ -55,5 +57,10 @@ public class Sin extends TrigNode {
 	@Override
 	public Node differentiate(Variable wrt) throws MathsInterpreterException {
 		return new Multiply(getNode().differentiate(wrt), new Cos(getNode())).simplify();
+	}
+
+	@Override
+	public double evaluate(HashMap<Variable, Node> values) {
+		return Math.sin(getNode().evaluate(values));
 	}
 }

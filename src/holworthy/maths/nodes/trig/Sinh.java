@@ -1,5 +1,7 @@
 package holworthy.maths.nodes.trig;
 
+import java.util.HashMap;
+
 import holworthy.maths.exceptions.MathsInterpreterException;
 import holworthy.maths.nodes.Multiply;
 import holworthy.maths.nodes.Node;
@@ -27,5 +29,10 @@ public class Sinh extends TrigNode {
 	@Override
 	public Node differentiate(Variable wrt) throws MathsInterpreterException {
 		return new Multiply(getNode().differentiate(wrt), new Cosh(getNode())).simplify();
+	}
+
+	@Override
+	public double evaluate(HashMap<Variable, Node> values) {
+		return Math.sinh(getNode().evaluate(values));
 	}
 }

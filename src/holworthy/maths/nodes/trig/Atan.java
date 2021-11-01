@@ -1,5 +1,7 @@
 package holworthy.maths.nodes.trig;
 
+import java.util.HashMap;
+
 import holworthy.maths.exceptions.MathsInterpreterException;
 import holworthy.maths.nodes.Add;
 import holworthy.maths.nodes.Divide;
@@ -30,5 +32,10 @@ public class Atan extends TrigNode {
 	@Override
 	public Node differentiate(Variable wrt) throws MathsInterpreterException {
 		return new Divide(getNode().differentiate(wrt), new Add(new Power(getNode(), new Number(2)), new Number(1))).simplify();
+	}
+
+	@Override
+	public double evaluate(HashMap<Variable, Node> values) {
+		return Math.atan(getNode().evaluate(values));
 	}
 }

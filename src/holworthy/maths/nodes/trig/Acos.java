@@ -1,5 +1,7 @@
 package holworthy.maths.nodes.trig;
 
+import java.util.HashMap;
+
 import holworthy.maths.exceptions.MathsInterpreterException;
 import holworthy.maths.nodes.Divide;
 import holworthy.maths.nodes.Negative;
@@ -32,5 +34,10 @@ public class Acos extends TrigNode {
 	@Override
 	public Node differentiate(Variable wrt) throws MathsInterpreterException {
 		return new Negative(new Divide(getNode().differentiate(wrt), new Sqrt(new Subtract(new Number(1), new Power(getNode(), new Number(2)))))).simplify();
+	}
+
+	@Override
+	public double evaluate(HashMap<Variable, Node> values) {
+		return Math.acos(getNode().evaluate(values));
 	}
 }

@@ -1,5 +1,7 @@
 package holworthy.maths.nodes.trig;
 
+import java.util.HashMap;
+
 import holworthy.maths.exceptions.MathsInterpreterException;
 import holworthy.maths.nodes.Add;
 import holworthy.maths.nodes.Divide;
@@ -34,5 +36,11 @@ public class Asech extends TrigNode {
 	@Override
 	public Node differentiate(Variable wrt) throws MathsInterpreterException {
 		return new Negative(new Divide(getNode().differentiate(wrt), new Multiply(new Multiply(new Sqrt(new Subtract(new Divide(new Number(1), getNode()), new Number(1))), new Sqrt(new Add(new Divide(new Number(1), getNode()), new Number(1)))), new Power(getNode(), new Number(2)))));
+	}
+
+	@Override
+	public double evaluate(HashMap<Variable, Node> values) {
+		double x = 1.0 / getNode().evaluate(values);
+		return Math.log(x + Math.sqrt(x * x - 1));
 	}
 }
