@@ -26,6 +26,11 @@ public class Variable extends Node {
 	}
 
 	@Override
+	public int hashCode() {
+		return getName().hashCode();
+	}
+
+	@Override
 	public Node copy() {
 		return this;
 	}

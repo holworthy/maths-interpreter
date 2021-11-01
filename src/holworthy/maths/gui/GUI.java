@@ -82,11 +82,10 @@ public class GUI {
 							JPanel graphPanel = new JPanel();
 							graphPanel.setLayout(new BoxLayout(graphPanel, BoxLayout.PAGE_AXIS));
 							graphPanel.add(new JLabel("Graph:"));
-							Graph graph = new Graph(simplified.toString());
+							Graph graph = new Graph((Equation) simplified);
 
 							// graph.setXAxis();
 							// graph.setYAxis();
-
 
 							graphPanel.add(graph);
 							outputPanel.add(graphPanel);

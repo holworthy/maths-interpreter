@@ -79,6 +79,8 @@ public class Nthrt extends FunctionNode {
 
 	@Override
 	public Node differentiate(Variable wrt) throws MathsInterpreterException {
+		if(getNode().isConstant())
+			return new Number(0);
 		return new Divide(new Multiply(new Power(getNode(), new Subtract(new Divide(new Number(1), degree), new Number(1))), getNode().differentiate(wrt)), degree).simplify();
 	}
 

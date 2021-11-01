@@ -3,7 +3,9 @@ package holworthy.maths.gui;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -17,19 +19,21 @@ import holworthy.maths.Maths;
 import holworthy.maths.exceptions.MathsInterpreterException;
 import holworthy.maths.nodes.BinaryNode;
 import holworthy.maths.nodes.Divide;
+import holworthy.maths.nodes.Equation;
 import holworthy.maths.nodes.Negative;
 import holworthy.maths.nodes.Node;
 import holworthy.maths.nodes.Number;
 import holworthy.maths.nodes.UnaryNode;
+import holworthy.maths.nodes.Variable;
 
 public class Graph extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener {
 	private HashMap<Double, Double> values = new HashMap<>();
-	private String equation;
+	private Equation equation;
 	private Dimension size = new Dimension(400, 400);
 	private boolean mouseEntered = false;
 	private Point mousePoint;
 
-	public Graph(String equation){
+	public Graph(Equation equation){
 		this.equation = equation;
 		setPreferredSize(size);
 		setMaximumSize(size);
@@ -52,7 +56,7 @@ public class Graph extends JPanel implements MouseListener, MouseMotionListener,
 	// Assumes y = equation
 	public void findValues(int upperBound, int lowerBound) throws Exception{
 		for (int x = lowerBound; x < upperBound + 1; x++){
-			String replaced = equation.replaceAll("x", "("+Integer.toString(x)+")");
+			String replaced = ""; //equation.replaceAll("x", "("+Integer.toString(x)+")");
 			Node answer = Maths.parseInput(replaced).simplify();
 			// y = 5
 			if(answer instanceof Number){
@@ -93,6 +97,9 @@ public class Graph extends JPanel implements MouseListener, MouseMotionListener,
 
 	@Override
 	protected void paintComponent(Graphics g) {
+		Graphics2D g2d = (Graphics2D) g;
+		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
 		g.setColor(Color.WHITE);
 		g.fillRect(0, 0, getWidth(), getHeight());
 		g.setColor(new Color(240, 240, 240));
@@ -103,19 +110,30 @@ public class Graph extends JPanel implements MouseListener, MouseMotionListener,
 			g.drawLine(0, y, getWidth(), y);
 		
 		g.setColor(Color.BLUE);
-		g.drawLine(0, 100, getWidth(), 300);
+		double lastX = 0;
+		double lastY = 0;
+		
+		// TODO: move somewhere else
+		try {
+			HashMap<Variable, Node> values = new HashMap<>();
+			for(double x = 0; x < 100; x += 1) {
+				values.put(new Variable("x"), Maths.parseInput("" + x));
+				double y = equation.evaluate(values);
+
+				g.drawLine((int) lastX, (int) (getHeight() - lastY), (int) x, (int) (getHeight() - y));
+				lastX = x;
+				lastY = y;
+			}
+		} catch(Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		if(mouseEntered) {
 			g.setColor(new Color(160, 160, 160));
 			g.drawLine(0, (int) mousePoint.getY(), getWidth(), (int) mousePoint.getY());
 			g.drawLine((int) mousePoint.getX(), 0, (int) mousePoint.getX(), getHeight());
 		}
-	}
-
-	public static void main(String[] args) throws Exception {
-		Graph graph = new Graph("2*x^2+x");
-		graph.findValues(10, -10);
-		System.out.println(graph);
 	}
 
 	@Override
