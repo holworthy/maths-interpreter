@@ -102,6 +102,9 @@ public class Testing {
 
 		// complex numbers
 		tests.put("sqrt(-16)","4*i");
+
+		// logs
+		tests.put("ln(2)+ln(2)", "2*ln(2)");
 		
 		// run the tests
 		runTests(tests);
