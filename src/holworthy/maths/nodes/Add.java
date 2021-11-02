@@ -206,7 +206,7 @@ public class Add extends BinaryNode {
 		// x+x=2*x
 		if(left.matches(right))
 			return new Multiply(new Number(2), left).expand();
-		if(left instanceof Multiply && ((BinaryNode) left).getRight().matches(right))
+		if(left instanceof Multiply && ((BinaryNode) left).getLeft() instanceof Number && ((BinaryNode) left).getRight().matches(right))
 			return new Multiply(new Add(((BinaryNode) left).getLeft(), new Number(1)), ((BinaryNode) left).getRight()).expand();
 
 		// TODO: i think this can go
