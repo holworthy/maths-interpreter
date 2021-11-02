@@ -129,7 +129,7 @@ public class Add extends BinaryNode {
 		while(flattenedRight.size() > 0 && flattenedRight.get(0).matches(new Matching.Constant()))
 			flattenedRight.remove(0);
 
-		if(flattenedLeft.size() != flattenedRight.size())
+		if(flattenedLeft.size() != flattenedRight.size() || flattenedLeft.size() == 0)
 			return false;
 		for(int i = 0; i < flattenedLeft.size(); i++)
 			if(!flattenedLeft.get(i).matches(flattenedRight.get(i)))
@@ -157,6 +157,9 @@ public class Add extends BinaryNode {
 			leftConstants.add(flattenedLeft.remove(0));
 		while(flattenedRight.size() > 0 && flattenedRight.get(0).matches(new Matching.Constant()))
 			rightConstants.add(flattenedRight.remove(0));
+
+		System.out.println(left);
+		System.out.println(right);
 
 		return new Multiply(new Add(unflatten2(leftConstants), unflatten2(rightConstants)), unflatten2(flattenedLeft)).expand();
 	}
@@ -203,6 +206,8 @@ public class Add extends BinaryNode {
 		// x+x=2*x
 		if(left.matches(right))
 			return new Multiply(new Number(2), left).expand();
+		if(left instanceof Multiply && ((BinaryNode) left).getRight().matches(right))
+			return new Multiply(new Add(((BinaryNode) left).getLeft(), new Number(1)), ((BinaryNode) left).getRight()).expand();
 
 		// TODO: i think this can go
 		// // a+b+b=a+2*b
