@@ -67,8 +67,8 @@ public class Graph extends JPanel implements MouseListener, MouseMotionListener,
 			g.drawLine(0, y, getWidth(), y);
 		
 		g.setColor(Color.BLUE);
-		double lastX = Double.NEGATIVE_INFINITY;
-		double lastY = 0;
+		double lastX = Double.NaN;
+		double lastY = Double.NaN;
 		
 		// TODO: move somewhere else
 		try {
@@ -77,12 +77,13 @@ public class Graph extends JPanel implements MouseListener, MouseMotionListener,
 				values.put(new Variable("x"), new InputDouble(x));
 				double y = equation.evaluate(values);
 
-				g.drawLine(
-					(int) (((lastX - startX) / (endX - startX)) * getWidth()),
-					(int) ((1.0 - (lastY - startY) / (endY - startY)) * getHeight()),
-					(int) (((x - startX) / (endX - startX)) * getWidth()),
-					(int) ((1.0 - (y - startY) / (endY - startY)) * getHeight())
-				);
+				if(!Double.isNaN(lastX) && !Double.isNaN(lastY) && !Double.isNaN(x) && !Double.isNaN(y))
+					g.drawLine(
+						(int) (((lastX - startX) / (endX - startX)) * getWidth()),
+						(int) ((1.0 - (lastY - startY) / (endY - startY)) * getHeight()),
+						(int) (((x - startX) / (endX - startX)) * getWidth()),
+						(int) ((1.0 - (y - startY) / (endY - startY)) * getHeight())
+					);
 				lastX = x;
 				lastY = y;
 			}
@@ -130,8 +131,8 @@ public class Graph extends JPanel implements MouseListener, MouseMotionListener,
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
+		mousePoint = e.getPoint();
+		repaint();
 	}
 
 	@Override

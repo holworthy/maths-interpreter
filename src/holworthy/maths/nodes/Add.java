@@ -77,6 +77,11 @@ public class Add extends BinaryNode {
 		if(left instanceof TrigNode && right instanceof TrigNode)
 			return ((FunctionNode) left).getName().compareTo(((FunctionNode) right).getName()) > 0;
 
+		if(left instanceof FunctionNode && right instanceof Variable)
+			return true;
+		if(left instanceof Variable && right instanceof FunctionNode)
+			return false;
+
 		if(left instanceof Negative)
 			return shouldSwap(((UnaryNode) left).getNode(), right);
 		if(right instanceof Negative)

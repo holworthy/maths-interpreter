@@ -9,6 +9,7 @@ import holworthy.maths.nodes.Number;
 import holworthy.maths.nodes.Power;
 import holworthy.maths.nodes.UnaryNode;
 import holworthy.maths.nodes.Variable;
+import holworthy.maths.nodes.constant.Pi;
 
 public class Tan extends TrigNode {
 	public Tan(Node arg) {
@@ -23,6 +24,10 @@ public class Tan extends TrigNode {
 	@Override
 	public Node expand() throws MathsInterpreterException {
 		Node node = getNode().expand();
+		if(node.matches(new Number(0)))
+			return new Number(0);
+		if(node.matches(new Pi()))
+			return new Number(0);
 		if(node instanceof Atan)
 			return ((UnaryNode) node).getNode();
 		return new Tan(node);
