@@ -29,9 +29,9 @@ public class Graph extends JPanel implements MouseListener, MouseMotionListener,
 	private Point lastMousePressPoint;
 
 	private double startX = -10;
-	private double endX = 10;
 	private double startY = -10;
-	private double endY = 10;
+	private double zoomX = 20;
+	private double zoomY = 20;
 
 	public Graph(Equation equation){
 		this.equation = equation;
@@ -74,7 +74,9 @@ public class Graph extends JPanel implements MouseListener, MouseMotionListener,
 		// TODO: move somewhere else
 		try {
 			HashMap<Variable, Node> values = new HashMap<>();
-			for(double x = startX; x <= endX; x += (endX - startX) / getWidth()) {
+			double endX = startX + zoomX;
+			double endY = startY + zoomY;
+			for(double x = startX; x <= startX + zoomX; x += (endX - startX) / getWidth()) {
 				values.put(new Variable("x"), new InputDouble(x));
 				double y = equation.evaluate(values);
 
@@ -102,7 +104,6 @@ public class Graph extends JPanel implements MouseListener, MouseMotionListener,
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		// TODO Auto-generated method stub
 		
 	}
 
@@ -113,7 +114,6 @@ public class Graph extends JPanel implements MouseListener, MouseMotionListener,
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		// TODO Auto-generated method stub
 		
 	}
 
@@ -131,12 +131,12 @@ public class Graph extends JPanel implements MouseListener, MouseMotionListener,
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		System.out.println(lastMousePressPoint);
-		
-		startX += (lastMousePressPoint.getX() - e.getX()) / 8f;
-		startY -= (lastMousePressPoint.getY() - e.getY()) / 8f;
-		endX += (lastMousePressPoint.getX() - e.getX()) / 8f;
-		endY -= (lastMousePressPoint.getY() - e.getY()) / 8f;
+		double dx = lastMousePressPoint.getX() - e.getX();
+		double dy = lastMousePressPoint.getY() - e.getY();
+		if(dx != 0)
+			startX += ((dx / getWidth()) * zoomX);
+		if(dy != 0)
+			startY -= ((dy / getHeight()) * zoomY);
 
 		lastMousePressPoint = mousePoint = e.getPoint();
 		repaint();
@@ -150,7 +150,17 @@ public class Graph extends JPanel implements MouseListener, MouseMotionListener,
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
-		// TODO Auto-generated method stub
-		
+		int rotation = e.getWheelRotation();
+		// zoom in
+		if(rotation < 0) {
+			zoomX /= 2;
+			zoomY /= 2;
+		}
+		// zoom out
+		if(rotation > 0) {
+			zoomX *= 2;
+			zoomY *= 2;
+		}
+		repaint();
 	}
 }

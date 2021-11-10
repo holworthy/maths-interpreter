@@ -5,7 +5,9 @@ import java.util.HashMap;
 
 import holworthy.maths.exceptions.MathsInterpreterException;
 import holworthy.maths.nodes.trig.Acos;
+import holworthy.maths.nodes.trig.Asin;
 import holworthy.maths.nodes.trig.Cos;
+import holworthy.maths.nodes.trig.Sin;
 
 public class Equation extends BinaryNode {
 	public Equation(Node left, Node right) {
@@ -127,6 +129,10 @@ public class Equation extends BinaryNode {
 						equation = new Equation(((BinaryNode) equation.getLeft()).getLeft(), new Nthrt(equation.getRight(), ((BinaryNode) equation.getLeft()).getRight()));
 					}
 					// TODO: logs
+
+				// sin(x) = a -> x = asin(a)
+				} else if(equation.getLeft() instanceof Sin) {
+					equation = new Equation(((UnaryNode) equation.getLeft()).getNode(), new Asin(equation.getRight()));
 
 				// cos(x) = a -> x = acos(a)
 				} else if(equation.getLeft() instanceof Cos) {
