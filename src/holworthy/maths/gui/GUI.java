@@ -27,7 +27,7 @@ public class GUI {
 
 		JFrame window = new JFrame("Maths Interpreter");
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		window.setSize(400, 400);
+		window.setSize(600, 600);
 		window.setLayout(new BorderLayout());
 
 		JPanel inputPanel = new JPanel();

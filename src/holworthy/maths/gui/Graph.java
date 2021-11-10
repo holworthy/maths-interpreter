@@ -26,6 +26,7 @@ public class Graph extends JPanel implements MouseListener, MouseMotionListener,
 	private Dimension size = new Dimension(400, 400);
 	private boolean mouseEntered = false;
 	private Point mousePoint;
+	private Point lastMousePressPoint;
 
 	private double startX = -10;
 	private double endX = 10;
@@ -107,8 +108,7 @@ public class Graph extends JPanel implements MouseListener, MouseMotionListener,
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
+		mousePoint = lastMousePressPoint = e.getPoint();
 	}
 
 	@Override
@@ -131,7 +131,14 @@ public class Graph extends JPanel implements MouseListener, MouseMotionListener,
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		mousePoint = e.getPoint();
+		System.out.println(lastMousePressPoint);
+		
+		startX += (lastMousePressPoint.getX() - e.getX()) / 8f;
+		startY -= (lastMousePressPoint.getY() - e.getY()) / 8f;
+		endX += (lastMousePressPoint.getX() - e.getX()) / 8f;
+		endY -= (lastMousePressPoint.getY() - e.getY()) / 8f;
+
+		lastMousePressPoint = mousePoint = e.getPoint();
 		repaint();
 	}
 
