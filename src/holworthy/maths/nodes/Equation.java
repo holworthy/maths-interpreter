@@ -81,6 +81,7 @@ public class Equation extends BinaryNode {
 			Equation equation = (Equation) start.copy();
 			
 			while(!equation.getLeft().matches(variable)) {
+				System.out.println(equation);
 				equation = (Equation) equation.simplify();
 				Equation expandedEquation = (Equation) equation.expand(); // helps reduce the number of rules for quadratics
 
@@ -145,11 +146,14 @@ public class Equation extends BinaryNode {
 
 				// x / a = b -> x = a * b
 				} else if(equation.getLeft() instanceof Divide) {
-					if(((BinaryNode) equation.getLeft()).getLeft().contains(variable) && ((BinaryNode) equation.getLeft()).getRight().contains(variable))
+					// a / x = b -> x = a / b
+					if(!(((BinaryNode) equation.getLeft()).getLeft().contains(variable)) && ((BinaryNode) equation.getLeft()).getRight().contains(variable))
+						equation = new Equation(((BinaryNode) equation.getLeft()).getRight(), new Divide(((BinaryNode) equation.getLeft()).getLeft(), equation.getRight()));
+					else if(((BinaryNode) equation.getLeft()).getLeft().contains(variable) && ((BinaryNode) equation.getLeft()).getRight().contains(variable))
 						equation = new Equation(new Subtract(((BinaryNode) equation.getLeft()).getLeft(), new Multiply(equation.getRight(), ((BinaryNode) equation.getLeft()).getRight())), new Number(0));
 					else
 						equation = new Equation(((BinaryNode) equation.getLeft()).getLeft(), new Multiply(((BinaryNode) equation.getLeft()).getRight(), equation.getRight()));
-						
+
 				} else if(equation.getLeft() instanceof Power) {
 					if(((BinaryNode) equation.getLeft()).getLeft().contains(variable)) {
 						equation = new Equation(((BinaryNode) equation.getLeft()).getLeft(), new Nthrt(equation.getRight(), ((BinaryNode) equation.getLeft()).getRight()));
