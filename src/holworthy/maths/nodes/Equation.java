@@ -149,8 +149,7 @@ public class Equation extends BinaryNode {
 						equation = new Equation(new Subtract(((BinaryNode) equation.getLeft()).getLeft(), new Multiply(equation.getRight(), ((BinaryNode) equation.getLeft()).getRight())), new Number(0));
 					else
 						equation = new Equation(((BinaryNode) equation.getLeft()).getLeft(), new Multiply(((BinaryNode) equation.getLeft()).getRight(), equation.getRight()));
-
-				// 
+						
 				} else if(equation.getLeft() instanceof Power) {
 					if(((BinaryNode) equation.getLeft()).getLeft().contains(variable)) {
 						equation = new Equation(((BinaryNode) equation.getLeft()).getLeft(), new Nthrt(equation.getRight(), ((BinaryNode) equation.getLeft()).getRight()));
@@ -188,5 +187,3 @@ public class Equation extends BinaryNode {
 		return getRight().evaluate(values);
 	}
 }
-
-// x^4+x^2 = 1

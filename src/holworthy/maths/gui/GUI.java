@@ -13,6 +13,7 @@ import javax.swing.UIManager;
 
 import holworthy.maths.Maths;
 import holworthy.maths.exceptions.MathsInterpreterException;
+import holworthy.maths.nodes.BinaryNode;
 import holworthy.maths.nodes.Equation;
 import holworthy.maths.nodes.Node;
 import holworthy.maths.nodes.Variable;
@@ -78,6 +79,9 @@ public class GUI {
 						outputPanel.add(solutionsPanel);
 
 						if(((Equation) simplified).numVariables() == 2) {
+							if(((BinaryNode) simplified).getRight().matches(new Variable("y"))){
+								simplified = new Equation(((BinaryNode) simplified).getRight(), ((BinaryNode) simplified).getLeft());
+							}
 							// graphs
 							JPanel graphPanel = new JPanel();
 							graphPanel.setLayout(new BoxLayout(graphPanel, BoxLayout.PAGE_AXIS));
