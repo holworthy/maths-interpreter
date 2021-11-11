@@ -61,6 +61,16 @@ public class Equation extends BinaryNode {
 		return getVariables(this).size();
 	}
 
+	private Equation quadraticSolution1(Node x, Node a, Node b, Node c, Node d) {
+		// x = (-b + sqrt(b^2 - 4 * a * (c - d))) / (2 * a)
+		return new Equation(x, new Divide(new Add(new Negative(b), new Sqrt(new Subtract(new Power(b, new Number(2)), new Multiply(new Multiply(new Number(4), a), new Subtract(c, d))))), new Multiply(new Number(2), a)));
+	}
+
+	private Equation quadraticSolution2(Node x, Node a, Node b, Node c, Node d) {
+		// x = (-b - sqrt(b^2 - 4 * a * (c - d))) / (2 * a)
+		return new Equation(x, new Divide(new Subtract(new Negative(b), new Sqrt(new Subtract(new Power(b, new Number(2)), new Multiply(new Multiply(new Number(4), a), new Subtract(c, d))))), new Multiply(new Number(2), a)));
+	}
+
 	public ArrayList<Equation> solve() throws MathsInterpreterException {
 		Node start = new Equation(new Subtract(getLeft(), getRight()).simplify(), new Number(0));
 		ArrayList<Variable> variables = getVariables(start);
@@ -72,20 +82,37 @@ public class Equation extends BinaryNode {
 			
 			while(!equation.getLeft().matches(variable)) {
 				equation = (Equation) equation.simplify();
-				
+				Equation expandedEquation = (Equation) equation.expand(); // helps reduce the number of rules for quadratics
+
+				// quadratics
 				// a*x^2 + b*x + c = d
-				if(equation.getLeft().matches(new Add(new Add(new Multiply(new Matching.Constant(), new Power(new Matching.Anything(), new Number(2))), new Multiply(new Matching.Constant(), new Matching.Anything())), new Matching.Constant())) && equation.getRight().matches(new Matching.Constant()) && ((BinaryNode) ((BinaryNode) ((BinaryNode) ((BinaryNode) equation.getLeft()).getLeft()).getLeft()).getRight()).getLeft().matches(((BinaryNode) ((BinaryNode) ((BinaryNode) equation.getLeft()).getLeft()).getRight()).getRight())) {
-					Node a = ((BinaryNode) ((BinaryNode) ((BinaryNode) equation.getLeft()).getLeft()).getLeft()).getLeft();
-					Node b = ((BinaryNode) ((BinaryNode) ((BinaryNode) equation.getLeft()).getLeft()).getRight()).getLeft();
-					Node c = ((BinaryNode) equation.getLeft()).getRight();
-					Node d = equation.getRight();
-					Node x = ((BinaryNode) ((BinaryNode) ((BinaryNode) equation.getLeft()).getLeft()).getRight()).getRight();
-
-					// x = (-b +- sqrt(b^2 - 4 * a * (c - d))) / (2 * a)
-					solutions.addAll(new Equation(x, new Divide(new Add(new Negative(b), new Sqrt(new Subtract(new Power(b, new Number(2)), new Multiply(new Multiply(new Number(4), a), new Subtract(c, d))))), new Multiply(new Number(2), a))).solve());
-					solutions.addAll(new Equation(x, new Divide(new Subtract(new Negative(b), new Sqrt(new Subtract(new Power(b, new Number(2)), new Multiply(new Multiply(new Number(4), a), new Subtract(c, d))))), new Multiply(new Number(2), a))).solve());
-
+				// a*x^2 + b*x = d
+				// a*x^2 + x + c = d
+				// a*x^2 + x = d
+				// x^2 + b*x + c = d
+				// x^2 + b*x = d
+				// x^2 + x + c = d
+				// x^2 + x = d
+				if(expandedEquation.getLeft().matches(new Add(new Add(new Multiply(new Matching.Constant(), new Power(new Matching.Anything(), new Number(2))), new Multiply(new Matching.Constant(), new Matching.Anything())), new Matching.Constant())) && expandedEquation.getRight().matches(new Matching.Constant()) && ((BinaryNode) ((BinaryNode) ((BinaryNode) ((BinaryNode) expandedEquation.getLeft()).getLeft()).getLeft()).getRight()).getLeft().matches(((BinaryNode) ((BinaryNode) ((BinaryNode) expandedEquation.getLeft()).getLeft()).getRight()).getRight())) {
+					Node a = ((BinaryNode) ((BinaryNode) ((BinaryNode) expandedEquation.getLeft()).getLeft()).getLeft()).getLeft();
+					Node b = ((BinaryNode) ((BinaryNode) ((BinaryNode) expandedEquation.getLeft()).getLeft()).getRight()).getLeft();
+					Node c = ((BinaryNode) expandedEquation.getLeft()).getRight();
+					Node d = expandedEquation.getRight();
+					Node x = ((BinaryNode) ((BinaryNode) ((BinaryNode) expandedEquation.getLeft()).getLeft()).getRight()).getRight();
+					solutions.addAll(quadraticSolution1(x, a, b, c, d).solve());
+					solutions.addAll(quadraticSolution2(x, a, b, c, d).solve());
 					break;
+				} else if(expandedEquation.getLeft().matches(new Add(new Multiply(new Matching.Constant(), new Power(new Matching.Anything(), new Number(2))), new Multiply(new Matching.Constant(), new Matching.Anything()))) && expandedEquation.getRight().matches(new Matching.Constant()) && ((BinaryNode) ((BinaryNode) ((BinaryNode) expandedEquation.getLeft()).getLeft()).getRight()).getLeft().matches(((BinaryNode) ((BinaryNode) expandedEquation.getLeft()).getRight()).getRight())) {
+					Node a = ((BinaryNode) ((BinaryNode) expandedEquation.getLeft()).getLeft()).getLeft();
+					Node b = ((BinaryNode) ((BinaryNode) expandedEquation.getLeft()).getRight()).getLeft();
+					Node c = new Number(0);
+					Node d = expandedEquation.getRight();
+					Node x = ((BinaryNode) ((BinaryNode) expandedEquation.getLeft()).getRight()).getRight();
+					solutions.addAll(quadraticSolution1(x, a, b, c, d).solve());
+					solutions.addAll(quadraticSolution2(x, a, b, c, d).solve());
+					break;
+				// TODO: havent finished this one yet still working on it
+				// } else if(expandedEquation.matches(new Equation(new Add(new Add(new Multiply(new Matching.Constant(), new Power(new Matching.Anything(), new Number(2))), new Matching.Anything()), new Matching.Constant()), new Matching.Constant()))) {
 
 				// -x = a -> x = -a
 				} else if(equation.getLeft() instanceof Negative) {
@@ -161,3 +188,5 @@ public class Equation extends BinaryNode {
 		return getRight().evaluate(values);
 	}
 }
+
+// x^4+x^2 = 1

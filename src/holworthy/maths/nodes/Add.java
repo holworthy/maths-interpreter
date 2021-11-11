@@ -21,6 +21,11 @@ public class Add extends BinaryNode {
 	}
 
 	@Override
+	public boolean matches(Node node) {
+		return node instanceof Matching.AddOrSubtract || super.matches(node);
+	}
+
+	@Override
 	public Node copy() {
 		return new Add(getLeft().copy(), getRight().copy());
 	}
