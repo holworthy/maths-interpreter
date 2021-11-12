@@ -92,7 +92,7 @@ public class Equation extends BinaryNode {
 	}
 
 	public ArrayList<Equation> solve() throws MathsInterpreterException {
-		Node start = new Equation(new Subtract(getLeft(), getRight()).simplify(), new Number(0));
+		Node start = new Equation(new Subtract(getLeft(), getRight()), new Number(0)).simplify();
 		ArrayList<Variable> variables = getVariables(start);
 		variables.sort((a, b) -> a.getName().compareTo(b.getName()));
 
@@ -255,8 +255,7 @@ public class Equation extends BinaryNode {
 				// acoth(x) = a -> x = coth(a)
 				} else if(equation.getLeft() instanceof Acoth) {
 					equation = new Equation(((UnaryNode) equation.getLeft()).getNode(), new Coth(equation.getRight()));
-				}
-				else {
+				} else {
 					System.out.println("cannot handle " + equation);
 					break;
 				}
