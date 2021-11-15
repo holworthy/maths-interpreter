@@ -59,15 +59,57 @@ public class Graph extends JPanel implements MouseListener, MouseMotionListener,
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
+		// clear background
 		g2d.setColor(Color.WHITE);
 		g2d.fillRect(0, 0, getWidth(), getHeight());
+		
+		// grid lines
 		g2d.setColor(new Color(240, 240, 240));
+		double lineGapX = 1;
+		int expX = 1;
+		while(lineGapX * 2 > zoomX) {
+			expX--;
+			lineGapX = Math.pow(10, expX);
+		}
+		while(lineGapX * 20 < zoomX) {
+			expX++;
+			lineGapX = Math.pow(10, expX);
+		}
+		double lineStartX = Math.round(startX / lineGapX) * lineGapX;
+		for(double x = lineStartX; x < startX + zoomX; x += lineGapX)
+			g2d.drawLine(
+				(int) (((x - startX) / zoomX) * getWidth()),
+				0,
+				(int) (((x - startX) / zoomX) * getWidth()),
+				getHeight()
+			);
+		double lineGapY = 1;
+		int expY = 1;
+		while(lineGapY * 2 > zoomY) {
+			expY--;
+			lineGapY = Math.pow(10, expY);
+		}
+		while(lineGapY * 20 < zoomY) {
+			expY++;
+			lineGapY = Math.pow(10, expY);
+		}
+		double lineStartY = Math.round(startY / lineGapY) * lineGapY;
+		for(double y = lineStartY; y < startY + zoomY; y += lineGapY)
+			g2d.drawLine(
+				0,
+				(int) ((1.0 - ((y - startY) / zoomY)) * getHeight()),
+				getHeight(),
+				(int) ((1.0 - ((y - startY) / zoomY)) * getHeight())
+			);
+
+		// x and y axis
+		g2d.setColor(Color.RED);
+		if(0 > startX && 0 < startX + zoomX)
+			g2d.drawLine((int) ((-startX / zoomX) * getWidth()), 0, (int) ((-startX / zoomX) * getWidth()), getHeight());
+		if(0 > startY && 0 < startY + zoomY)
+			g2d.drawLine(0, (int) ((1.0 - (-startY / zoomY)) * getHeight()), getWidth(), (int) ((1.0 - (-startY / zoomY)) * getHeight()));
 		
-		for(int x = 0; x < 400; x += 10)
-			g2d.drawLine(x, 0, x, getHeight());
-		for(int y = 0; y < 400; y += 10)
-			g2d.drawLine(0, y, getWidth(), y);
-		
+		// graph
 		g2d.setColor(Color.BLUE);
 		double lastX = Double.NaN;
 		double lastY = Double.NaN;
@@ -101,9 +143,9 @@ public class Graph extends JPanel implements MouseListener, MouseMotionListener,
 		// g2d.drawLine(equation.evaluate(0f), 0, equation.evaluate(0), getHeight());
 
 		if(mouseEntered) {
-			g2d.setColor(new Color(160, 160, 160));
-			g2d.drawLine(0, (int) mousePoint.getY(), getWidth(), (int) mousePoint.getY());
-			g2d.drawLine((int) mousePoint.getX(), 0, (int) mousePoint.getX(), getHeight());
+			// g2d.setColor(new Color(160, 160, 160));
+			// g2d.drawLine(0, (int) mousePoint.getY(), getWidth(), (int) mousePoint.getY());
+			// g2d.drawLine((int) mousePoint.getX(), 0, (int) mousePoint.getX(), getHeight());
 		}
 	}
 

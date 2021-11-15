@@ -171,9 +171,6 @@ public class Add extends BinaryNode {
 		while(flattenedRight.size() > 0 && flattenedRight.get(0).matches(new Matching.Constant()))
 			rightConstants.add(flattenedRight.remove(0));
 
-		System.out.println(left);
-		System.out.println(right);
-
 		return new Multiply(new Add(unflatten2(leftConstants), unflatten2(rightConstants)), unflatten2(flattenedLeft)).expand();
 	}
 

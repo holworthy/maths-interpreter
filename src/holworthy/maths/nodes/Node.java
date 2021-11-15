@@ -33,6 +33,9 @@ public abstract class Node {
 	}
 
 	public abstract Node differentiate(Variable wrt) throws MathsInterpreterException;
+	public Node differentiate(String wrt) throws MathsInterpreterException {
+		return differentiate(new Variable(wrt));
+	}
 
 	public abstract double evaluate(HashMap<Variable, Node> values);
 }

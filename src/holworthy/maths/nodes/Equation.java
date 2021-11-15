@@ -92,6 +92,8 @@ public class Equation extends BinaryNode {
 	}
 
 	public ArrayList<Equation> solve() throws MathsInterpreterException {
+		// TODO: we need to output when we cannot solve an equation
+
 		Node start = new Equation(new Subtract(getLeft(), getRight()), new Number(0)).simplify();
 		ArrayList<Variable> variables = getVariables(start);
 		variables.sort((a, b) -> a.getName().compareTo(b.getName()));
@@ -101,7 +103,6 @@ public class Equation extends BinaryNode {
 			Equation equation = (Equation) start.copy();
 			
 			while(!equation.getLeft().matches(variable)) {
-				System.out.println(equation);
 				equation = (Equation) equation.simplify();
 				Equation expandedEquation = (Equation) equation.expand(); // helps reduce the number of rules for quadratics
 

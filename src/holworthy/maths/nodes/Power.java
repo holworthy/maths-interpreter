@@ -83,7 +83,6 @@ public class Power extends BinaryNode {
 			return left;
 
 		// binomial theorum which works as multinomial theorum
-		// TODO: verify
 		if(left instanceof Add && right instanceof Number) {
 			Node temp = new Number(0);
 			for(BigInteger k = BigInteger.ZERO; k.compareTo(((Number) right).getValue().add(BigInteger.ONE)) < 0; k = k.add(BigInteger.ONE))
