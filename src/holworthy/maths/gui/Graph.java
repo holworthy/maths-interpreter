@@ -12,6 +12,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.text.DecimalFormat;
 import java.util.HashMap;
 
 import javax.swing.JPanel;
@@ -33,6 +34,8 @@ public class Graph extends JPanel implements MouseListener, MouseMotionListener,
 	private double startY = -10;
 	private double zoomX = 20;
 	private double zoomY = 20;
+
+	private DecimalFormat decimalFormat = new DecimalFormat("0.00E0");
 
 	public Graph(Equation equation){
 		this.equation = equation;
@@ -64,46 +67,64 @@ public class Graph extends JPanel implements MouseListener, MouseMotionListener,
 		g2d.fillRect(0, 0, getWidth(), getHeight());
 		
 		// grid lines
-		g2d.setColor(new Color(240, 240, 240));
 		double lineGapX = 1;
 		int expX = 1;
-		while(lineGapX * 2 > zoomX) {
-			expX--;
-			lineGapX = Math.pow(10, expX);
-		}
 		while(lineGapX * 20 < zoomX) {
 			expX++;
 			lineGapX = Math.pow(10, expX);
 		}
+		while(lineGapX * 2 > zoomX) {
+			expX--;
+			lineGapX = Math.pow(10, expX);
+		}
 		double lineStartX = Math.round(startX / lineGapX) * lineGapX;
-		for(double x = lineStartX; x < startX + zoomX; x += lineGapX)
+		double lineGapY = 1;
+		int expY = 1;
+		while(lineGapY * 20 < zoomY) {
+			expY++;
+			lineGapY = Math.pow(10, expY);
+		}
+		while(lineGapY * 2 > zoomY) {
+			expY--;
+			lineGapY = Math.pow(10, expY);
+		}
+		double lineStartY = Math.round(startY / lineGapY) * lineGapY;
+
+		for(double x = lineStartX; x < startX + zoomX; x += lineGapX) {
+			g2d.setColor(new Color(240, 240, 240));
 			g2d.drawLine(
 				(int) (((x - startX) / zoomX) * getWidth()),
 				0,
 				(int) (((x - startX) / zoomX) * getWidth()),
 				getHeight()
 			);
-		double lineGapY = 1;
-		int expY = 1;
-		while(lineGapY * 2 > zoomY) {
-			expY--;
-			lineGapY = Math.pow(10, expY);
 		}
-		while(lineGapY * 20 < zoomY) {
-			expY++;
-			lineGapY = Math.pow(10, expY);
-		}
-		double lineStartY = Math.round(startY / lineGapY) * lineGapY;
-		for(double y = lineStartY; y < startY + zoomY; y += lineGapY)
+		for(double y = lineStartY; y < startY + zoomY; y += lineGapY) {
+			g2d.setColor(new Color(240, 240, 240));
 			g2d.drawLine(
 				0,
 				(int) ((1.0 - ((y - startY) / zoomY)) * getHeight()),
 				getHeight(),
 				(int) ((1.0 - ((y - startY) / zoomY)) * getHeight())
 			);
+		}
+		for(double x = lineStartX; x < startX + zoomX; x += lineGapX) {
+			g2d.setColor(Color.BLACK);
+			int tx = (int) (((x - startX) / zoomX) * getWidth());
+			int ty = 0;
+			g2d.translate(tx, ty);
+			g2d.rotate(Math.PI / 2);
+			g2d.drawString(decimalFormat.format(x), 0, 0);
+			g2d.rotate(-Math.PI / 2);
+			g2d.translate(-tx, -ty);
+		}
+		for(double y = lineStartY; y < startY + zoomY; y += lineGapY) {
+			g2d.setColor(Color.BLACK);
+			g2d.drawString(decimalFormat.format(y), 0, (int) ((1.0 - ((y - startY) / zoomY)) * getHeight()));
+		}
 
 		// x and y axis
-		g2d.setColor(Color.RED);
+		g2d.setColor(new Color(255 - 16 * 4, 255 - 16 * 4, 255 - 16 * 4));
 		if(0 > startX && 0 < startX + zoomX)
 			g2d.drawLine((int) ((-startX / zoomX) * getWidth()), 0, (int) ((-startX / zoomX) * getWidth()), getHeight());
 		if(0 > startY && 0 < startY + zoomY)
@@ -206,11 +227,11 @@ public class Graph extends JPanel implements MouseListener, MouseMotionListener,
 
 		// zoom in
 		if(rotation < 0) {
-			if(shouldScrollX) {
+			if(shouldScrollX && zoomX > 10e-13 && zoomX < 10e150) {
 				startX = startX + zoomX * mx - (zoomX / 2f) * mx;
 				zoomX /= 2;
 			}
-			if(shouldScrollY) {
+			if(shouldScrollY && zoomY > 10e-13 && zoomY < 10e150) {
 				startY = startY + zoomY * (1.0 - my) - (zoomY / 2f) * (1.0 - my);
 				zoomY /= 2;
 			}
@@ -226,6 +247,15 @@ public class Graph extends JPanel implements MouseListener, MouseMotionListener,
 				zoomY *= 2;
 			}
 		}
+
+		// if somehow floating point numbers have failed us reset the values
+		if(Double.isNaN(startX) || Double.isNaN(startY) || Double.isNaN(zoomX) || Double.isNaN(zoomY) || Double.isInfinite(zoomX) || Double.isInfinite(zoomY)) {
+			startX = -10;
+			startY = -10;
+			zoomX = 20;
+			zoomY = 20;
+		}
+
 		repaint();
 	}
 }
