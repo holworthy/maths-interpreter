@@ -194,7 +194,7 @@ public class Add extends BinaryNode {
 			return new Number(((Number) left).getValue().add(((Number) right).getValue()));
 		
 		// x + number + number = x + number
-		if(left instanceof Add && right instanceof Number && (((Add) left).getRight() instanceof Number || ((Add) left).getRight() instanceof Negative))
+		if(left instanceof Add && right instanceof Number && (((Add) left).getRight() instanceof Number || (((Add) left).getRight() instanceof Negative && ((UnaryNode) ((BinaryNode) left).getRight()).getNode() instanceof Number)))
 			return new Add(((Add) left).getLeft(), new Add(((Add) left).getRight(), right).expand());
 		
 		// number + -number
