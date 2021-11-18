@@ -38,6 +38,32 @@ public abstract class Node {
 		return differentiate(new Variable(wrt));
 	}
 
+	public ArrayList<Variable> getVariables() {
+		ArrayList<Variable> variables = new ArrayList<>();
+
+		if(this instanceof Variable) {
+			if(!variables.contains((Variable) this))
+				variables.add((Variable) this);
+		} else if(this instanceof UnaryNode) {
+			for(Variable variable : ((UnaryNode) this).getNode().getVariables())
+				if(!variables.contains(variable))
+					variables.add(variable);
+		} else if(this instanceof BinaryNode) {
+			for(Variable variable : ((BinaryNode) this).getLeft().getVariables())
+				if(!variables.contains(variable))
+					variables.add(variable);
+			for(Variable variable : ((BinaryNode) this).getRight().getVariables())
+				if(!variables.contains(variable))
+						variables.add(variable);
+		}
+
+		return variables;
+	}
+
+	public int numVariables() {
+		return getVariables().size();
+	}
+
 	public abstract double evaluate(HashMap<Variable, Node> values);
 
 	public ArrayList<Node> otherForms() throws MathsInterpreterException {

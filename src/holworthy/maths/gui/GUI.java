@@ -98,12 +98,13 @@ public class GUI {
 
 					// derivative
 					try {
-						JPanel derivativePanel = new JPanel();
-						derivativePanel.setLayout(new BoxLayout(derivativePanel, BoxLayout.PAGE_AXIS));
-						derivativePanel.add(new JLabel("Derivative:"));
-						// TODO: differentiate wrt whatever variables exist
-						derivativePanel.add(new JLabel(simplified.differentiate(new Variable("x")).toString()));
-						outputPanel.add(derivativePanel);
+						for(Variable wrt : simplified.getVariables()) {
+							JPanel derivativePanel = new JPanel();
+							derivativePanel.setLayout(new BoxLayout(derivativePanel, BoxLayout.PAGE_AXIS));
+							derivativePanel.add(new JLabel("Derivative with respect to " + wrt + ":"));
+							derivativePanel.add(new JLabel(simplified.differentiate(wrt).toString()));
+							outputPanel.add(derivativePanel);
+						}
 					} catch(MathsInterpreterException e) {
 
 					}
