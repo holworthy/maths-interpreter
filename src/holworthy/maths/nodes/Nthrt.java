@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.HashMap;
 
 import holworthy.maths.exceptions.MathsInterpreterException;
-import holworthy.maths.nodes.constant.I;
 
 public class Nthrt extends FunctionNode {
 	private Node degree;
