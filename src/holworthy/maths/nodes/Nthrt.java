@@ -1,9 +1,12 @@
 package holworthy.maths.nodes;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 import holworthy.maths.exceptions.MathsInterpreterException;
+import holworthy.maths.nodes.constant.I;
 
 public class Nthrt extends FunctionNode {
 	private Node degree;
@@ -43,6 +46,22 @@ public class Nthrt extends FunctionNode {
 		return s;
 	}
 
+	public static ArrayList<BigInteger> primeFactors(BigInteger number){
+		BigInteger n = number;
+		ArrayList<BigInteger> factors = new ArrayList<>();
+		if(!(n.isProbablePrime(100))){
+			for(BigInteger i = BigInteger.TWO; i.compareTo(n) <= 0; i = i.add(BigInteger.ONE)){
+				while(n.mod(i).equals(BigInteger.ZERO)){
+					factors.add(i);
+					n = n.divide(i);
+				}
+			}
+		}
+		else
+			factors.add(n);
+		return factors;
+	}
+
 	@Override
 	public Node expand() throws MathsInterpreterException {
 		Node node = getNode().expand();
@@ -64,8 +83,34 @@ public class Nthrt extends FunctionNode {
 			BigInteger n = ((Number) node).getValue();
 			if(iroot(exponent, n).pow(exponent.intValue()).compareTo(n) == 0)
 				return new Number(iroot(exponent, n));
+			else{
+				ArrayList<BigInteger> roots = primeFactors(n);
+				if(roots.size() > 1){
+					ArrayList<BigInteger> removed = new ArrayList<>();
+					ArrayList<BigInteger> checked = new ArrayList<>();
+					for (int i = 0; i < roots.size(); i++){
+						if (!(checked.contains(roots.get(i))) && BigInteger.valueOf(Collections.frequency(roots, roots.get(i))).compareTo(((Number) degree).getValue()) >= 0){
+							removed.add(roots.get(i));
+							checked.add(roots.get(i));
+						}
+					}
+					BigInteger removeTotal = BigInteger.ONE;
+					for (int i = 0; i < removed.size(); i++){
+						for (BigInteger j = ((Number) degree).getValue(); j.compareTo(BigInteger.ZERO) > 0; j = j.subtract(BigInteger.ONE)){
+							roots.remove(removed.get(i));
+						}
+						removeTotal = removeTotal.multiply(removed.get(i));
+					}
+					BigInteger rootTotal = BigInteger.ONE;
+					for (int i = 0; i < roots.size(); i++){
+						rootTotal = rootTotal.multiply(roots.get(i));
+					}
+					if(removeTotal.compareTo(BigInteger.ONE) != 0 && rootTotal.compareTo(BigInteger.ONE) != 0){
+						return new Multiply(new Number(removeTotal), new Nthrt(new Number(rootTotal), degree)).simplify();
+					}
+				}
+			}
 		}
-
 		return new Nthrt(node, degree);
 	}
 	
@@ -91,5 +136,8 @@ public class Nthrt extends FunctionNode {
 
 	// public static void main(String[] args) throws MathsInterpreterException {
 	// 	// System.out.println(new Nthrt(new Number(5), new Number(2)).simplify());
+	// 	// System.out.println(primeFactors(BigInteger.valueOf(1212121217)));
+	// 	// System.out.println(new Nthrt(new Number(4), new Number(2)).simplify());
+	// 	System.out.println(new Multiply(new I(), new Nthrt(new Number(8), new Number(2))).simplify());
 	// }
 }

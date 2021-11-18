@@ -120,8 +120,8 @@ public class Equation extends BinaryNode {
 					Node c = ((BinaryNode) expandedEquation.getLeft()).getRight();
 					Node d = expandedEquation.getRight();
 					Node x = ((BinaryNode) ((BinaryNode) ((BinaryNode) expandedEquation.getLeft()).getLeft()).getRight()).getRight();
-					solutions.addAll(quadraticSolution1(x, a, b, c, d).solve());
-					solutions.addAll(quadraticSolution2(x, a, b, c, d).solve());
+					solutions.addAll(((Equation) quadraticSolution1(x, a, b, c, d).simplify()).solve());
+					solutions.addAll(((Equation) quadraticSolution2(x, a, b, c, d).simplify()).solve());
 					break;
 				// a*x^2 + b*x = 0
 				} else if(expandedEquation.getLeft().matches(new Add(new Multiply(new Matching.Constant(), new Power(new Matching.Anything(), new Number(2))), new Multiply(new Matching.Constant(), new Matching.Anything()))) && expandedEquation.getRight().matches(new Matching.Constant()) && ((BinaryNode) ((BinaryNode) ((BinaryNode) expandedEquation.getLeft()).getLeft()).getRight()).getLeft().matches(((BinaryNode) ((BinaryNode) expandedEquation.getLeft()).getRight()).getRight())) {

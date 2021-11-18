@@ -86,7 +86,7 @@ public class Testing {
 		tests.put("-2*x+3*x","x");
 		tests.put("-2*x-x","-(3*x)");
 		tests.put("-2*x-2*x","-(4*x)");
-		tests.put("(x+5)*(a-6)","a*(x + 5) - 6*x - 30");
+		tests.put("(x+5)*(a-6)","a*(x+5)-6*x-30");
 		tests.put("5*(-3*x-2)-(x-3)=-4*(4*x+5)+13","0=0"); //TODO: probably shouldnt just kill program
 
 		// negatives
