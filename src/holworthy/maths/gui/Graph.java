@@ -155,8 +155,7 @@ public class Graph extends JPanel implements MouseListener, MouseMotionListener,
 				lastY = y;
 			}
 		} catch(Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			
 		}
 
 		g2d.setColor(Color.RED);

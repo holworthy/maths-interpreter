@@ -1,5 +1,6 @@
 package holworthy.maths.nodes;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import holworthy.maths.exceptions.MathsInterpreterException;
@@ -38,4 +39,8 @@ public abstract class Node {
 	}
 
 	public abstract double evaluate(HashMap<Variable, Node> values);
+
+	public ArrayList<Node> otherForms() throws MathsInterpreterException {
+		return new ArrayList<>();
+	}
 }

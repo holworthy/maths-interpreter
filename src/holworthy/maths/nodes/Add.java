@@ -8,6 +8,8 @@ import java.util.ListIterator;
 
 import holworthy.maths.exceptions.MathsInterpreterException;
 import holworthy.maths.nodes.constant.ConstantNode;
+import holworthy.maths.nodes.trig.Cos;
+import holworthy.maths.nodes.trig.Sin;
 import holworthy.maths.nodes.trig.TrigNode;
 
 public class Add extends BinaryNode {
@@ -225,6 +227,14 @@ public class Add extends BinaryNode {
 			Divide newRight = new Divide(new Multiply(((Divide) right).getLeft(), ((Divide) left).getRight()), new Multiply(((Divide) right).getRight(),((Divide) left).getRight()));
 			return new Divide(new Add(newLeft.getLeft(), newRight.getLeft()), newLeft.getRight()).expand();
 		}
+
+		// sin(x)^2+cos(x)^2=1
+		if(left.matches(new Power(new Sin(new Matching.Anything()), new Number(2))) && right.matches(new Power(new Cos(new Matching.Anything()), new Number(2))) && ((UnaryNode) ((BinaryNode) left).getLeft()).getNode().matches(((UnaryNode) ((BinaryNode) right).getLeft()).getNode()))
+			return new Number(1);
+		
+		// log(x, b) + log(y, b) = log(x * y, b)
+		if(left instanceof Log && right instanceof Log && ((Log) left).getBase().matches(((Log) right).getBase()))
+			return new Log(new Multiply(((UnaryNode) left).getNode(), ((UnaryNode) right).getNode()), ((Log) left).getBase()).simplify();
 
 		// combine terms which can be combined
 		if(canCombine(left, right))
