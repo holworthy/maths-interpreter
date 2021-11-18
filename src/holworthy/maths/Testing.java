@@ -48,7 +48,6 @@ public class Testing {
 		tests.put("2*x*5*y*7*z","70*x*y*z");
 		tests.put("(z+3)*2","2*z+6");
 		tests.put("2*(x+5)", "2*x+10");
-		// tests.put("2*x+5=15", "x=5"); //doesn't solve
 		tests.put("(x+2)^2+3","x^2+4*x+7");
 		tests.put("(3*x+2)/(3*x+2)", "1");
 		tests.put("(3*x*2)/(3*x*5)", "(2)/(5)");
@@ -101,11 +100,10 @@ public class Testing {
 
 		// division
 		tests.put("-(2/-3)", "2/3");
-		// tests.put("-0.7=f/-2", "f=7/5");
 
 		// complex numbers
 		tests.put("sqrt(-16)","4*i");
-		tests.put("((sqrt(3)+i)/2)^6+((i-sqrt(3))/2)^6","-2");
+		tests.put("((sqrt(3)+i)/2)^6+((i-sqrt(3))/2)^6","-2"); // TODO:this breaks
 
 		// logs
 		tests.put("ln(2)+ln(2)", "2*ln(2)");
