@@ -54,33 +54,6 @@ public class Equation extends BinaryNode {
 		return new Equation(getLeft().collapse(), getRight().collapse());
 	}
 
-	private ArrayList<Variable> getVariables(Node node) {
-		ArrayList<Variable> variables = new ArrayList<>();
-
-		if(node instanceof Variable) {
-			if(!variables.contains((Variable) node))
-				variables.add((Variable) node);
-		} else if(node instanceof UnaryNode) {
-			for(Variable variable : getVariables(((UnaryNode) node).getNode()))
-				if(!variables.contains(variable))
-					variables.add(variable);
-		} else if(node instanceof BinaryNode) {
-			for(Variable variable : getVariables(((BinaryNode) node).getLeft()))
-				if(!variables.contains(variable))
-					variables.add(variable);
-
-			for(Variable variable : getVariables(((BinaryNode) node).getRight()))
-				if(!variables.contains(variable))
-						variables.add(variable);
-		}
-
-		return variables;
-	}
-
-	public int numVariables() {
-		return getVariables(this).size();
-	}
-
 	private Equation quadraticSolution1(Node x, Node a, Node b, Node c, Node d) {
 		// x = (-b + sqrt(b^2 - 4 * a * (c - d))) / (2 * a)
 		return new Equation(x, new Divide(new Add(new Negative(b), new Sqrt(new Subtract(new Power(b, new Number(2)), new Multiply(new Multiply(new Number(4), a), new Subtract(c, d))))), new Multiply(new Number(2), a)));
@@ -95,7 +68,7 @@ public class Equation extends BinaryNode {
 		// TODO: we need to output when we cannot solve an equation
 
 		Node start = new Equation(new Subtract(getLeft(), getRight()), new Number(0)).simplify();
-		ArrayList<Variable> variables = getVariables(start);
+		ArrayList<Variable> variables = start.getVariables();
 		variables.sort((a, b) -> a.getName().compareTo(b.getName()));
 
 		ArrayList<Equation> solutions = new ArrayList<>();

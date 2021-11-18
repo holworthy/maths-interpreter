@@ -8,6 +8,9 @@ import java.util.ListIterator;
 
 import holworthy.maths.exceptions.DivideByZeroException;
 import holworthy.maths.exceptions.MathsInterpreterException;
+import holworthy.maths.nodes.trig.Cos;
+import holworthy.maths.nodes.trig.Sin;
+import holworthy.maths.nodes.trig.Tan;
 
 public class Divide extends BinaryNode {
 	public Divide(Node left, Node right) {
@@ -61,6 +64,9 @@ public class Divide extends BinaryNode {
 
 			return new Divide(new Number(a.divide(divisor)), new Number(b.divide(divisor)));
 		}
+
+		if(left instanceof Sin && right instanceof Cos && ((UnaryNode) left).getNode().matches(((UnaryNode) right).getNode()))
+			return new Tan(((UnaryNode) left).getNode());
 
 		if(left instanceof Divide)
 			return new Divide(((BinaryNode) left).getLeft(), new Multiply(((BinaryNode) left).getRight(), right)).expand();

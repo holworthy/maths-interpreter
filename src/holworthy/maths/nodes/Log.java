@@ -37,6 +37,8 @@ public class Log extends FunctionNode {
 		Node node = getNode().expand();
 		Node base = getBase().expand();
 
+		if(node.matches(new Number(1)))
+			return new Number(0);
 		if(node.matches(base))
 			return new Number(1);
 		if(node instanceof Power && ((BinaryNode) node).getLeft().matches(base))
