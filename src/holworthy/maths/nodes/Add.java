@@ -220,13 +220,6 @@ public class Add extends BinaryNode {
 			return new Multiply(new Number(2), left).expand();
 		if(left instanceof Multiply && ((BinaryNode) left).getLeft() instanceof Number && ((BinaryNode) left).getRight().matches(right))
 			return new Multiply(new Add(((BinaryNode) left).getLeft(), new Number(1)), ((BinaryNode) left).getRight()).expand();
-			
-		// a/b+c/d
-		if(left instanceof Divide && right instanceof Divide){
-			Divide newLeft = new Divide(new Multiply(((Divide) left).getLeft(), ((Divide) right).getRight()), new Multiply(((Divide) left).getRight(), ((Divide) right).getRight()));
-			Divide newRight = new Divide(new Multiply(((Divide) right).getLeft(), ((Divide) left).getRight()), new Multiply(((Divide) right).getRight(),((Divide) left).getRight()));
-			return new Divide(new Add(newLeft.getLeft(), newRight.getLeft()), newLeft.getRight()).expand();
-		}
 
 		// sin(x)^2+cos(x)^2=1
 		if(left.matches(new Power(new Sin(new Matching.Anything()), new Number(2))) && right.matches(new Power(new Cos(new Matching.Anything()), new Number(2))) && ((UnaryNode) ((BinaryNode) left).getLeft()).getNode().matches(((UnaryNode) ((BinaryNode) right).getLeft()).getNode()))
@@ -296,6 +289,13 @@ public class Add extends BinaryNode {
 		// a + -b = a - b
 		if(right instanceof Negative)
 			return new Subtract(left, ((UnaryNode) right).getNode()).collapse();
+
+		// a/b+c/d
+		if(left instanceof Divide && right instanceof Divide){
+			Divide newLeft = new Divide(new Multiply(((Divide) left).getLeft(), ((Divide) right).getRight()), new Multiply(((Divide) left).getRight(), ((Divide) right).getRight()));
+			Divide newRight = new Divide(new Multiply(((Divide) right).getLeft(), ((Divide) left).getRight()), new Multiply(((Divide) right).getRight(),((Divide) left).getRight()));
+			return new Divide(new Add(newLeft.getLeft(), newRight.getLeft()), newLeft.getRight()).expand();
+		}
 
 		if(left instanceof Multiply && right instanceof Multiply){
 			if(((BinaryNode) left).getRight().matches(((BinaryNode) right).getRight())){
