@@ -13,6 +13,7 @@ import javax.swing.UIManager;
 
 import holworthy.maths.Maths;
 import holworthy.maths.exceptions.MathsInterpreterException;
+import holworthy.maths.nodes.BinaryNode;
 import holworthy.maths.nodes.Equation;
 import holworthy.maths.nodes.Node;
 import holworthy.maths.nodes.Variable;
@@ -27,7 +28,7 @@ public class GUI {
 
 		JFrame window = new JFrame("Maths Interpreter");
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		window.setSize(400, 400);
+		window.setSize(600, 600);
 		window.setLayout(new BorderLayout());
 
 		JPanel inputPanel = new JPanel();
@@ -78,6 +79,9 @@ public class GUI {
 						outputPanel.add(solutionsPanel);
 
 						if(((Equation) simplified).numVariables() == 2) {
+							if(((BinaryNode) simplified).getRight().matches(new Variable("y"))){
+								simplified = new Equation(((BinaryNode) simplified).getRight(), ((BinaryNode) simplified).getLeft());
+							}
 							// graphs
 							JPanel graphPanel = new JPanel();
 							graphPanel.setLayout(new BoxLayout(graphPanel, BoxLayout.PAGE_AXIS));
@@ -94,12 +98,13 @@ public class GUI {
 
 					// derivative
 					try {
-						JPanel derivativePanel = new JPanel();
-						derivativePanel.setLayout(new BoxLayout(derivativePanel, BoxLayout.PAGE_AXIS));
-						derivativePanel.add(new JLabel("Derivative:"));
-						// TODO: differentiate wrt whatever variables exist
-						derivativePanel.add(new JLabel(simplified.differentiate(new Variable("x")).toString()));
-						outputPanel.add(derivativePanel);
+						for(Variable wrt : simplified.getVariables()) {
+							JPanel derivativePanel = new JPanel();
+							derivativePanel.setLayout(new BoxLayout(derivativePanel, BoxLayout.PAGE_AXIS));
+							derivativePanel.add(new JLabel("Derivative with respect to " + wrt + ":"));
+							derivativePanel.add(new JLabel(simplified.differentiate(wrt).toString()));
+							outputPanel.add(derivativePanel);
+						}
 					} catch(MathsInterpreterException e) {
 
 					}

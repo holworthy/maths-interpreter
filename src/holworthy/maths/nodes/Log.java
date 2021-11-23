@@ -28,10 +28,17 @@ public class Log extends FunctionNode {
 	}
 
 	@Override
+	public boolean matches(Node node) {
+		return super.matches(node) || (node instanceof Log && getNode().matches(((Log) node).getNode()) && getBase().matches(((Log) node).getBase()));
+	}
+
+	@Override
 	public Node expand() throws MathsInterpreterException {
 		Node node = getNode().expand();
 		Node base = getBase().expand();
 
+		if(node.matches(new Number(1)))
+			return new Number(0);
 		if(node.matches(base))
 			return new Number(1);
 		if(node instanceof Power && ((BinaryNode) node).getLeft().matches(base))

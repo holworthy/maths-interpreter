@@ -42,4 +42,8 @@ public abstract class Matching {
 	public static class Anything extends MatchingNode {
 		
 	}
+
+	public static class AddOrSubtract extends MatchingNode {
+		
+	}
 }

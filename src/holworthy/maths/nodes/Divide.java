@@ -8,6 +8,9 @@ import java.util.ListIterator;
 
 import holworthy.maths.exceptions.DivideByZeroException;
 import holworthy.maths.exceptions.MathsInterpreterException;
+import holworthy.maths.nodes.trig.Cos;
+import holworthy.maths.nodes.trig.Sin;
+import holworthy.maths.nodes.trig.Tan;
 
 public class Divide extends BinaryNode {
 	public Divide(Node left, Node right) {
@@ -62,8 +65,19 @@ public class Divide extends BinaryNode {
 			return new Divide(new Number(a.divide(divisor)), new Number(b.divide(divisor)));
 		}
 
+		if(left instanceof Sin && right instanceof Cos && ((UnaryNode) left).getNode().matches(((UnaryNode) right).getNode()))
+			return new Tan(((UnaryNode) left).getNode());
+
 		if(left instanceof Divide)
 			return new Divide(((BinaryNode) left).getLeft(), new Multiply(((BinaryNode) left).getRight(), right)).expand();
+
+		if(left instanceof Add){
+			return new Add(new Divide(((BinaryNode) left).getLeft(), right), new Divide(((BinaryNode) left).getRight(), right)).expand();
+		}
+
+		if(left instanceof Subtract){
+			return new Subtract(new Divide(((BinaryNode) left).getLeft(), right), new Divide(((BinaryNode) left).getRight(), right)).expand();
+		}
 
 		if(left.isConstant() && right.isConstant())
 			return new Divide(left, right);
@@ -131,11 +145,31 @@ public class Divide extends BinaryNode {
 		if (left instanceof Multiply && right instanceof Multiply){
 			ArrayList<Node> leftList = flatten((Multiply) left);
 			ArrayList<Node> rightList = flatten((Multiply) right);
-			ListIterator<Node> leftItr = leftList.listIterator();
-			
-			while(leftItr.hasNext()){
-				Node n = leftItr.next();
-				ListIterator<Node> rightItr = rightList.listIterator();
+			return removeCommonFactors(leftList, rightList);
+		}
+
+		if (left instanceof Multiply && right instanceof Node && !(right instanceof BinaryNode) && (!(right instanceof UnaryNode) || right instanceof FunctionNode)){
+			ArrayList<Node> leftList = flatten((Multiply) left);
+			ArrayList<Node> rightList = new ArrayList<>();
+			rightList.add(right);
+			return removeCommonFactors(leftList, rightList);
+		}
+
+		if (left instanceof Negative && ((UnaryNode) left).getNode() instanceof Multiply && right instanceof Node && !(right instanceof BinaryNode) && (!(right instanceof UnaryNode) || right instanceof FunctionNode)){
+			ArrayList<Node> leftList = flatten(new Multiply(((UnaryNode) left).getNode(), new Negative(new Number(1))));
+			ArrayList<Node> rightList = new ArrayList<>();
+			rightList.add(right);
+			return removeCommonFactors(leftList, rightList);
+		}
+
+		return new Divide(left, right);
+	}
+
+	public Node removeCommonFactors(ArrayList<Node> leftList, ArrayList<Node> rightList){
+		ListIterator<Node> leftItr = leftList.listIterator();
+		while(leftItr.hasNext()){
+			Node n = leftItr.next();
+			ListIterator<Node> rightItr = rightList.listIterator();
 				while(rightItr.hasNext()){
 					Node o = rightItr.next();
 					if(n.matches(o)){
@@ -153,10 +187,10 @@ public class Divide extends BinaryNode {
 					}
 				}
 			}
+		if (rightList.size() > 0){
 			return new Divide(unFlatten(leftList), unFlatten(rightList));
 		}
-
-		return new Divide(left, right);
+		return unFlatten(leftList);
 	}
 
 	@Override

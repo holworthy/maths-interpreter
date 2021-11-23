@@ -6,8 +6,10 @@ import holworthy.maths.exceptions.MathsInterpreterException;
 import holworthy.maths.nodes.Multiply;
 import holworthy.maths.nodes.Negative;
 import holworthy.maths.nodes.Node;
+import holworthy.maths.nodes.Number;
 import holworthy.maths.nodes.UnaryNode;
 import holworthy.maths.nodes.Variable;
+import holworthy.maths.nodes.constant.Pi;
 
 public class Cos extends TrigNode {
 	public Cos(Node arg) {
@@ -22,8 +24,14 @@ public class Cos extends TrigNode {
 	@Override
 	public Node expand() throws MathsInterpreterException {
 		Node node = getNode().expand();
+		if(node.matches(new Number(0)))
+			return new Number(1);
+		if(node.matches(new Pi()))
+			return new Negative(new Number(1));
 		if(node instanceof Acos)
 			return ((UnaryNode) node).getNode();
+		if(node instanceof Negative)
+			return new Cos(((UnaryNode) node).getNode());
 		return new Cos(node);
 	}
 
