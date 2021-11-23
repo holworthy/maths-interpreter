@@ -101,6 +101,9 @@ public class Power extends BinaryNode {
 		if(left instanceof Multiply)
 			return new Multiply(new Power(((BinaryNode) left).getLeft(), right), new Power(((BinaryNode) left).getRight(), right)).expand();
 
+		if(left instanceof Nthrt)
+			return new Power(((Nthrt) left).getNode(), new Divide(right, ((Nthrt) left).getDegree())).expand();
+		
 		return new Power(left, right);
 	}
 
