@@ -11,6 +11,7 @@ public class Variable extends Node {
 		this.name = name;
 	}
 
+	@Override
 	public String getName() {
 		return name;
 	}

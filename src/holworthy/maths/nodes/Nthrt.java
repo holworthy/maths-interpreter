@@ -34,6 +34,11 @@ public class Nthrt extends FunctionNode {
 		return getNode().isConstant();
 	}
 
+	@Override
+	public boolean matches(Node node) {
+		return super.matches(node) || (node instanceof Nthrt && getDegree().matches(((Nthrt) node).getDegree()) && getNode().matches(((UnaryNode) node).getNode()));
+	}
+
 	public BigInteger iroot(BigInteger k, BigInteger n){
 		BigInteger k1 = k.subtract(BigInteger.ONE);
 		BigInteger s = n.add(BigInteger.ONE);

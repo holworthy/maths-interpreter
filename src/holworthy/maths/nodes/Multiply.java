@@ -105,6 +105,7 @@ public class Multiply extends BinaryNode {
 	}
 
 	public boolean shouldSwap(Node left, Node right) {
+		// TODO: refactor these rules
 		// swap numbers and other constants
 		if(left instanceof ConstantNode && right.isConstant() && !(right instanceof ConstantNode) && !(right instanceof FunctionNode))
 			return true;
@@ -112,13 +113,13 @@ public class Multiply extends BinaryNode {
 		if((left instanceof Variable && (right instanceof Number || right instanceof Negative)) || (left instanceof Power && (right instanceof Number || right instanceof Negative)))
 			return true;
 		// swap powers by variables
-		if(left instanceof Variable && right instanceof Power && ((BinaryNode) right).getLeft() instanceof Variable && ((Variable) left).getName().compareTo(((Variable) ((BinaryNode) right).getLeft()).getName()) > 0)
+		if(left instanceof Variable && right instanceof Power && ((BinaryNode) right).getLeft() instanceof Variable && left.getName().compareTo(((Variable) ((BinaryNode) right).getLeft()).getName()) > 0)
 			return true;
-		if(left instanceof Power && right instanceof Power && ((BinaryNode) right).getLeft() instanceof Variable && ((BinaryNode) left).getLeft() instanceof Variable && ((Variable) ((BinaryNode) left).getLeft()).getName().compareTo(((Variable) ((BinaryNode) right).getLeft()).getName()) > 0)
+		if(left instanceof Power && right instanceof Power && ((BinaryNode) right).getLeft() instanceof Variable && ((BinaryNode) left).getLeft() instanceof Variable && ((BinaryNode) left).getLeft().getName().compareTo(((BinaryNode) right).getLeft().getName()) > 0)
 			return true;
 		// swap variables
 		if(left instanceof Variable && right instanceof Variable)
-			if (((Variable) left).getName().compareTo(((Variable) right).getName()) > 0)
+			if (left.getName().compareTo(right.getName()) > 0)
 				return true;
 		if(left instanceof ConstantNode && right instanceof ConstantNode)
 			return left.toString().compareTo(right.toString()) > 0;
@@ -130,7 +131,7 @@ public class Multiply extends BinaryNode {
 			return true;
 		// sort functions alphabetically
 		if(left instanceof FunctionNode && right instanceof FunctionNode)
-			return ((FunctionNode) left).getName().compareTo(((FunctionNode) right).getName()) > 0;
+			return left.getName().compareTo(right.getName()) > 0;
 
 		return false;
 	}

@@ -71,13 +71,13 @@ public class Divide extends BinaryNode {
 		if(left instanceof Divide)
 			return new Divide(((BinaryNode) left).getLeft(), new Multiply(((BinaryNode) left).getRight(), right)).expand();
 
-		if(left instanceof Add){
-			return new Add(new Divide(((BinaryNode) left).getLeft(), right), new Divide(((BinaryNode) left).getRight(), right)).expand();
-		}
+		// if(left instanceof Add){
+		// 	return new Add(new Divide(((BinaryNode) left).getLeft(), right), new Divide(((BinaryNode) left).getRight(), right)).expand();
+		// }
 
-		if(left instanceof Subtract){
-			return new Subtract(new Divide(((BinaryNode) left).getLeft(), right), new Divide(((BinaryNode) left).getRight(), right)).expand();
-		}
+		// if(left instanceof Subtract){
+		// 	return new Subtract(new Divide(((BinaryNode) left).getLeft(), right), new Divide(((BinaryNode) left).getRight(), right)).expand();
+		// }
 
 		if(left.isConstant() && right.isConstant())
 			return new Divide(left, right);
@@ -85,7 +85,8 @@ public class Divide extends BinaryNode {
 		if(left instanceof Add || right instanceof Add)
 			return new Divide(left, right);
 
-		return new Multiply(left, new Power(right, new Negative(new Number(1)))).expand();
+		// return new Multiply(left, new Power(right, new Negative(new Number(1)))).expand();
+		return new Divide(left, right);
 	}
 
 	public ArrayList<Node> flatten(Multiply root){

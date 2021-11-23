@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import holworthy.maths.exceptions.DivideByZeroException;
 import holworthy.maths.exceptions.MathsInterpreterException;
+import holworthy.maths.nodes.constant.ConstantNode;
 import holworthy.maths.nodes.constant.E;
 import holworthy.maths.nodes.constant.I;
 import holworthy.maths.nodes.constant.Pi;
@@ -16,7 +17,7 @@ public class Power extends BinaryNode {
 
 	@Override
 	public String toString() {
-		return (getLeft() instanceof Power || getLeft() instanceof Variable || getLeft() instanceof Number ? getLeft() : "(" + getLeft() + ")") + "^" + (getRight() instanceof Power || getRight() instanceof Number || getRight() instanceof Variable ? getRight() : "(" + getRight() + ")");
+		return (getLeft() instanceof Power || getLeft() instanceof Variable || getLeft() instanceof Number || getLeft() instanceof ConstantNode ? getLeft() : "(" + getLeft() + ")") + "^" + (getRight() instanceof Power || getRight() instanceof Number || getRight() instanceof Variable ? getRight() : "(" + getRight() + ")");
 	}
 
 	@Override
@@ -111,6 +112,13 @@ public class Power extends BinaryNode {
 
 		if(left instanceof Nthrt)
 			return new Power(((Nthrt) left).getNode(), new Divide(right, ((Nthrt) left).getDegree())).expand();
+
+		if(right instanceof Number && left instanceof Negative) {
+			if(((Number) right).getValue().mod(BigInteger.TWO).equals(BigInteger.ZERO))
+				return new Power(((UnaryNode) left).getNode(), right).expand();
+			else
+				return new Negative(new Power(((UnaryNode) left).getNode(), right)).expand();
+		}
 		
 		return new Power(left, right);
 	}

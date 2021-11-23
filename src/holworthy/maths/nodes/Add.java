@@ -10,7 +10,6 @@ import holworthy.maths.exceptions.MathsInterpreterException;
 import holworthy.maths.nodes.constant.ConstantNode;
 import holworthy.maths.nodes.trig.Cos;
 import holworthy.maths.nodes.trig.Sin;
-import holworthy.maths.nodes.trig.TrigNode;
 
 public class Add extends BinaryNode {
 	public Add(Node left, Node right) {
@@ -59,8 +58,15 @@ public class Add extends BinaryNode {
 	}
 
 	private boolean shouldSwap(Node left, Node right) {
+		// don't swap identical nodes
 		if(left.matches(right))
 			return false;
+		
+		// negatives do not affect the result
+		if(left instanceof Negative)
+			return shouldSwap(((UnaryNode) left).getNode(), right);
+		if(right instanceof Negative)
+			return shouldSwap(left, ((UnaryNode) right).getNode());
 
 		// numbers on the right
 		if(left instanceof Number && right instanceof Number)
@@ -68,31 +74,30 @@ public class Add extends BinaryNode {
 		if(left instanceof Number && !(right instanceof Number))
 			return true;
 
-		if(left instanceof Number && (right instanceof Multiply || right instanceof Power))
-			return true;
-
 		// constants before numbers
 		if(left instanceof Number && right instanceof ConstantNode)
 			return true;
+		if(left instanceof ConstantNode && right instanceof ConstantNode)
+			return left.getName().compareTo(right.getName()) > 0;
 
 		// variables alphabetically
 		if(left instanceof Variable && right instanceof Variable)
-			return ((Variable) left).getName().compareTo(((Variable) right).getName()) > 0;
+			return left.getName().compareTo(right.getName()) > 0;
+		// variables before constants
 		if(left instanceof ConstantNode && right instanceof Variable)
 			return true;
-
-		if(left instanceof TrigNode && right instanceof TrigNode)
-			return ((FunctionNode) left).getName().compareTo(((FunctionNode) right).getName()) > 0;
-
-		if(left instanceof FunctionNode && right instanceof Variable)
+		// variables before constants
+		if(left instanceof Number && right instanceof Variable)
 			return true;
-		if(left instanceof Variable && right instanceof FunctionNode)
-			return false;
 
-		if(left instanceof Negative)
-			return shouldSwap(((UnaryNode) left).getNode(), right);
-		if(right instanceof Negative)
-			return shouldSwap(left, ((UnaryNode) right).getNode());
+		// functions before numbers
+		if(left instanceof Number && right instanceof FunctionNode)
+			return true;
+		// functions before constants
+		if(left instanceof ConstantNode && right instanceof FunctionNode)
+			return true;
+		if(left instanceof FunctionNode && right instanceof ConstantNode)
+			return false;
 
 		ArrayList<Node> flattenedLeft = flatten2(left);
 		ArrayList<Node> flattenedRight = flatten2(right);
@@ -139,9 +144,9 @@ public class Add extends BinaryNode {
 		ArrayList<Node> flattenedLeft = flatten2(left);
 		ArrayList<Node> flattenedRight = flatten2(right);
 
-		while(flattenedLeft.size() > 0 && flattenedLeft.get(0).matches(new Matching.Constant()))
+		while(flattenedLeft.size() > 0 && flattenedLeft.get(0).matches(new Matching.Constant()) && !(flattenedLeft.get(0) instanceof ConstantNode))
 			flattenedLeft.remove(0);
-		while(flattenedRight.size() > 0 && flattenedRight.get(0).matches(new Matching.Constant()))
+		while(flattenedRight.size() > 0 && flattenedRight.get(0).matches(new Matching.Constant()) && !(flattenedRight.get(0) instanceof ConstantNode))
 			flattenedRight.remove(0);
 
 		if(flattenedLeft.size() != flattenedRight.size() || flattenedLeft.size() == 0)
@@ -168,9 +173,9 @@ public class Add extends BinaryNode {
 		ArrayList<Node> rightConstants = new ArrayList<>();
 		rightConstants.add(new Number(1));
 
-		while(flattenedLeft.size() > 0 && flattenedLeft.get(0).matches(new Matching.Constant()))
+		while(flattenedLeft.size() > 0 && flattenedLeft.get(0).matches(new Matching.Constant()) && !(flattenedLeft.get(0) instanceof ConstantNode))
 			leftConstants.add(flattenedLeft.remove(0));
-		while(flattenedRight.size() > 0 && flattenedRight.get(0).matches(new Matching.Constant()))
+		while(flattenedRight.size() > 0 && flattenedRight.get(0).matches(new Matching.Constant()) && !(flattenedRight.get(0) instanceof ConstantNode))
 			rightConstants.add(flattenedRight.remove(0));
 
 		return new Multiply(new Add(unflatten2(leftConstants), unflatten2(rightConstants)), unflatten2(flattenedLeft)).expand();
@@ -215,11 +220,18 @@ public class Add extends BinaryNode {
 		if(left instanceof Negative && right instanceof Negative && ((UnaryNode) left).getNode() instanceof Number && ((UnaryNode) right).getNode() instanceof Number)
 			return new Negative(new Add(((UnaryNode) left).getNode(), ((UnaryNode) right).getNode())).expand();
 
+		if(right.matches(new Negative(left)) || left.matches(new Negative(right)))
+			return new Number(0);
+
 		// x+x=2*x
 		if(left.matches(right))
 			return new Multiply(new Number(2), left).expand();
 		if(left instanceof Multiply && ((BinaryNode) left).getLeft() instanceof Number && ((BinaryNode) left).getRight().matches(right))
 			return new Multiply(new Add(((BinaryNode) left).getLeft(), new Number(1)), ((BinaryNode) left).getRight()).expand();
+
+		// a/b + c/d = ((a*d)+(c*b))/(b*d)
+		if(left instanceof Divide && right instanceof Divide)
+			return new Divide(new Add(new Multiply(((BinaryNode) left).getLeft(), ((BinaryNode) right).getRight()), new Multiply(((BinaryNode) right).getLeft(), ((BinaryNode) left).getRight())), new Multiply(((BinaryNode) left).getRight(), ((BinaryNode) right).getRight())).expand();
 
 		// sin(x)^2+cos(x)^2=1
 		if(left.matches(new Power(new Sin(new Matching.Anything()), new Number(2))) && right.matches(new Power(new Cos(new Matching.Anything()), new Number(2))) && ((UnaryNode) ((BinaryNode) left).getLeft()).getNode().matches(((UnaryNode) ((BinaryNode) right).getLeft()).getNode()))

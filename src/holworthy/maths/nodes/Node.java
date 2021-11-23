@@ -69,4 +69,8 @@ public abstract class Node {
 	public ArrayList<Node> otherForms() throws MathsInterpreterException {
 		return new ArrayList<>();
 	}
+
+	public String getName() {
+		return getClass().getSimpleName().toLowerCase();
+	}
 }
