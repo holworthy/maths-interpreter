@@ -30,6 +30,8 @@ public class Cos extends TrigNode {
 			return new Negative(new Number(1));
 		if(node instanceof Acos)
 			return ((UnaryNode) node).getNode();
+		if(node instanceof Negative)
+			return new Cos(((UnaryNode) node).getNode());
 		return new Cos(node);
 	}
 

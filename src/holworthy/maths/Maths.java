@@ -204,7 +204,7 @@ public abstract class Maths {
 					decimal = true;
 				parser.incrementCursor();
 			}
-				
+
 			String value = parser.getInput().substring(start, parser.getCursor());
 			if(decimal)
 				return decimalToFraction(Double.parseDouble(value));
@@ -304,7 +304,7 @@ public abstract class Maths {
 	}
 
 	public static Node parseInput(String input) throws Exception {
-		Parser parser = new Parser(input);
+		Parser parser = new Parser(input.replace(" ", ""));
 		Node equation = parseEquation(parser);
 		assert parser.getInput().length() == parser.getCursor();
 		return equation;

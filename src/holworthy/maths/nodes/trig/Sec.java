@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import holworthy.maths.exceptions.MathsInterpreterException;
 import holworthy.maths.nodes.Multiply;
+import holworthy.maths.nodes.Negative;
 import holworthy.maths.nodes.Node;
 import holworthy.maths.nodes.UnaryNode;
 import holworthy.maths.nodes.Variable;
@@ -23,6 +24,8 @@ public class Sec extends TrigNode {
 		Node node = getNode().expand();
 		if(node instanceof Asec)
 			return ((UnaryNode) node).getNode();
+		if(node instanceof Negative)
+			return new Sec(((UnaryNode) node).getNode());
 		return new Sec(node);
 	}
 
