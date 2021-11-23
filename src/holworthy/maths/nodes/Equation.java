@@ -83,17 +83,6 @@ public class Equation extends BinaryNode {
 				// 37*x^2+42*c-42*c+(1/37)*x=0 pretty sure this is cos quadratics
 
 				// quadratics
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-
 				// a*x^2 + b*x + c = d
 				// a*x^2 + b*x = d
 				if(expandedEquation.getLeft().matches(new Add(new Add(new Multiply(new Matching.Constant(), new Power(new Matching.Anything(), new Number(2))), new Multiply(new Matching.Constant(), new Matching.Anything())), new Matching.Constant())) && expandedEquation.getRight().matches(new Matching.Constant()) && ((BinaryNode) ((BinaryNode) ((BinaryNode) ((BinaryNode) expandedEquation.getLeft()).getLeft()).getLeft()).getRight()).getLeft().matches(((BinaryNode) ((BinaryNode) ((BinaryNode) expandedEquation.getLeft()).getLeft()).getRight()).getRight())) {

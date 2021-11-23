@@ -82,6 +82,14 @@ public class Power extends BinaryNode {
 		if(right.matches(new Number(1)))
 			return left;
 
+		if(left instanceof Divide && right instanceof Number){
+			return new Divide(new Power(((BinaryNode) left).getLeft(), right), new Power(((BinaryNode) left).getRight(), right)).expand();
+		}
+
+		if(left instanceof Negative && ((UnaryNode) left).getNode() instanceof Divide && right instanceof Number){
+			return new Divide(new Power(new Negative(((BinaryNode) ((UnaryNode) left).getNode()).getLeft()), right), new Power(((BinaryNode) ((UnaryNode) left).getNode()).getRight(), right)).expand();
+		}
+
 		// binomial theorum which works as multinomial theorum
 		if(left instanceof Add && right instanceof Number) {
 			Node temp = new Number(0);
