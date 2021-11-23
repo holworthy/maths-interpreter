@@ -71,6 +71,14 @@ public class Divide extends BinaryNode {
 		if(left instanceof Divide)
 			return new Divide(((BinaryNode) left).getLeft(), new Multiply(((BinaryNode) left).getRight(), right)).expand();
 
+		if(left instanceof Add){
+			return new Add(new Divide(((BinaryNode) left).getLeft(), right), new Divide(((BinaryNode) left).getRight(), right)).expand();
+		}
+
+		if(left instanceof Subtract){
+			return new Subtract(new Divide(((BinaryNode) left).getLeft(), right), new Divide(((BinaryNode) left).getRight(), right)).expand();
+		}
+
 		if(left.isConstant() && right.isConstant())
 			return new Divide(left, right);
 
@@ -137,11 +145,31 @@ public class Divide extends BinaryNode {
 		if (left instanceof Multiply && right instanceof Multiply){
 			ArrayList<Node> leftList = flatten((Multiply) left);
 			ArrayList<Node> rightList = flatten((Multiply) right);
-			ListIterator<Node> leftItr = leftList.listIterator();
-			
-			while(leftItr.hasNext()){
-				Node n = leftItr.next();
-				ListIterator<Node> rightItr = rightList.listIterator();
+			return removeCommonFactors(leftList, rightList);
+		}
+
+		if (left instanceof Multiply && right instanceof Node && !(right instanceof BinaryNode) && (!(right instanceof UnaryNode) || right instanceof FunctionNode)){
+			ArrayList<Node> leftList = flatten((Multiply) left);
+			ArrayList<Node> rightList = new ArrayList<>();
+			rightList.add(right);
+			return removeCommonFactors(leftList, rightList);
+		}
+
+		if (left instanceof Negative && ((UnaryNode) left).getNode() instanceof Multiply && right instanceof Node && !(right instanceof BinaryNode) && (!(right instanceof UnaryNode) || right instanceof FunctionNode)){
+			ArrayList<Node> leftList = flatten(new Multiply(((UnaryNode) left).getNode(), new Negative(new Number(1))));
+			ArrayList<Node> rightList = new ArrayList<>();
+			rightList.add(right);
+			return removeCommonFactors(leftList, rightList);
+		}
+
+		return new Divide(left, right);
+	}
+
+	public Node removeCommonFactors(ArrayList<Node> leftList, ArrayList<Node> rightList){
+		ListIterator<Node> leftItr = leftList.listIterator();
+		while(leftItr.hasNext()){
+			Node n = leftItr.next();
+			ListIterator<Node> rightItr = rightList.listIterator();
 				while(rightItr.hasNext()){
 					Node o = rightItr.next();
 					if(n.matches(o)){
@@ -159,10 +187,10 @@ public class Divide extends BinaryNode {
 					}
 				}
 			}
+		if (rightList.size() > 0){
 			return new Divide(unFlatten(leftList), unFlatten(rightList));
 		}
-
-		return new Divide(left, right);
+		return unFlatten(leftList);
 	}
 
 	@Override

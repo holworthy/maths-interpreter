@@ -106,7 +106,7 @@ public class Multiply extends BinaryNode {
 
 	public boolean shouldSwap(Node left, Node right) {
 		// swap numbers and other constants
-		if(left instanceof ConstantNode && right.isConstant() && !(right instanceof ConstantNode))
+		if(left instanceof ConstantNode && right.isConstant() && !(right instanceof ConstantNode) && !(right instanceof FunctionNode))
 			return true;
 		// swap variables and numbers
 		if((left instanceof Variable && (right instanceof Number || right instanceof Negative)) || (left instanceof Power && (right instanceof Number || right instanceof Negative)))
