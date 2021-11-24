@@ -156,6 +156,13 @@ public class Divide extends BinaryNode {
 			return removeCommonFactors(leftList, rightList);
 		}
 
+		if (left instanceof Node && !(left instanceof BinaryNode) && (!(left instanceof UnaryNode) || left instanceof FunctionNode) && right instanceof Multiply){
+			ArrayList<Node> leftList = new ArrayList<>();
+			leftList.add(left);
+			ArrayList<Node> rightList = flatten((Multiply) right);
+			return removeCommonFactors(leftList, rightList);
+		}
+
 		if (left instanceof Negative && ((UnaryNode) left).getNode() instanceof Multiply && right instanceof Node && !(right instanceof BinaryNode) && (!(right instanceof UnaryNode) || right instanceof FunctionNode)){
 			ArrayList<Node> leftList = flatten(new Multiply(((UnaryNode) left).getNode(), new Negative(new Number(1))));
 			ArrayList<Node> rightList = new ArrayList<>();
@@ -188,7 +195,11 @@ public class Divide extends BinaryNode {
 					}
 				}
 			}
-		if (rightList.size() > 0){
+		if (rightList.size() > 0 && leftList.size() > 0){
+			return new Divide(unFlatten(leftList), unFlatten(rightList));
+		}
+		else if(leftList.size() == 0 && rightList.size() > 0){
+			leftList.add(new Number(1));
 			return new Divide(unFlatten(leftList), unFlatten(rightList));
 		}
 		return unFlatten(leftList);
