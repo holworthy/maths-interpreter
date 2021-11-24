@@ -58,6 +58,10 @@ public class Add extends BinaryNode {
 	}
 
 	private boolean shouldSwap(Node left, Node right) {
+		System.out.println(left);
+		System.out.println(right);
+		System.out.println();
+
 		// don't swap identical nodes
 		if(left.matches(right))
 			return false;
@@ -97,6 +101,11 @@ public class Add extends BinaryNode {
 		if(left instanceof ConstantNode && right instanceof FunctionNode)
 			return true;
 		if(left instanceof FunctionNode && right instanceof ConstantNode)
+			return false;
+
+		if((left instanceof Multiply || left instanceof Power || left instanceof Divide) && (right instanceof Number || right instanceof Variable))
+			return true;
+		if((right instanceof Multiply || right instanceof Power || right instanceof Divide) && (left instanceof Number || left instanceof Variable))
 			return false;
 
 		ArrayList<Node> flattenedLeft = flatten2(left);

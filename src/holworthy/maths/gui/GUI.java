@@ -88,6 +88,7 @@ public class GUI {
 							graphPanel.add(new JLabel("Graph:"));
 							Graph graph = new Graph((Equation) simplified);
 
+							// TODO: specify which variable is on which axis
 							// graph.setXAxis();
 							// graph.setYAxis();
 
