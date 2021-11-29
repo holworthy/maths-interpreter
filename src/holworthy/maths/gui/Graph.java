@@ -13,7 +13,9 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.HashMap;
+import java.util.Locale;
 
 import javax.swing.JPanel;
 
@@ -35,9 +37,11 @@ public class Graph extends JPanel implements MouseListener, MouseMotionListener,
 	private double zoomX = 20;
 	private double zoomY = 20;
 
-	private DecimalFormat decimalFormat = new DecimalFormat("0.00E0");
+	private DecimalFormat decimalFormat = new DecimalFormat("0", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+	//TODO: make even more usable
 
 	public Graph(Equation equation){
+		decimalFormat.setMaximumFractionDigits(340);
 		this.equation = equation;
 		setPreferredSize(size);
 		setMaximumSize(size);
