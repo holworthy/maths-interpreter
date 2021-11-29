@@ -63,4 +63,9 @@ public class Log extends FunctionNode {
 	public double evaluate(HashMap<Variable, Node> values) {
 		return Math.log(getNode().evaluate(values)) / Math.log(getBase().evaluate(values));
 	}
+
+	@Override
+	public boolean contains(Variable variable) {
+		return super.contains(variable) || getBase().contains(variable);
+	}
 }

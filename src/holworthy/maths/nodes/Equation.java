@@ -309,9 +309,17 @@ public class Equation extends BinaryNode {
 				} else if(equation.getLeft() instanceof Power) {
 					if(((BinaryNode) equation.getLeft()).getLeft().contains(variable)) {
 						equation = new Equation(((BinaryNode) equation.getLeft()).getLeft(), new Nthrt(equation.getRight(), ((BinaryNode) equation.getLeft()).getRight()));
+					} else if(((BinaryNode) equation.getLeft()).getRight().contains(variable)){
+						equation = new Equation(((BinaryNode) equation.getLeft()).getRight(), new Log(equation.getRight(), ((BinaryNode) equation.getLeft()).getLeft()));
 					}
 					// TODO: logs
-
+				} else if(equation.getLeft() instanceof Log) {
+					if(((UnaryNode) equation.getLeft()).getNode().contains(variable)){
+						equation = new Equation(((UnaryNode) equation.getLeft()).getNode(), new Power(((Log) equation.getLeft()).getBase(), equation.getRight()));
+					} else if(((Log) equation.getLeft()).getBase().contains(variable)) {
+						equation = new Equation(new Power(((Log) equation.getLeft()).getBase(), equation.getRight()), ((UnaryNode) equation.getLeft()).getNode());
+					}
+				
 				// sin(x) = a -> x = asin(a)
 				} else if(equation.getLeft() instanceof Sin) {
 					equation = new Equation(((UnaryNode) equation.getLeft()).getNode(), new Asin(equation.getRight()));
