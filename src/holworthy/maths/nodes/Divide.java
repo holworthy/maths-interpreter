@@ -85,8 +85,8 @@ public class Divide extends BinaryNode {
 		if(left instanceof Add || right instanceof Add)
 			return new Divide(left, right);
 
-		// return new Multiply(left, new Power(right, new Negative(new Number(1)))).expand();
-		return new Divide(left, right);
+		return new Multiply(left, new Power(right, new Negative(new Number(1)))).expand();
+		// return new Divide(left, right);
 	}
 
 	public ArrayList<Node> flatten(Multiply root){
