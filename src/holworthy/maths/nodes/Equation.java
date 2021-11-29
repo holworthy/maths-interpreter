@@ -312,7 +312,6 @@ public class Equation extends BinaryNode {
 					} else if(((BinaryNode) equation.getLeft()).getRight().contains(variable)){
 						equation = new Equation(((BinaryNode) equation.getLeft()).getRight(), new Log(equation.getRight(), ((BinaryNode) equation.getLeft()).getLeft()));
 					}
-					// TODO: logs
 				} else if(equation.getLeft() instanceof Log) {
 					if(((UnaryNode) equation.getLeft()).getNode().contains(variable)){
 						equation = new Equation(((UnaryNode) equation.getLeft()).getNode(), new Power(((Log) equation.getLeft()).getBase(), equation.getRight()));

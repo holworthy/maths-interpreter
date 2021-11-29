@@ -103,7 +103,7 @@ public class Testing {
 
 		// complex numbers
 		tests.put("sqrt(-16)","4*i");
-		tests.put("((sqrt(3)+i)/2)^6+((i-sqrt(3))/2)^6","-2"); // TODO:this breaks
+		tests.put("((sqrt(3)+i)/2)^6+((i-sqrt(3))/2)^6","-2");
 
 		// logs
 		tests.put("ln(2)+ln(2)", "2*ln(2)");
