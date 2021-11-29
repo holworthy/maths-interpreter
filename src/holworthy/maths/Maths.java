@@ -74,7 +74,7 @@ import holworthy.maths.nodes.trig.Tanh;
 
 public abstract class Maths {
 	private static ArrayList<String> CONSTANTS = new ArrayList<>(Arrays.asList(new String[]{"e", "i", "pi"}));
-	private static ArrayList<String> FUNCTIONS = new ArrayList<>(Arrays.asList(new String[]{"nthrt", "sqrt", "log", "ln", "factorial", "acos", "acosh", "acot", "acoth", "acsc", "acsch", "asec", "asech", "asin", "asinh", "atan", "atanh", "cos", "cosh", "cot", "coth", "csc", "csch", "sec", "sech", "sin", "sinh", "tan", "tanh", "differentiate", "integrate"}));
+	private static ArrayList<String> FUNCTIONS = new ArrayList<>(Arrays.asList(new String[]{"nthrt", "sqrt", "log", "ln", "factorial", "acos", "acosh", "acot", "acoth", "acsc", "acsch", "asec", "asech", "asin", "asinh", "atan", "atanh", "cos", "cosh", "cot", "coth", "csc", "csch", "sec", "sech", "sin", "sinh", "tan", "tanh"}));
 
 	private static Node parseValue(Parser parser) throws Exception {
 		if(parser.hasMore() && parser.getChar() == '(') {
@@ -182,12 +182,6 @@ public abstract class Maths {
 							return new Nthrt(params.get(0), params.get(1));
 						case "log":
 							return new Log(params.get(0), params.get(1));
-						case "differentiate":
-							// TODO
-							return null;
-						case "integrate":
-							// TODO
-							return null;
 					}
 				} else {
 					throw new Error("wrong number of parameters for " + name);
