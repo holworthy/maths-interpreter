@@ -1,7 +1,9 @@
 package holworthy.maths.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Font;
 import java.util.ArrayList;
+import java.util.Enumeration;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -9,6 +11,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 
 import holworthy.maths.Maths;
@@ -21,9 +24,20 @@ import holworthy.maths.nodes.Variable;
 public class GUI {
 	public GUI() {
 		try {
+			// set the UI back to the windows look rather than the Java look
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch(Exception e) {
 
+		}
+
+		// scale the fonts up to be legible
+		UIDefaults defaults = UIManager.getDefaults();
+		Enumeration<Object> keys = defaults.keys();
+		while(keys.hasMoreElements()) {
+			Object key = keys.nextElement();
+			Object value = defaults.get(key);
+			if(value instanceof Font)
+				defaults.put(key, ((Font) value).deriveFont(((Font) value).getSize() * 1.5f));
 		}
 
 		JFrame window = new JFrame("Maths Interpreter");
