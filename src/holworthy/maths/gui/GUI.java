@@ -91,8 +91,11 @@ public class GUI {
 						solutionsPanel.setLayout(new BoxLayout(solutionsPanel, BoxLayout.PAGE_AXIS));
 						solutionsPanel.add(new JLabel("Solutions:"));
 						ArrayList<Equation> solutions = ((Equation) simplified).solve();
-						for(Equation solution : solutions)
-							solutionsPanel.add(new JLabel(solution.toString()));
+						if(solutions.size() > 0)
+							for(Equation solution : solutions)
+								solutionsPanel.add(new JLabel(solution.toString()));
+						else
+							solutionsPanel.add(new JLabel("No Solutions"));
 						outputPanel.add(solutionsPanel);
 
 						for(Equation solution : solutions) {

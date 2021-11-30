@@ -289,7 +289,6 @@ public class Equation extends BinaryNode {
 					}
 				
 				// x * a = b -> x = b / a
-				// TODO: check this okay
 				} else if(equation.getLeft() instanceof Multiply) {
 					if(((BinaryNode) equation.getLeft()).getLeft().contains(variable))
 						equation = new Equation(((BinaryNode) equation.getLeft()).getLeft(), new Divide(equation.getRight(), ((BinaryNode) equation.getLeft()).getRight()));
