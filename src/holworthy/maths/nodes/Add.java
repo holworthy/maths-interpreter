@@ -97,6 +97,11 @@ public class Add extends BinaryNode {
 		// functions before numbers
 		if(left instanceof Number && right instanceof FunctionNode)
 			return true;
+		// functions before variables
+		if(left instanceof Variable && right instanceof FunctionNode)
+			return true;
+		if(left instanceof FunctionNode && right instanceof Variable)
+			return false;
 		// functions before constants
 		if(left instanceof ConstantNode && right instanceof FunctionNode)
 			return true;
