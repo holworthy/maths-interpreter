@@ -57,11 +57,13 @@ import holworthy.maths.nodes.trig.Tanh;
 <multiply-or-divide> ::= <multiply-or-divide> "*" <negative> | <multiply-or-divide> "/" <negative> | <negative>
 <negative> ::= "-" <negative> | <power>
 <power> ::= <value> "^" <negative> | <value>
-<value> ::= <number> | <brackets> | <variable> | <function>
+<value> ::= <number> | <brackets> | <variable> | <function> | <factorial>
 <brackets> ::= "(" <expression> ")"
 
 <function> ::= <name> "(" <parameter-list> ")"
 <parameter-list> ::= <parameter-list> "," <equation> | <equation>
+
+<factorial> ::= <variable> | <brackets> | <variable>  | <function>
 
 <variable> ::= <name>
 <name> ::= <name> <letter> | <letter>
