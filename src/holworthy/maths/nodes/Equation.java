@@ -65,8 +65,6 @@ public class Equation extends BinaryNode {
 	}
 
 	public ArrayList<Equation> solve() throws MathsInterpreterException {
-		// TODO: we need to output when we cannot solve an equation
-
 		Node start = new Equation(new Subtract(getLeft(), getRight()), new Number(0)).simplify();
 		ArrayList<Variable> variables = start.getVariables();
 		variables.sort((a, b) -> a.getName().compareTo(b.getName()));
@@ -396,7 +394,7 @@ public class Equation extends BinaryNode {
 				}
 			}
 
-			if(equation.getLeft().matches(variable))
+			if(equation.getLeft().matches(variable) && !(equation.getRight().contains((Variable) equation.getLeft())))
 				solutions.add((Equation) equation.simplify());
 		}
 
