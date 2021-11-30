@@ -228,8 +228,17 @@ public abstract class Maths {
 		return new Divide(new Number(BigDecimal.valueOf(h1).toBigInteger()), new Number(BigDecimal.valueOf(k1).toBigInteger()));
 	}
 
-	private static Node parsePower(Parser parser) throws Exception {
+	private static Node parseFactorialAsPoint(Parser parser) throws Exception{
 		Node left = parseValue(parser);
+		if(parser.hasMore() && parser.getChar() == '!'){
+			parser.incrementCursor();
+			left = new Factorial(left);
+		}
+		return left;
+	}
+
+	private static Node parsePower(Parser parser) throws Exception {
+		Node left = parseFactorialAsPoint(parser);
 		if(parser.hasMore() && parser.getChar() == '^') {
 			parser.incrementCursor();
 			Node right = parseNegative(parser);
