@@ -124,7 +124,6 @@ public abstract class Maths {
 							return new Sqrt(params.get(0));
 						case "ln":
 							return new Ln(params.get(0));
-						// TODO: also add 5! as corect syntax
 						case "factorial":
 							return new Factorial(params.get(0));
 						case "acos":
