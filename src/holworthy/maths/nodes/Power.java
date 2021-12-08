@@ -148,4 +148,11 @@ public class Power extends BinaryNode {
 	public double evaluate(HashMap<Variable, Node> values) {
 		return Math.pow(getLeft().evaluate(values), getRight().evaluate(values));
 	}
+
+	@Override
+	public Node replace(Node before, Node after) {
+		if(matches(before))
+			return after;
+		return new Power(getLeft().replace(before, after), getRight().replace(before, after));
+	}
 }

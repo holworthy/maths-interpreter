@@ -38,4 +38,11 @@ public class Subtract extends BinaryNode {
 	public double evaluate(HashMap<Variable, Node> values) {
 		return getLeft().evaluate(values) - getRight().evaluate(values);
 	}
+
+	@Override
+	public Node replace(Node before, Node after) {
+		if(matches(before))
+			return after;
+		return new Subtract(getLeft().replace(before, after), getRight().replace(before, after));
+	}
 }

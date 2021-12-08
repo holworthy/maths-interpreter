@@ -35,4 +35,11 @@ public abstract class ConstantNode extends Node {
 	public boolean contains(Variable variable) {
 		return false;
 	}
+
+	@Override
+	public Node replace(Node before, Node after) {
+		if(matches(before))
+			return after;
+		return this;
+	}
 }

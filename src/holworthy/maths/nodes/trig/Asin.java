@@ -39,4 +39,11 @@ public class Asin extends TrigNode {
 	public double evaluate(HashMap<Variable, Node> values) {
 		return Math.asin(getNode().evaluate(values));
 	}
+
+	@Override
+	public Node replace(Node before, Node after) {
+		if(matches(before))
+			return after;
+		return new Asin(getNode().replace(before, after));
+	}
 }

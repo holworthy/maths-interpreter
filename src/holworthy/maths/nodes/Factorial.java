@@ -82,4 +82,11 @@ public class Factorial extends FunctionNode {
 		
 		return gamma(value);
 	}
+
+	@Override
+	public Node replace(Node before, Node after) {
+		if(matches(before))
+			return after;
+		return new Factorial(getNode().replace(before, after));
+	}
 }

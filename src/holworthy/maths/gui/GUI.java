@@ -19,8 +19,10 @@ import javax.swing.UIManager;
 
 import holworthy.maths.Maths;
 import holworthy.maths.exceptions.MathsInterpreterException;
+import holworthy.maths.nodes.BinaryNode;
 import holworthy.maths.nodes.Equation;
 import holworthy.maths.nodes.Node;
+import holworthy.maths.nodes.Number;
 import holworthy.maths.nodes.Variable;
 
 public class GUI {
@@ -106,6 +108,21 @@ public class GUI {
 				outputPanel.add(simplifiedPanel);
 
 				if(simplified instanceof Equation) {
+					// zero crossings
+					JPanel zeroCrossingsPanel = new JPanel();
+					zeroCrossingsPanel.setLayout(new BoxLayout(zeroCrossingsPanel, BoxLayout.PAGE_AXIS));
+					zeroCrossingsPanel.add(new JLabel("Zero Crossings:"));
+					for(Variable replacing : simplified.getVariables()) {
+						Node copy = simplified.copy();
+						try {
+							for(Node crossing : ((Equation) copy.replace(replacing, new Number(0)).simplify()).solve())
+								zeroCrossingsPanel.add(new JLabel(crossing.toString()));
+						} catch (MathsInterpreterException e) {
+							
+						}
+					}
+					outputPanel.add(zeroCrossingsPanel);
+
 					// solutions
 					try {
 						ArrayList<Equation> solutions = ((Equation) simplified).solve();
@@ -138,7 +155,7 @@ public class GUI {
 						}
 					} catch (MathsInterpreterException e) {
 						
-					}	
+					}
 				}
 
 				// derivative

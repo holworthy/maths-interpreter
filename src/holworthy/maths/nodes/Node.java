@@ -78,4 +78,6 @@ public abstract class Node {
 	public String getName() {
 		return getClass().getSimpleName().toLowerCase();
 	}
+
+	public abstract Node replace(Node before, Node after);
 }

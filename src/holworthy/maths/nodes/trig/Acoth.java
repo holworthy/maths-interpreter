@@ -39,4 +39,11 @@ public class Acoth extends TrigNode {
 		double x = getNode().evaluate(values);
 		return 0.5 * Math.log(1.0 / x + 1) - 0.5 * Math.log(1 - 1.0 / x);
 	}
+
+	@Override
+	public Node replace(Node before, Node after) {
+		if(matches(before))
+			return after;
+		return new Acoth(getNode().replace(before, after));
+	}
 }

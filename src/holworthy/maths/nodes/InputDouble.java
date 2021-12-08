@@ -35,4 +35,11 @@ public class InputDouble extends Node {
 	public double evaluate(HashMap<Variable, Node> values) {
 		return value;
 	}
+
+	@Override
+	public Node replace(Node before, Node after) {
+		if(matches(before))
+			return after;
+		return this;
+	}
 }

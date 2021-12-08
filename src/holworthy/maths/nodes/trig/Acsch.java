@@ -42,4 +42,11 @@ public class Acsch extends TrigNode {
 		double x = 1.0 / getNode().evaluate(values);
 		return Math.log(x + Math.sqrt(x * x + 1));
 	}
+
+	@Override
+	public Node replace(Node before, Node after) {
+		if(matches(before))
+			return after;
+		return new Acsch(getNode().replace(before, after));
+	}
 }

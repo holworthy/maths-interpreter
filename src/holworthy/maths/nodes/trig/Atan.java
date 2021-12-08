@@ -38,4 +38,11 @@ public class Atan extends TrigNode {
 	public double evaluate(HashMap<Variable, Node> values) {
 		return Math.atan(getNode().evaluate(values));
 	}
+
+	@Override
+	public Node replace(Node before, Node after) {
+		if(matches(before))
+			return after;
+		return new Atan(getNode().replace(before, after));
+	}
 }

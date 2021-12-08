@@ -68,8 +68,12 @@ public class Nthrt extends FunctionNode {
 
 	@Override
 	public Node expand() throws MathsInterpreterException {
+		System.out.println(this);
 		Node node = getNode().expand();
 		Node degree = getDegree().expand();
+
+		if(getNode().matches(new Number(0)))
+			return new Number(0);
 
 		if(degree.matches(new Number(0)))
 			throw new MathsInterpreterException("Cannot have a 0th root");
@@ -144,4 +148,11 @@ public class Nthrt extends FunctionNode {
 	// 	// System.out.println(new Nthrt(new Number(4), new Number(2)).simplify());
 	// 	System.out.println(new Multiply(new I(), new Nthrt(new Number(8), new Number(2))).simplify());
 	// }
+
+	@Override
+	public Node replace(Node before, Node after) {
+		if(matches(before))
+			return after;
+		return new Nthrt(getNode().replace(before, after), getDegree().replace(before, after));
+	}
 }
