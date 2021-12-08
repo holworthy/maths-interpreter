@@ -9,6 +9,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
@@ -62,35 +63,52 @@ public class GUI {
 
 		// event listeners
 		interpretButton.addActionListener(ae -> {
-			try {
-				String text = inputTextField.getText();
-				if(text.length() > 0) {
-					// TODO: do this on another thread
-					Node input = Maths.parseInput(text);
-					Node simplified = input.simplify();
+			String text = inputTextField.getText();
+			if(text.length() > 0) {
+				Node input;
+				try {
+					input = Maths.parseInput(text);
+				} catch (Exception e1) {
+					JOptionPane.showMessageDialog(window, "Make sure you are using the correct syntax", "Uh oh", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				Node simplified;
+				try {
+					simplified = input.simplify();
+				} catch (MathsInterpreterException e1) {
+					JOptionPane.showMessageDialog(window, "Not able to simplify that", "Uh oh", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
 
-					outputPanel.removeAll();
-					
-					// expanded
+				outputPanel.removeAll();
+				
+				// expanded
+				Node expanded;
+				try {
+					expanded = input.expand();
 					JPanel expandedPanel = new JPanel();
 					expandedPanel.setLayout(new BoxLayout(expandedPanel, BoxLayout.PAGE_AXIS));
 					expandedPanel.add(new JLabel("Expanded:"));
-					expandedPanel.add(new JLabel(input.expand().toString()));
+					expandedPanel.add(new JLabel(expanded.toString()));
 					outputPanel.add(expandedPanel);
+				} catch(MathsInterpreterException e) {
+					
+				}
+				
+				// simplified
+				JPanel simplifiedPanel = new JPanel();
+				simplifiedPanel.setLayout(new BoxLayout(simplifiedPanel, BoxLayout.PAGE_AXIS));
+				simplifiedPanel.add(new JLabel("Simplified:"));
+				simplifiedPanel.add(new JLabel(simplified.toString()));
+				outputPanel.add(simplifiedPanel);
 
-					// simplified
-					JPanel simplifiedPanel = new JPanel();
-					simplifiedPanel.setLayout(new BoxLayout(simplifiedPanel, BoxLayout.PAGE_AXIS));
-					simplifiedPanel.add(new JLabel("Simplified:"));
-					simplifiedPanel.add(new JLabel(simplified.toString()));
-					outputPanel.add(simplifiedPanel);
-
-					if(simplified instanceof Equation) {
-						// solutions
+				if(simplified instanceof Equation) {
+					// solutions
+					try {
+						ArrayList<Equation> solutions = ((Equation) simplified).solve();
 						JPanel solutionsPanel = new JPanel();
 						solutionsPanel.setLayout(new BoxLayout(solutionsPanel, BoxLayout.PAGE_AXIS));
 						solutionsPanel.add(new JLabel("Solutions:"));
-						ArrayList<Equation> solutions = ((Equation) simplified).solve();
 						if(solutions.size() > 0)
 							for(Equation solution : solutions)
 								solutionsPanel.add(new JLabel(solution.toString()));
@@ -115,28 +133,26 @@ public class GUI {
 								outputPanel.add(graphPanel);
 							}
 						}
+					} catch (MathsInterpreterException e) {
 						
-					}
-
-					// derivative
-					try {
-						for(Variable wrt : simplified.getVariables()) {
-							JPanel derivativePanel = new JPanel();
-							derivativePanel.setLayout(new BoxLayout(derivativePanel, BoxLayout.PAGE_AXIS));
-							derivativePanel.add(new JLabel("Derivative with respect to " + wrt + ":"));
-							derivativePanel.add(new JLabel(simplified.differentiate(wrt).toString()));
-							outputPanel.add(derivativePanel);
-						}
-					} catch(MathsInterpreterException e) {
-
-					}
-
-					outputPanel.revalidate();
-					outputPanel.repaint();
+					}	
 				}
-			} catch(Exception e) {
-				e.printStackTrace();
-				// TODO: remove this and handle errors
+
+				// derivative
+				try {
+					for(Variable wrt : simplified.getVariables()) {
+						JPanel derivativePanel = new JPanel();
+						derivativePanel.setLayout(new BoxLayout(derivativePanel, BoxLayout.PAGE_AXIS));
+						derivativePanel.add(new JLabel("Derivative with respect to " + wrt + ":"));
+						derivativePanel.add(new JLabel(simplified.differentiate(wrt).toString()));
+						outputPanel.add(derivativePanel);
+					}
+				} catch(MathsInterpreterException e) {
+
+				}
+
+				outputPanel.revalidate();
+				outputPanel.repaint();
 			}
 		});
 		inputTextField.addActionListener(e -> interpretButton.doClick());

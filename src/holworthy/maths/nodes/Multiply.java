@@ -105,7 +105,6 @@ public class Multiply extends BinaryNode {
 	}
 
 	public boolean shouldSwap(Node left, Node right) {
-		// TODO: refactor these rules
 		// swap numbers and other constants
 		if(left instanceof ConstantNode && right.isConstant() && !(right instanceof ConstantNode) && !(right instanceof FunctionNode))
 			return true;
@@ -145,32 +144,23 @@ public class Multiply extends BinaryNode {
 			return new Negative(new Multiply(((UnaryNode) left).getNode(), right)).collapse();
 		if(right instanceof Negative)
 			return new Negative(new Multiply(left, ((UnaryNode) right).getNode())).collapse();
-
 		// x * y/z = (x*y)/z
 		if (right instanceof Divide && !(left instanceof Divide))
 			return new Divide(new Multiply(left, ((BinaryNode) right).getLeft()).expand(), ((BinaryNode) right).getRight()).collapse();
-
 		if (left instanceof Divide && !(right instanceof Divide))
 			return new Divide(new Multiply(((BinaryNode) left).getLeft(), right).expand(), ((BinaryNode) left).getRight()).collapse();
-
 		// x/y * z/w = x*z / y*w
-		if (left instanceof Divide && right instanceof Divide){
+		if (left instanceof Divide && right instanceof Divide)
 			return new Divide(new Multiply(((BinaryNode) left).getLeft(), ((BinaryNode) right).getLeft()).expand(), new Multiply(((BinaryNode) left).getRight(), ((BinaryNode) right).getRight()).expand()).collapse();
-		}
-
 		// x^-1 * y^-1 = (x*y)^-1
 		if (left instanceof Power && right instanceof Power && ((BinaryNode) left).getRight().matches(((BinaryNode) right).getRight()))
 			return new Power(new Multiply(((BinaryNode) left).getLeft(), ((BinaryNode) right).getLeft()), ((BinaryNode) left).getRight()).collapse();
-
 		// x * y^-1 = x/y
-		if(right instanceof Power && ((BinaryNode) right).getRight() instanceof Negative){
+		if(right instanceof Power && ((BinaryNode) right).getRight() instanceof Negative)
 			return new Divide(left, new Power(((BinaryNode) right).getLeft(), ((UnaryNode) ((BinaryNode) right).getRight()).getNode())).expand().collapse();
-		}
-
 		// x^-1 * y = y/x
-		if(left instanceof Power && ((BinaryNode) left).getRight() instanceof Negative){
+		if(left instanceof Power && ((BinaryNode) left).getRight() instanceof Negative)
 			return new Divide(right, new Power(((BinaryNode) left).getLeft(), ((UnaryNode) ((BinaryNode) left).getRight()).getNode())).expand().collapse();
-		}
 
 		return new Multiply(left, right);
 	}

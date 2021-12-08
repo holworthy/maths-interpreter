@@ -314,6 +314,7 @@ public abstract class Maths {
 		return equation;
 	}
 
+	// TODO: spaces in variables are funky
 	public static void main(String[] args) throws Exception {
 		Scanner scanner = new Scanner(System.in);
 

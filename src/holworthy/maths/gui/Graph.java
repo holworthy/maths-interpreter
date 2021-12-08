@@ -27,7 +27,6 @@ import holworthy.maths.nodes.Variable;
 
 public class Graph extends JComponent {
 	private Equation equation;
-	private Dimension size = new Dimension(400, 400);
 	private DecimalFormat decimalFormat = new DecimalFormat("0", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
 	
 	private class GraphPanel extends JPanel {
@@ -157,7 +156,7 @@ public class Graph extends JComponent {
 				g2d.drawLine(
 					0,
 					(int) ((1.0 - ((y - startY) / zoomY)) * getHeight()),
-					getHeight(),
+					getWidth(),
 					(int) ((1.0 - ((y - startY) / zoomY)) * getHeight())
 				);
 			}
@@ -188,7 +187,6 @@ public class Graph extends JComponent {
 			double lastX = Double.NaN;
 			double lastY = Double.NaN;
 			
-			// TODO: move somewhere else
 			try {
 				// get variables for each axis
 				Variable yVar = (Variable) equation.getLeft();
@@ -233,9 +231,8 @@ public class Graph extends JComponent {
 		decimalFormat.setMaximumFractionDigits(340);
 		this.equation = equation;
 
-		// setPreferredSize(size);
-		// setMaximumSize(size);
-		// setMinimumSize(size);
+		setPreferredSize(new Dimension(0, 400));
+		setMinimumSize(new Dimension(0, 400));
 
 		setLayout(new BorderLayout());
 		GraphPanel graphPanel = new GraphPanel();
