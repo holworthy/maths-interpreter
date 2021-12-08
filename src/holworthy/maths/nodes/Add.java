@@ -108,12 +108,6 @@ public class Add extends BinaryNode {
 		if(left instanceof FunctionNode && right instanceof ConstantNode)
 			return false;
 
-		// TODO: why was this written (DAN)
-		// if((left instanceof Multiply || left instanceof Power || left instanceof Divide) && (right instanceof Number || right instanceof Variable))
-		// 	return true;
-		// if((right instanceof Multiply || right instanceof Power || right instanceof Divide) && (left instanceof Number || left instanceof Variable))
-			// return false;
-
 		ArrayList<Node> flattenedLeft = flatten2(left);
 		ArrayList<Node> flattenedRight = flatten2(right);
 
