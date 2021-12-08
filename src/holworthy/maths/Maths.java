@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 
+import holworthy.maths.exceptions.MathsInterpreterException;
 import holworthy.maths.nodes.Add;
 import holworthy.maths.nodes.Divide;
 import holworthy.maths.nodes.Equation;
@@ -308,10 +309,41 @@ public abstract class Maths {
 	}
 
 	public static Node parseInput(String input) throws Exception {
-		Parser parser = new Parser(input.replace(" ", ""));
+		Parser parser = new Parser(removeSpaces(input));
 		Node equation = parseEquation(parser);
 		assert parser.getInput().length() == parser.getCursor();
 		return equation;
+	}
+
+	public static String removeSpaces(String input) throws MathsInterpreterException {
+		input = input.trim();
+		for (int i = 0; i < input.length(); i++){
+			if (input.charAt(i) == ' '){
+				if (Character.isLetterOrDigit(input.charAt(i-1))){
+					while(i + 1 < input.length()){
+						i++;
+						if(input.charAt(i) != ' ' && Character.isLetterOrDigit(input.charAt(i))){
+							throw new MathsInterpreterException("Invalid use of whitespace");
+						}
+						else if (!(Character.isLetterOrDigit(input.charAt(i)))){
+							break;
+						}
+					}
+				}
+				else if(!(Character.isLetterOrDigit(input.charAt(i-1)))){
+					while(i + 1 < input.length()){
+						i++;
+						if(input.charAt(i) != ' ' && !(Character.isLetterOrDigit(input.charAt(i)))){
+							throw new MathsInterpreterException("Invalid use of whitespace");
+						}
+						else if (Character.isLetterOrDigit(input.charAt(i))){
+							break;
+						}
+					}
+				}
+			}
+		}
+		return input.replace(" ", "");
 	}
 
 	// TODO: spaces in variables are funky
