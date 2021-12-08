@@ -5,6 +5,7 @@ import java.awt.Font;
 import java.util.ArrayList;
 import java.util.Enumeration;
 
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -47,6 +48,8 @@ public class GUI {
 		
 		JPanel wrapperPanel = new JPanel(new BorderLayout());
 		JScrollPane scrollPane = new JScrollPane(wrapperPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		scrollPane.setBorder(BorderFactory.createEmptyBorder());
+		scrollPane.getVerticalScrollBar().setUnitIncrement(16);
 		window.add(scrollPane);
 
 		JPanel inputPanel = new JPanel();

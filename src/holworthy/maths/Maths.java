@@ -64,6 +64,7 @@ import holworthy.maths.nodes.trig.Tanh;
 <function> ::= <name> "(" <parameter-list> ")"
 <parameter-list> ::= <parameter-list> "," <equation> | <equation>
 
+// TODO: what
 <factorial> ::= <variable> | <brackets> | <variable>  | <function>
 
 <variable> ::= <name>
