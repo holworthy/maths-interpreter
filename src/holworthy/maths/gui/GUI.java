@@ -19,7 +19,6 @@ import javax.swing.UIManager;
 
 import holworthy.maths.Maths;
 import holworthy.maths.exceptions.MathsInterpreterException;
-import holworthy.maths.nodes.BinaryNode;
 import holworthy.maths.nodes.Equation;
 import holworthy.maths.nodes.Node;
 import holworthy.maths.nodes.Number;
@@ -116,7 +115,7 @@ public class GUI {
 						Node copy = simplified.copy();
 						try {
 							for(Node crossing : ((Equation) copy.replace(replacing, new Number(0)).simplify()).solve())
-								zeroCrossingsPanel.add(new JLabel(crossing.toString()));
+								zeroCrossingsPanel.add(new JLabel(crossing.simplify().toString()));
 						} catch (MathsInterpreterException e) {
 							
 						}

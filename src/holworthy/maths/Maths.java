@@ -10,6 +10,7 @@ import holworthy.maths.exceptions.MathsInterpreterException;
 import holworthy.maths.nodes.Add;
 import holworthy.maths.nodes.Divide;
 import holworthy.maths.nodes.Equation;
+import holworthy.maths.nodes.Equations;
 import holworthy.maths.nodes.Factorial;
 import holworthy.maths.nodes.Ln;
 import holworthy.maths.nodes.Log;
@@ -57,15 +58,13 @@ import holworthy.maths.nodes.trig.Tanh;
 <add-or-subtract> ::= <add-or-subtract> "+" <multiply-or-divide> | <add-or-subtract> "-" <multiply-or-divide> | <multiply-or-divide>
 <multiply-or-divide> ::= <multiply-or-divide> "*" <negative> | <multiply-or-divide> "/" <negative> | <negative>
 <negative> ::= "-" <negative> | <power>
-<power> ::= <value> "^" <negative> | <value>
-<value> ::= <number> | <brackets> | <variable> | <function> | <factorial>
+<power> ::= <factorial> "^" <negative> | <factorial>
+<factorial> ::= <value> "!" | <value>
+<value> ::= <number> | <brackets> | <variable> | <function>
 <brackets> ::= "(" <expression> ")"
 
 <function> ::= <name> "(" <parameter-list> ")"
 <parameter-list> ::= <parameter-list> "," <equation> | <equation>
-
-// TODO: what
-<factorial> ::= <variable> | <brackets> | <variable>  | <function>
 
 <variable> ::= <name>
 <name> ::= <name> <letter> | <letter>
@@ -309,10 +308,28 @@ public abstract class Maths {
 		return left;
 	}
 
+	private static Node parseEquations(Parser parser) throws Exception {
+		Equations equations = new Equations();
+
+		Node equation = parseEquation(parser);
+		equations.addEquation(equation);
+		while(parser.hasMore() && parser.getChar() == ',') {
+			parser.incrementCursor();
+			equation = parseEquation(parser);
+			equations.addEquation(equation);
+		}
+
+		if(equations.getEquations().size() == 1)
+			return equation;
+
+		return equations;
+	}
+
 	public static Node parseInput(String input) throws Exception {
 		Parser parser = new Parser(removeSpaces(input));
-		Node equation = parseEquation(parser);
-		assert parser.getInput().length() == parser.getCursor();
+		Node equation = parseEquations(parser);
+		if(parser.getInput().length() != parser.getCursor())
+			throw new MathsInterpreterException("Invalid syntax");
 		return equation;
 	}
 
