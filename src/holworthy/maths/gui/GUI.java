@@ -20,6 +20,7 @@ import javax.swing.UIManager;
 import holworthy.maths.Maths;
 import holworthy.maths.exceptions.MathsInterpreterException;
 import holworthy.maths.nodes.Equation;
+import holworthy.maths.nodes.Equations;
 import holworthy.maths.nodes.Node;
 import holworthy.maths.nodes.Number;
 import holworthy.maths.nodes.Variable;
@@ -78,7 +79,16 @@ public class GUI {
 				}
 				Node simplified;
 				try {
-					simplified = input.simplify();
+					if(input instanceof Equations){
+						input = ((Equations) input).replaceVariables();
+						simplified = new Equations();
+						for (Node e : ((Equations)input).getEquations()){
+							((Equations) simplified).addEquation(e.simplify());
+						}
+
+					}
+					else
+						simplified = input.simplify();
 				} catch (MathsInterpreterException e1) {
 					JOptionPane.showMessageDialog(window, "Not able to simplify that", "Uh oh", JOptionPane.ERROR_MESSAGE);
 					return;
