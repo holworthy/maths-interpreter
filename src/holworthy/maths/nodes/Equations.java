@@ -49,6 +49,6 @@ public class Equations extends Node {
 
 	@Override
 	public String toString() {
-		return String.join(",", equations.stream().map(node -> node.toString()).toArray(String[]::new));
+		return String.join(", ", equations.stream().map(node -> node.toString()).toArray(String[]::new));
 	}
 }
