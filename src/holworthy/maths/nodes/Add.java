@@ -58,9 +58,6 @@ public class Add extends BinaryNode {
 	}
 
 	private boolean shouldSwap(Node left, Node right) {
-		// System.out.println(left);
-		// System.out.println(right);
-		// System.out.println();
 
 		// don't swap identical nodes
 		if(left.matches(right))

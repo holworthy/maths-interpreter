@@ -68,7 +68,6 @@ public class Nthrt extends FunctionNode {
 
 	@Override
 	public Node expand() throws MathsInterpreterException {
-		System.out.println(this);
 		Node node = getNode().expand();
 		Node degree = getDegree().expand();
 
@@ -143,10 +142,6 @@ public class Nthrt extends FunctionNode {
 	}
 
 	// public static void main(String[] args) throws MathsInterpreterException {
-	// 	// System.out.println(new Nthrt(new Number(5), new Number(2)).simplify());
-	// 	// System.out.println(primeFactors(BigInteger.valueOf(1212121217)));
-	// 	// System.out.println(new Nthrt(new Number(4), new Number(2)).simplify());
-	// 	System.out.println(new Multiply(new I(), new Nthrt(new Number(8), new Number(2))).simplify());
 	// }
 
 	@Override
