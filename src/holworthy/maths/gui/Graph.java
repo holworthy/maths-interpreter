@@ -232,8 +232,8 @@ public class Graph extends JComponent {
 		decimalFormat.setMaximumFractionDigits(340);
 		this.equation = equation;
 
-		setPreferredSize(new Dimension(0, 400));
-		setMinimumSize(new Dimension(0, 400));
+		setPreferredSize(new Dimension(0, 600));
+		setMinimumSize(new Dimension(0, 600));
 
 		setLayout(new BorderLayout());
 		GraphPanel graphPanel = new GraphPanel();

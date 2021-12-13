@@ -4,7 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Font;
 import java.util.ArrayList;
 import java.util.Enumeration;
-	
+
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -47,7 +47,7 @@ public class GUI {
 
 		JFrame window = new JFrame("Maths Interpreter");
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		window.setSize(600, 600);
+		window.setSize(600, 900);
 		
 		JPanel wrapperPanel = new JPanel(new BorderLayout());
 		JScrollPane scrollPane = new JScrollPane(wrapperPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
