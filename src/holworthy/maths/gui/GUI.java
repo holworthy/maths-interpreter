@@ -106,6 +106,19 @@ public class GUI {
 				simplifiedPanel.add(new JLabel(simplified.toString()));
 				outputPanel.add(simplifiedPanel);
 
+				// derivative
+				try {
+					for(Variable wrt : simplified.getVariables()) {
+						JPanel derivativePanel = new JPanel();
+						derivativePanel.setLayout(new BoxLayout(derivativePanel, BoxLayout.PAGE_AXIS));
+						derivativePanel.add(new JLabel("Derivative with respect to " + wrt + ":"));
+						derivativePanel.add(new JLabel(simplified.differentiate(wrt).toString()));
+						outputPanel.add(derivativePanel);
+					}
+				} catch(MathsInterpreterException e) {
+
+				}
+
 				if(simplified instanceof Equation) {
 					// zero crossings
 					JPanel zeroCrossingsPanel = new JPanel();
@@ -155,19 +168,6 @@ public class GUI {
 					} catch (MathsInterpreterException e) {
 						
 					}
-				}
-
-				// derivative
-				try {
-					for(Variable wrt : simplified.getVariables()) {
-						JPanel derivativePanel = new JPanel();
-						derivativePanel.setLayout(new BoxLayout(derivativePanel, BoxLayout.PAGE_AXIS));
-						derivativePanel.add(new JLabel("Derivative with respect to " + wrt + ":"));
-						derivativePanel.add(new JLabel(simplified.differentiate(wrt).toString()));
-						outputPanel.add(derivativePanel);
-					}
-				} catch(MathsInterpreterException e) {
-
 				}
 
 				outputPanel.revalidate();

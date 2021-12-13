@@ -12,10 +12,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Locale;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -27,7 +25,7 @@ import holworthy.maths.nodes.Variable;
 
 public class Graph extends JComponent {
 	private Equation equation;
-	private DecimalFormat decimalFormat = new DecimalFormat("0", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+	private DecimalFormat decimalFormat = new DecimalFormat("0.00E0");
 	
 	private class GraphPanel extends JPanel {
 		private double startX = -10;
@@ -129,14 +127,14 @@ public class Graph extends JComponent {
 			// grid lines
 			double lineGapX = 1;
 			int expX = 1;
-			while(lineGapX * 20 < zoomX)
+			while(lineGapX * 10 < zoomX)
 				lineGapX = Math.pow(10, ++expX);
 			while(lineGapX * 2 > zoomX)
 				lineGapX = Math.pow(10, --expX);
 			double lineStartX = Math.round(startX / lineGapX) * lineGapX;
 			double lineGapY = 1;
 			int expY = 1;
-			while(lineGapY * 20 < zoomY)
+			while(lineGapY * 10 < zoomY)
 				lineGapY = Math.pow(10, ++expY);
 			while(lineGapY * 2 > zoomY)
 				lineGapY = Math.pow(10, --expY);
@@ -160,6 +158,16 @@ public class Graph extends JComponent {
 					(int) ((1.0 - ((y - startY) / zoomY)) * getHeight())
 				);
 			}
+
+			// x and y axis
+			g2d.setColor(new Color(255 - 16 * 4, 255 - 16 * 4, 255 - 16 * 4));
+			if(0 > startX && 0 < startX + zoomX)
+				g2d.drawLine((int) ((-startX / zoomX) * getWidth()), 0, (int) ((-startX / zoomX) * getWidth()), getHeight());
+			if(0 > startY && 0 < startY + zoomY)
+				g2d.drawLine(0, (int) ((1.0 - (-startY / zoomY)) * getHeight()), getWidth(), (int) ((1.0 - (-startY / zoomY)) * getHeight()));
+
+
+			// labels
 			for(double x = lineStartX; x < startX + zoomX; x += lineGapX) {
 				g2d.setColor(Color.BLACK);
 				int tx = (int) (((x - startX) / zoomX) * getWidth());
@@ -175,13 +183,6 @@ public class Graph extends JComponent {
 				g2d.drawString(decimalFormat.format(y), 0, (int) ((1.0 - ((y - startY) / zoomY)) * getHeight()));
 			}
 
-			// x and y axis
-			g2d.setColor(new Color(255 - 16 * 4, 255 - 16 * 4, 255 - 16 * 4));
-			if(0 > startX && 0 < startX + zoomX)
-				g2d.drawLine((int) ((-startX / zoomX) * getWidth()), 0, (int) ((-startX / zoomX) * getWidth()), getHeight());
-			if(0 > startY && 0 < startY + zoomY)
-				g2d.drawLine(0, (int) ((1.0 - (-startY / zoomY)) * getHeight()), getWidth(), (int) ((1.0 - (-startY / zoomY)) * getHeight()));
-			
 			// graph
 			g2d.setColor(Color.BLUE);
 			double lastX = Double.NaN;
