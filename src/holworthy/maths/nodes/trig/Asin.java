@@ -27,6 +27,8 @@ public class Asin extends TrigNode {
 		Node node = getNode().expand();
 		if(node instanceof Sin)
 			return ((UnaryNode) node).getNode();
+		if(node.matches(new Number(0)))
+			return new Number(0);
 		return new Asin(node);
 	}
 

@@ -4,7 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Font;
 import java.util.ArrayList;
 import java.util.Enumeration;
-
+	
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -19,6 +19,7 @@ import javax.swing.UIManager;
 
 import holworthy.maths.Maths;
 import holworthy.maths.exceptions.MathsInterpreterException;
+import holworthy.maths.nodes.BinaryNode;
 import holworthy.maths.nodes.Equation;
 import holworthy.maths.nodes.Equations;
 import holworthy.maths.nodes.Node;
@@ -96,19 +97,6 @@ public class GUI {
 
 				outputPanel.removeAll();
 				
-				// expanded
-				Node expanded;
-				try {
-					expanded = input.expand();
-					JPanel expandedPanel = new JPanel();
-					expandedPanel.setLayout(new BoxLayout(expandedPanel, BoxLayout.PAGE_AXIS));
-					expandedPanel.add(new JLabel("Expanded:"));
-					expandedPanel.add(new JLabel(expanded.toString()));
-					outputPanel.add(expandedPanel);
-				} catch(MathsInterpreterException e) {
-					
-				}
-				
 				// simplified
 				JPanel simplifiedPanel = new JPanel();
 				simplifiedPanel.setLayout(new BoxLayout(simplifiedPanel, BoxLayout.PAGE_AXIS));
@@ -131,19 +119,21 @@ public class GUI {
 
 				if(simplified instanceof Equation) {
 					// zero crossings
-					JPanel zeroCrossingsPanel = new JPanel();
-					zeroCrossingsPanel.setLayout(new BoxLayout(zeroCrossingsPanel, BoxLayout.PAGE_AXIS));
-					zeroCrossingsPanel.add(new JLabel("Zero Crossings:"));
-					for(Variable replacing : simplified.getVariables()) {
-						Node copy = simplified.copy();
-						try {
-							for(Node crossing : ((Equation) copy.replace(replacing, new Number(0)).simplify()).solve())
-								zeroCrossingsPanel.add(new JLabel(crossing.simplify().toString()));
-						} catch (MathsInterpreterException e) {
-							
+					if(simplified.numVariables() == 2) {
+						JPanel zeroCrossingsPanel = new JPanel();
+						zeroCrossingsPanel.setLayout(new BoxLayout(zeroCrossingsPanel, BoxLayout.PAGE_AXIS));
+						zeroCrossingsPanel.add(new JLabel("Zero Crossings:"));
+						for(Variable replacing : simplified.getVariables()) {
+							Node copy = simplified.copy();
+							try {
+								for(Node crossing : ((Equation) copy.replace(replacing, new Number(0)).simplify()).solve())
+									zeroCrossingsPanel.add(new JLabel(crossing.simplify().toString()));
+							} catch (MathsInterpreterException e) {
+								
+							}
 						}
+						outputPanel.add(zeroCrossingsPanel);
 					}
-					outputPanel.add(zeroCrossingsPanel);
 
 					// solutions
 					try {
@@ -157,26 +147,20 @@ public class GUI {
 						else
 							solutionsPanel.add(new JLabel("No Solutions"));
 						outputPanel.add(solutionsPanel);
-
-						for(Equation solution : solutions) {
-							if(solution.numVariables() == 2) {
-							
-								// graphs
-								JPanel graphPanel = new JPanel();
-								graphPanel.setLayout(new BoxLayout(graphPanel, BoxLayout.PAGE_AXIS));
-								graphPanel.add(new JLabel("Graph of " + solution + ":"));
-								Graph graph = new Graph((Equation) solution);
-	
-								// TODO: specify which variable is on which axis
-								// graph.setXAxis();
-								// graph.setYAxis();
-	
-								graphPanel.add(graph);
-								outputPanel.add(graphPanel);
-							}
-						}
 					} catch (MathsInterpreterException e) {
 						
+					}
+
+					if(simplified.numVariables() == 2 && ((BinaryNode) simplified).getLeft() instanceof Variable) {
+							
+						// graphs
+						JPanel graphPanel = new JPanel();
+						graphPanel.setLayout(new BoxLayout(graphPanel, BoxLayout.PAGE_AXIS));
+						graphPanel.add(new JLabel("Graph of " + simplified + ":"));
+						Graph graph = new Graph((Equation) simplified);
+
+						graphPanel.add(graph);
+						outputPanel.add(graphPanel);
 					}
 				}
 
