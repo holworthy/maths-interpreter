@@ -35,4 +35,11 @@ public class Cosh extends TrigNode {
 	public double evaluate(HashMap<Variable, Node> values) {
 		return Math.cosh(getNode().evaluate(values));
 	}
+
+	@Override
+	public Node replace(Node before, Node after) {
+		if(matches(before))
+			return after;
+		return new Cosh(getNode().replace(before, after));
+	}
 }

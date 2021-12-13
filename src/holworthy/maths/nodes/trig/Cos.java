@@ -44,4 +44,11 @@ public class Cos extends TrigNode {
 	public double evaluate(HashMap<Variable, Node> values) {
 		return Math.cos(getNode().evaluate(values));
 	}
+
+	@Override
+	public Node replace(Node before, Node after) {
+		if(matches(before))
+			return after;
+		return new Cos(getNode().replace(before, after));
+	}
 }

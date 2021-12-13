@@ -65,8 +65,6 @@ public class Equation extends BinaryNode {
 	}
 
 	public ArrayList<Equation> solve() throws MathsInterpreterException {
-		// TODO: we need to output when we cannot solve an equation
-
 		Node start = new Equation(new Subtract(getLeft(), getRight()), new Number(0)).simplify();
 		ArrayList<Variable> variables = start.getVariables();
 		variables.sort((a, b) -> a.getName().compareTo(b.getName()));
@@ -83,17 +81,6 @@ public class Equation extends BinaryNode {
 				// 37*x^2+42*c-42*c+(1/37)*x=0 pretty sure this is cos quadratics
 
 				// quadratics
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-
 				// a*x^2 + b*x + c = d
 				// a*x^2 + b*x = d
 				if(expandedEquation.getLeft().matches(new Add(new Add(new Multiply(new Matching.Constant(), new Power(new Matching.Anything(), new Number(2))), new Multiply(new Matching.Constant(), new Matching.Anything())), new Matching.Constant())) && expandedEquation.getRight().matches(new Matching.Constant()) && ((BinaryNode) ((BinaryNode) ((BinaryNode) ((BinaryNode) expandedEquation.getLeft()).getLeft()).getLeft()).getRight()).getLeft().matches(((BinaryNode) ((BinaryNode) ((BinaryNode) expandedEquation.getLeft()).getLeft()).getRight()).getRight())) {
@@ -300,7 +287,6 @@ public class Equation extends BinaryNode {
 					}
 				
 				// x * a = b -> x = b / a
-				// TODO: check this okay
 				} else if(equation.getLeft() instanceof Multiply) {
 					if(((BinaryNode) equation.getLeft()).getLeft().contains(variable))
 						equation = new Equation(((BinaryNode) equation.getLeft()).getLeft(), new Divide(equation.getRight(), ((BinaryNode) equation.getLeft()).getRight()));
@@ -320,9 +306,16 @@ public class Equation extends BinaryNode {
 				} else if(equation.getLeft() instanceof Power) {
 					if(((BinaryNode) equation.getLeft()).getLeft().contains(variable)) {
 						equation = new Equation(((BinaryNode) equation.getLeft()).getLeft(), new Nthrt(equation.getRight(), ((BinaryNode) equation.getLeft()).getRight()));
+					} else if(((BinaryNode) equation.getLeft()).getRight().contains(variable)){
+						equation = new Equation(((BinaryNode) equation.getLeft()).getRight(), new Log(equation.getRight(), ((BinaryNode) equation.getLeft()).getLeft()));
 					}
-					// TODO: logs
-
+				} else if(equation.getLeft() instanceof Log) {
+					if(((UnaryNode) equation.getLeft()).getNode().contains(variable)){
+						equation = new Equation(((UnaryNode) equation.getLeft()).getNode(), new Power(((Log) equation.getLeft()).getBase(), equation.getRight()));
+					} else if(((Log) equation.getLeft()).getBase().contains(variable)) {
+						equation = new Equation(new Power(((Log) equation.getLeft()).getBase(), equation.getRight()), ((UnaryNode) equation.getLeft()).getNode());
+					}
+				
 				// sin(x) = a -> x = asin(a)
 				} else if(equation.getLeft() instanceof Sin) {
 					equation = new Equation(((UnaryNode) equation.getLeft()).getNode(), new Asin(equation.getRight()));
@@ -401,7 +394,7 @@ public class Equation extends BinaryNode {
 				}
 			}
 
-			if(equation.getLeft().matches(variable))
+			if(equation.getLeft().matches(variable) && !(equation.getRight().contains((Variable) equation.getLeft())))
 				solutions.add((Equation) equation.simplify());
 		}
 
@@ -416,5 +409,12 @@ public class Equation extends BinaryNode {
 	@Override
 	public double evaluate(HashMap<Variable, Node> values) {
 		return getRight().evaluate(values);
+	}
+
+	@Override
+	public Node replace(Node before, Node after) {
+		if(matches(before))
+			return after;
+		return new Equation(getLeft().replace(before, after), getRight().replace(before, after));
 	}
 }

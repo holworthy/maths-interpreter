@@ -65,4 +65,11 @@ public class Negative extends UnaryNode {
 	public double evaluate(HashMap<Variable, Node> values) {
 		return -getNode().evaluate(values);
 	}
+
+	@Override
+	public Node replace(Node before, Node after) {
+		if(matches(before))
+			return after;
+		return new Negative(getNode().replace(before, after));
+	}
 }

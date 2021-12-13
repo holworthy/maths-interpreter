@@ -30,6 +30,11 @@ public abstract class Matching {
 		public double evaluate(HashMap<Variable, Node> values) {
 			return Double.NaN;
 		}
+
+		@Override
+		public Node replace(Node before, Node after) {
+			return this;
+		}
 	}
 	
 	public static class Constant extends MatchingNode {

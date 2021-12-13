@@ -41,4 +41,11 @@ public class Acosh extends TrigNode {
 		double x = getNode().evaluate(values);
 		return Math.log(x + Math.sqrt(x * x - 1));
 	}
+
+	@Override
+	public Node replace(Node before, Node after) {
+		if(matches(before))
+			return after;
+		return new Acosh(getNode().replace(before, after));
+	}
 }

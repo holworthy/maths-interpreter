@@ -6,9 +6,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 
+import holworthy.maths.exceptions.MathsInterpreterException;
 import holworthy.maths.nodes.Add;
 import holworthy.maths.nodes.Divide;
 import holworthy.maths.nodes.Equation;
+import holworthy.maths.nodes.Equations;
 import holworthy.maths.nodes.Factorial;
 import holworthy.maths.nodes.Ln;
 import holworthy.maths.nodes.Log;
@@ -56,7 +58,8 @@ import holworthy.maths.nodes.trig.Tanh;
 <add-or-subtract> ::= <add-or-subtract> "+" <multiply-or-divide> | <add-or-subtract> "-" <multiply-or-divide> | <multiply-or-divide>
 <multiply-or-divide> ::= <multiply-or-divide> "*" <negative> | <multiply-or-divide> "/" <negative> | <negative>
 <negative> ::= "-" <negative> | <power>
-<power> ::= <value> "^" <negative> | <value>
+<power> ::= <factorial> "^" <negative> | <factorial>
+<factorial> ::= <value> "!" | <value>
 <value> ::= <number> | <brackets> | <variable> | <function>
 <brackets> ::= "(" <expression> ")"
 
@@ -74,7 +77,7 @@ import holworthy.maths.nodes.trig.Tanh;
 
 public abstract class Maths {
 	private static ArrayList<String> CONSTANTS = new ArrayList<>(Arrays.asList(new String[]{"e", "i", "pi"}));
-	private static ArrayList<String> FUNCTIONS = new ArrayList<>(Arrays.asList(new String[]{"nthrt", "sqrt", "log", "ln", "factorial", "acos", "acosh", "acot", "acoth", "acsc", "acsch", "asec", "asech", "asin", "asinh", "atan", "atanh", "cos", "cosh", "cot", "coth", "csc", "csch", "sec", "sech", "sin", "sinh", "tan", "tanh", "differentiate", "integrate"}));
+	private static ArrayList<String> FUNCTIONS = new ArrayList<>(Arrays.asList(new String[]{"nthrt", "sqrt", "log", "ln", "factorial", "acos", "acosh", "acot", "acoth", "acsc", "acsch", "asec", "asech", "asin", "asinh", "atan", "atanh", "cos", "cosh", "cot", "coth", "csc", "csch", "sec", "sech", "sin", "sinh", "tan", "tanh"}));
 
 	private static Node parseValue(Parser parser) throws Exception {
 		if(parser.hasMore() && parser.getChar() == '(') {
@@ -124,7 +127,6 @@ public abstract class Maths {
 							return new Sqrt(params.get(0));
 						case "ln":
 							return new Ln(params.get(0));
-						// TODO: also add 5! as corect syntax
 						case "factorial":
 							return new Factorial(params.get(0));
 						case "acos":
@@ -182,12 +184,6 @@ public abstract class Maths {
 							return new Nthrt(params.get(0), params.get(1));
 						case "log":
 							return new Log(params.get(0), params.get(1));
-						case "differentiate":
-							// TODO
-							return null;
-						case "integrate":
-							// TODO
-							return null;
 					}
 				} else {
 					throw new Error("wrong number of parameters for " + name);
@@ -234,8 +230,17 @@ public abstract class Maths {
 		return new Divide(new Number(BigDecimal.valueOf(h1).toBigInteger()), new Number(BigDecimal.valueOf(k1).toBigInteger()));
 	}
 
-	private static Node parsePower(Parser parser) throws Exception {
+	private static Node parseFactorialAsPoint(Parser parser) throws Exception{
 		Node left = parseValue(parser);
+		if(parser.hasMore() && parser.getChar() == '!'){
+			parser.incrementCursor();
+			left = new Factorial(left);
+		}
+		return left;
+	}
+
+	private static Node parsePower(Parser parser) throws Exception {
+		Node left = parseFactorialAsPoint(parser);
 		if(parser.hasMore() && parser.getChar() == '^') {
 			parser.incrementCursor();
 			Node right = parseNegative(parser);
@@ -303,11 +308,60 @@ public abstract class Maths {
 		return left;
 	}
 
-	public static Node parseInput(String input) throws Exception {
-		Parser parser = new Parser(input.replace(" ", ""));
+	private static Node parseEquations(Parser parser) throws Exception {
+		Equations equations = new Equations();
+
 		Node equation = parseEquation(parser);
-		assert parser.getInput().length() == parser.getCursor();
+		equations.addEquation(equation);
+		while(parser.hasMore() && parser.getChar() == ',') {
+			parser.incrementCursor();
+			equation = parseEquation(parser);
+			equations.addEquation(equation);
+		}
+
+		if(equations.getEquations().size() == 1)
+			return equation;
+
+		return equations;
+	}
+
+	public static Node parseInput(String input) throws Exception {
+		Parser parser = new Parser(removeSpaces(input));
+		Node equation = parseEquations(parser);
+		if(parser.getInput().length() != parser.getCursor())
+			throw new MathsInterpreterException("Invalid syntax");
 		return equation;
+	}
+
+	public static String removeSpaces(String input) throws MathsInterpreterException {
+		input = input.trim();
+		for (int i = 0; i < input.length(); i++){
+			if (input.charAt(i) == ' '){
+				if (Character.isLetterOrDigit(input.charAt(i-1))){
+					while(i + 1 < input.length()){
+						i++;
+						if(input.charAt(i) != ' ' && Character.isLetterOrDigit(input.charAt(i))){
+							throw new MathsInterpreterException("Invalid use of whitespace");
+						}
+						else if (!(Character.isLetterOrDigit(input.charAt(i)))){
+							break;
+						}
+					}
+				}
+				else if(!(Character.isLetterOrDigit(input.charAt(i-1)))){
+					while(i + 1 < input.length()){
+						i++;
+						if(input.charAt(i) != ' ' && !(Character.isLetterOrDigit(input.charAt(i)))){
+							throw new MathsInterpreterException("Invalid use of whitespace");
+						}
+						else if (Character.isLetterOrDigit(input.charAt(i))){
+							break;
+						}
+					}
+				}
+			}
+		}
+		return input.replace(" ", "");
 	}
 
 	public static void main(String[] args) throws Exception {

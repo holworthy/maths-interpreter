@@ -11,6 +11,7 @@ public class Variable extends Node {
 		this.name = name;
 	}
 
+	@Override
 	public String getName() {
 		return name;
 	}
@@ -58,5 +59,12 @@ public class Variable extends Node {
 	@Override
 	public double evaluate(HashMap<Variable, Node> values) {
 		return values.get(this).evaluate(values);
+	}
+
+	@Override
+	public Node replace(Node before, Node after) {
+		if(matches(before))
+			return after;
+		return this;
 	}
 }

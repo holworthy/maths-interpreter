@@ -39,4 +39,11 @@ public class Coth extends TrigNode {
 		double x = getNode().evaluate(values);
 		return Math.cosh(x) / Math.sinh(x);
 	}
+
+	@Override
+	public Node replace(Node before, Node after) {
+		if(matches(before))
+			return after;
+		return new Coth(getNode().replace(before, after));
+	}
 }

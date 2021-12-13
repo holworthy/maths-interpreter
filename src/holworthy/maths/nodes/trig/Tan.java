@@ -51,4 +51,11 @@ public class Tan extends TrigNode {
 		otherForms.add(new Divide((new Sin(getNode())).simplify(), (new Cos(getNode())).simplify()));
 		return otherForms;
 	}
+
+	@Override
+	public Node replace(Node before, Node after) {
+		if(matches(before))
+			return after;
+		return new Tan(getNode().replace(before, after));
+	}
 }

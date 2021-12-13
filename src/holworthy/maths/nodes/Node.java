@@ -48,6 +48,11 @@ public abstract class Node {
 			for(Variable variable : ((UnaryNode) this).getNode().getVariables())
 				if(!variables.contains(variable))
 					variables.add(variable);
+			if(this instanceof Log){
+				for(Variable variable : ((Log) this).getBase().getVariables())
+					if(!variables.contains(variable))
+						variables.add(variable);
+			}
 		} else if(this instanceof BinaryNode) {
 			for(Variable variable : ((BinaryNode) this).getLeft().getVariables())
 				if(!variables.contains(variable))
@@ -69,4 +74,10 @@ public abstract class Node {
 	public ArrayList<Node> otherForms() throws MathsInterpreterException {
 		return new ArrayList<>();
 	}
+
+	public String getName() {
+		return getClass().getSimpleName().toLowerCase();
+	}
+
+	public abstract Node replace(Node before, Node after);
 }

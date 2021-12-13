@@ -38,4 +38,11 @@ public class Cot extends TrigNode {
 	public double evaluate(HashMap<Variable, Node> values) {
 		return 1.0 / Math.tan(getNode().evaluate(values));
 	}
+
+	@Override
+	public Node replace(Node before, Node after) {
+		if(matches(before))
+			return after;
+		return new Cot(getNode().replace(before, after));
+	}
 }

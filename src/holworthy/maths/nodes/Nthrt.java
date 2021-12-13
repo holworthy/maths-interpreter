@@ -34,6 +34,11 @@ public class Nthrt extends FunctionNode {
 		return getNode().isConstant();
 	}
 
+	@Override
+	public boolean matches(Node node) {
+		return super.matches(node) || (node instanceof Nthrt && getDegree().matches(((Nthrt) node).getDegree()) && getNode().matches(((UnaryNode) node).getNode()));
+	}
+
 	public BigInteger iroot(BigInteger k, BigInteger n){
 		BigInteger k1 = k.subtract(BigInteger.ONE);
 		BigInteger s = n.add(BigInteger.ONE);
@@ -65,6 +70,9 @@ public class Nthrt extends FunctionNode {
 	public Node expand() throws MathsInterpreterException {
 		Node node = getNode().expand();
 		Node degree = getDegree().expand();
+
+		if(getNode().matches(new Number(0)))
+			return new Number(0);
 
 		if(degree.matches(new Number(0)))
 			throw new MathsInterpreterException("Cannot have a 0th root");
@@ -134,9 +142,12 @@ public class Nthrt extends FunctionNode {
 	}
 
 	// public static void main(String[] args) throws MathsInterpreterException {
-	// 	// System.out.println(new Nthrt(new Number(5), new Number(2)).simplify());
-	// 	// System.out.println(primeFactors(BigInteger.valueOf(1212121217)));
-	// 	// System.out.println(new Nthrt(new Number(4), new Number(2)).simplify());
-	// 	System.out.println(new Multiply(new I(), new Nthrt(new Number(8), new Number(2))).simplify());
 	// }
+
+	@Override
+	public Node replace(Node before, Node after) {
+		if(matches(before))
+			return after;
+		return new Nthrt(getNode().replace(before, after), getDegree().replace(before, after));
+	}
 }

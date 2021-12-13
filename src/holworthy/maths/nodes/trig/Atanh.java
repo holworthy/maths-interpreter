@@ -39,4 +39,11 @@ public class Atanh extends TrigNode {
 		double x = getNode().evaluate(values);
 		return 0.5 * Math.log(x + 1) - 0.5 * Math.log(1 - x);
 	}
+
+	@Override
+	public Node replace(Node before, Node after) {
+		if(matches(before))
+			return after;
+		return new Atanh(getNode().replace(before, after));
+	}
 }

@@ -71,13 +71,13 @@ public class Divide extends BinaryNode {
 		if(left instanceof Divide)
 			return new Divide(((BinaryNode) left).getLeft(), new Multiply(((BinaryNode) left).getRight(), right)).expand();
 
-		if(left instanceof Add){
-			return new Add(new Divide(((BinaryNode) left).getLeft(), right), new Divide(((BinaryNode) left).getRight(), right)).expand();
-		}
+		// if(left instanceof Add){
+		// 	return new Add(new Divide(((BinaryNode) left).getLeft(), right), new Divide(((BinaryNode) left).getRight(), right)).expand();
+		// }
 
-		if(left instanceof Subtract){
-			return new Subtract(new Divide(((BinaryNode) left).getLeft(), right), new Divide(((BinaryNode) left).getRight(), right)).expand();
-		}
+		// if(left instanceof Subtract){
+		// 	return new Subtract(new Divide(((BinaryNode) left).getLeft(), right), new Divide(((BinaryNode) left).getRight(), right)).expand();
+		// }
 
 		if(left.isConstant() && right.isConstant())
 			return new Divide(left, right);
@@ -86,6 +86,7 @@ public class Divide extends BinaryNode {
 			return new Divide(left, right);
 
 		return new Multiply(left, new Power(right, new Negative(new Number(1)))).expand();
+		// return new Divide(left, right);
 	}
 
 	public ArrayList<Node> flatten(Multiply root){
@@ -155,6 +156,13 @@ public class Divide extends BinaryNode {
 			return removeCommonFactors(leftList, rightList);
 		}
 
+		if (left instanceof Node && !(left instanceof BinaryNode) && (!(left instanceof UnaryNode) || left instanceof FunctionNode) && right instanceof Multiply){
+			ArrayList<Node> leftList = new ArrayList<>();
+			leftList.add(left);
+			ArrayList<Node> rightList = flatten((Multiply) right);
+			return removeCommonFactors(leftList, rightList);
+		}
+
 		if (left instanceof Negative && ((UnaryNode) left).getNode() instanceof Multiply && right instanceof Node && !(right instanceof BinaryNode) && (!(right instanceof UnaryNode) || right instanceof FunctionNode)){
 			ArrayList<Node> leftList = flatten(new Multiply(((UnaryNode) left).getNode(), new Negative(new Number(1))));
 			ArrayList<Node> rightList = new ArrayList<>();
@@ -187,7 +195,11 @@ public class Divide extends BinaryNode {
 					}
 				}
 			}
-		if (rightList.size() > 0){
+		if (rightList.size() > 0 && leftList.size() > 0){
+			return new Divide(unFlatten(leftList), unFlatten(rightList));
+		}
+		else if(leftList.size() == 0 && rightList.size() > 0){
+			leftList.add(new Number(1));
 			return new Divide(unFlatten(leftList), unFlatten(rightList));
 		}
 		return unFlatten(leftList);
@@ -208,5 +220,12 @@ public class Divide extends BinaryNode {
 	@Override
 	public double evaluate(HashMap<Variable, Node> values) {
 		return getLeft().evaluate(values) / getRight().evaluate(values);
+	}
+
+	@Override
+	public Node replace(Node before, Node after) {
+		if(matches(before))
+			return after;
+		return new Divide(getLeft().replace(before, after), getRight().replace(before, after));
 	}
 }

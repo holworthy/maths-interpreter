@@ -40,4 +40,11 @@ public class Acos extends TrigNode {
 	public double evaluate(HashMap<Variable, Node> values) {
 		return Math.acos(getNode().evaluate(values));
 	}
+
+	@Override
+	public Node replace(Node before, Node after) {
+		if(matches(before))
+			return after;
+		return new Acos(getNode().replace(before, after));
+	}
 }

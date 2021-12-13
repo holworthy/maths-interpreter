@@ -27,6 +27,8 @@ public class Asin extends TrigNode {
 		Node node = getNode().expand();
 		if(node instanceof Sin)
 			return ((UnaryNode) node).getNode();
+		if(node.matches(new Number(0)))
+			return new Number(0);
 		return new Asin(node);
 	}
 
@@ -38,5 +40,12 @@ public class Asin extends TrigNode {
 	@Override
 	public double evaluate(HashMap<Variable, Node> values) {
 		return Math.asin(getNode().evaluate(values));
+	}
+
+	@Override
+	public Node replace(Node before, Node after) {
+		if(matches(before))
+			return after;
+		return new Asin(getNode().replace(before, after));
 	}
 }

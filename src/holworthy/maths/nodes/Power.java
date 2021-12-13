@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import holworthy.maths.exceptions.DivideByZeroException;
 import holworthy.maths.exceptions.MathsInterpreterException;
+import holworthy.maths.nodes.constant.ConstantNode;
 import holworthy.maths.nodes.constant.E;
 import holworthy.maths.nodes.constant.I;
 import holworthy.maths.nodes.constant.Pi;
@@ -16,7 +17,7 @@ public class Power extends BinaryNode {
 
 	@Override
 	public String toString() {
-		return (getLeft() instanceof Power || getLeft() instanceof Variable || getLeft() instanceof Number ? getLeft() : "(" + getLeft() + ")") + "^" + (getRight() instanceof Power || getRight() instanceof Number || getRight() instanceof Variable ? getRight() : "(" + getRight() + ")");
+		return (getLeft() instanceof Power || getLeft() instanceof Variable || getLeft() instanceof Number || getLeft() instanceof ConstantNode ? getLeft() : "(" + getLeft() + ")") + "^" + (getRight() instanceof Power || getRight() instanceof Number || getRight() instanceof Variable ? getRight() : "(" + getRight() + ")");
 	}
 
 	@Override
@@ -58,6 +59,9 @@ public class Power extends BinaryNode {
 		if(left instanceof Number && right instanceof Divide && ((BinaryNode) right).getLeft() instanceof Number && ((BinaryNode) right).getRight() instanceof Number)
 			return new Nthrt(new Power(left, ((BinaryNode) right).getLeft()), ((Number) ((BinaryNode) right).getRight())).expand();
 
+		if(left instanceof Power)
+			return new Power(((BinaryNode) left).getLeft(), new Multiply(((BinaryNode) left).getRight(), right)).expand();
+
 		// i^0 = 1
 		// i^1 = i
 		// i^2 = -1
@@ -82,6 +86,14 @@ public class Power extends BinaryNode {
 		if(right.matches(new Number(1)))
 			return left;
 
+		if(left instanceof Divide && right instanceof Number){
+			return new Divide(new Power(((BinaryNode) left).getLeft(), right), new Power(((BinaryNode) left).getRight(), right)).expand();
+		}
+
+		if(left instanceof Negative && ((UnaryNode) left).getNode() instanceof Divide && right instanceof Number){
+			return new Divide(new Power(new Negative(((BinaryNode) ((UnaryNode) left).getNode()).getLeft()), right), new Power(((BinaryNode) ((UnaryNode) left).getNode()).getRight(), right)).expand();
+		}
+
 		// binomial theorum which works as multinomial theorum
 		if(left instanceof Add && right instanceof Number) {
 			Node temp = new Number(0);
@@ -101,6 +113,16 @@ public class Power extends BinaryNode {
 		if(left instanceof Multiply)
 			return new Multiply(new Power(((BinaryNode) left).getLeft(), right), new Power(((BinaryNode) left).getRight(), right)).expand();
 
+		if(left instanceof Nthrt)
+			return new Power(((Nthrt) left).getNode(), new Divide(right, ((Nthrt) left).getDegree())).expand();
+
+		if(right instanceof Number && left instanceof Negative) {
+			if(((Number) right).getValue().mod(BigInteger.TWO).equals(BigInteger.ZERO))
+				return new Power(((UnaryNode) left).getNode(), right).expand();
+			else
+				return new Negative(new Power(((UnaryNode) left).getNode(), right)).expand();
+		}
+		
 		return new Power(left, right);
 	}
 
@@ -125,5 +147,12 @@ public class Power extends BinaryNode {
 	@Override
 	public double evaluate(HashMap<Variable, Node> values) {
 		return Math.pow(getLeft().evaluate(values), getRight().evaluate(values));
+	}
+
+	@Override
+	public Node replace(Node before, Node after) {
+		if(matches(before))
+			return after;
+		return new Power(getLeft().replace(before, after), getRight().replace(before, after));
 	}
 }
